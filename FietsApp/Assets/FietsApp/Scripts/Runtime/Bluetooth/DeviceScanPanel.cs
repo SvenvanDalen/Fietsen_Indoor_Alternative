@@ -22,6 +22,7 @@ namespace FietsApp.Bluetooth
         const int MaxRows = 12;
         const float Width = 620f;
         const float RowHeight = 34f;
+        const float HeaderHeight = 140f;
 
         GameObject _panel;
         Text _status, _scanLabel, _allLabel;
@@ -146,6 +147,11 @@ namespace FietsApp.Bluetooth
             if (lines.Count == 0 && _scanWanted && bridge.IsConnected)
                 lines.Add((null, null, "Nog geen apparaten gevonden.", Color.clear));
 
+            // Paneel groeit mee met het aantal regels, zodat het leeg niet de weg bedekt.
+            int shown = Mathf.Min(lines.Count, _rows.Length);
+            var panel = (RectTransform)_panel.transform;
+            panel.sizeDelta = new Vector2(Width, HeaderHeight + shown * (RowHeight + 4f) + 8f);
+
             for (int i = 0; i < _rows.Length; i++)
             {
                 var row = _rows[i];
@@ -177,7 +183,7 @@ namespace FietsApp.Bluetooth
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.matchWidthOrHeight = 0.5f;
 
-            float height = 150f + MaxRows * (RowHeight + 4f);
+            float height = HeaderHeight;
             var panel = new GameObject("Paneel", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
             panel.SetParent(canvasGo.transform, false);
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0f, 0f);
