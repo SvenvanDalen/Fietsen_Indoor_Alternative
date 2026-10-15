@@ -5,18 +5,15 @@ using UnityEngine;
 namespace FietsApp
 {
     /// <summary>
-    /// Bouwt de weg als mesh langs de route (story 3.1b): asfalt, berm en een talud naar beneden,
-    /// zodat de weg tegen een berg lijkt te liggen. Echt terrein volgt in story 3.2.
+    /// Bouwt de weg als mesh langs de route (story 3.1b): asfalt en berm. Het terrein eromheen
+    /// komt van <see cref="TerrainView"/> (story 3.2).
     /// </summary>
     public sealed class RouteView : MonoBehaviour
     {
         [SerializeField] Material roadMaterial;
         [SerializeField] Material vergeMaterial;
-        [SerializeField] Material slopeMaterial;
         [SerializeField, Min(2f)] float roadWidth = 6f;
         [SerializeField, Min(0f)] float vergeWidth = 2.5f;
-        [SerializeField, Min(0f)] float slopeWidth = 25f;
-        [SerializeField, Min(0f)] float slopeDrop = 18f;
 
         public Route Route { get; private set; }
 
@@ -39,20 +36,14 @@ namespace FietsApp
                 new Vector2(-half - vergeWidth, -0.15f), new Vector2(-half, 0f),
                 new Vector2(half, 0f), new Vector2(half + vergeWidth, -0.15f),
             };
-            var slopes = new[]
-            {
-                new Vector2(-half - vergeWidth - slopeWidth, -slopeDrop), new Vector2(-half - vergeWidth, -0.15f),
-                new Vector2(half + vergeWidth, -0.15f), new Vector2(half + vergeWidth + slopeWidth, -slopeDrop),
-            };
 
             AddStrip("Weg", road, roadMaterial, pts);
             AddStrip("Berm", verges, vergeMaterial, pts);
-            AddStrip("Talud", slopes, slopeMaterial, pts);
         }
 
         /// <summary>
         /// Maakt een strook langs de route. Het profiel bestaat uit paren punten (links, rechts);
-        /// elk paar wordt een eigen band, zodat berm en talud aan beide kanten in één mesh passen.
+        /// elk paar wordt een eigen band, zodat de berm aan beide kanten in één mesh past.
         /// </summary>
         void AddStrip(string name, Vector2[] profile, Material material, IReadOnlyList<RoutePoint> pts)
         {
