@@ -4,6 +4,7 @@
     "references": [
         "FietsApp.Physics",
         "FietsApp.Trainers",
+        "FietsApp.World",
         "Unity.InputSystem",
         "UnityEngine.UI"
     ],
