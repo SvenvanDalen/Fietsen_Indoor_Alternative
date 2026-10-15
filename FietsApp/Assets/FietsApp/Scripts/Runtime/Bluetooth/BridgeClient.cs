@@ -30,6 +30,8 @@ namespace FietsApp.Bluetooth
         public event Action<bool> ConnectionChanged;
         public event Action<StatusMessage> StatusReceived;
         public event Action<DevicesMessage> DevicesReceived;
+        public event Action<DataMessage> DataReceived;
+        public event Action<ConnectionMessage> ConnectionReceived;
 
         void OnEnable()
         {
@@ -64,11 +66,21 @@ namespace FietsApp.Bluetooth
                     case DevicesMessage devices:
                         DevicesReceived?.Invoke(devices);
                         break;
+                    case DataMessage data:
+                        DataReceived?.Invoke(data);
+                        break;
+                    case ConnectionMessage connection:
+                        ConnectionReceived?.Invoke(connection);
+                        break;
                 }
             }
         }
 
         public void SetScanning(bool enabled, bool all) => _ = SendAsync(BridgeMessages.Scan(enabled, all));
+
+        public void Connect(string id) => _ = SendAsync(BridgeMessages.Connect(id));
+
+        public void Disconnect(string id) => _ = SendAsync(BridgeMessages.Disconnect(id));
 
         async Task SendAsync(string text)
         {
