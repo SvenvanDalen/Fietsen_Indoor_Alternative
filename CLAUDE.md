@@ -15,6 +15,15 @@ Werk altijd op een eigen branch en lever op via een pull request naar `main`:
 3. Push de branch en open een PR met `gh pr create`. Noem in de body de stories (`Story #<issue>`) en hoe het getest is.
 4. Laat het mergen aan de eigenaar. Sluit geen issues: een story is pas klaar als hij werkt op de echte trainer (definitie van klaar, backlog sectie 6).
 
+## Bluetooth-brug (`Bridge/`)
+
+Unity heeft op Windows geen Bluetooth LE; `Bridge/FietsBridge` (.NET 10, Windows-API) doet het Bluetooth-werk en praat JSON met Unity via `ws://localhost:8765/` (besluit in `docs/decisions.md`).
+
+- `FietsBridge.Core`: platformloze logica (service-herkenning, apparatenregister, protocol), gedekt door `dotnet test Bridge`.
+- `FietsBridge`: de Windows-kant (`BleScanner`, `BridgeServer`). Starten: `dotnet run --project Bridge/FietsBridge`.
+- Het protocol staat aan twee kanten: `Bridge/FietsBridge.Core/Protocol.cs` en `FietsApp/Assets/FietsApp/Scripts/Runtime/Bluetooth/BridgeMessages.cs` (veldnamen gelijk voor `JsonUtility`). Wijzig ze samen en houd de voorbeeldberichten in beide testsets gelijk.
+- Bluetooth-UUID's controleer je tegen de Bluetooth SIG assigned numbers (`bitbucket.org/bluetooth-SIG/public`, map `assigned_numbers/uuids`).
+
 ## Unity-project (`FietsApp/`)
 
 Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
@@ -23,7 +32,7 @@ Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
 |---|---|---|
 | `FietsApp.Physics` | Fysicamodel | `noEngineReferences`: puur C#, testbaar zonder Unity |
 | `FietsApp.Trainers` | `ITrainer` en implementaties (simulator, later FTMS en ANT+) | `noEngineReferences` |
-| `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer | Mag Unity gebruiken |
+| `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer, brugclient (`Bluetooth/`) | Mag Unity gebruiken |
 | `FietsApp.Tests.EditMode` | NUnit-tests | |
 
 Houd logica in de engine-vrije assemblies, zodat ze met EditMode-tests te dekken zijn; de MonoBehaviours zijn dunne lijmlagen.
@@ -34,10 +43,12 @@ Houd logica in de engine-vrije assemblies, zodat ze met EditMode-tests te dekken
 
 ### Tests draaien via de Unity-MCP
 
-Er is geen command-line testrunner; draai tests met `Unity_RunCommand` via `TestRunnerApi` met `runSynchronously = true`, filter op assembly `FietsApp.Tests.EditMode`, en tel geslaagd/gefaald in een `ICallbacks`-implementatie. Een PR gaat pas open als alle tests groen zijn.
+Er is geen command-line testrunner; draai tests met `Unity_RunCommand` via `TestRunnerApi` met `runSynchronously = true`, filter op assembly `FietsApp.Tests.EditMode`, en tel geslaagd/gefaald in een `ICallbacks`-implementatie. Een PR gaat pas open als alle tests groen zijn, ook `dotnet test Bridge` als de brug geraakt is.
 
 ### Valkuilen
 
 - Unity's AI Assistant-pakket wijzigt soms vanzelf `ProjectSettings/` (bijvoorbeeld `APP_UI_EDITOR_ONLY`, `SceneTemplateSettings.json`). Commit die niet mee met eigen werk.
-- Als de Unity-editor op de achtergrond draait, loopt de tijd in de Play-modus niet door. Verifieer gedrag in de Play-modus daarom met de eigenaar, of via EditMode-tests.
+- Als de Unity-editor op de achtergrond draait, loopt de Play-modus niet door (ook niet met Run In Background). Laat frames lopen met `EditorApplication.isPaused = true` plus een lus van `EditorApplication.Step()` in één `Unity_RunCommand`; dan lopen ook async-voortzettingen en WebSocket-berichten.
+- `Unity_RunCommand` staat `System.Reflection` niet toe. Druk knoppen in via `Button.onClick.Invoke()`.
+- `PlayerSettings` via de MCP wijzigen komt niet altijd op schijf; controleer `ProjectSettings.asset` met git diff.
 - Referentiewaarden in tests reken je los van de code uit (bijvoorbeeld met een Python-script), anders test je de code tegen zichzelf.
