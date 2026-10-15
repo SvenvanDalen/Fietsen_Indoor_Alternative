@@ -241,6 +241,14 @@ Als rijder wil ik een 3D-weg langs een route zien.
 - [ ] Weg gegenereerd uit GPX
 - [ ] 60 fps op een gemiddelde laptop
 
+**Gesplitst (2026-10-15):**
+
+- 3.1a Routemodel: afstand naar positie, hoogte en helling (2 pt)
+- 3.1b Weg als mesh langs de route, met berm en talud (3 pt)
+- 3.1c Rijder en camera volgen de route; de helling van de route gaat naar de rit (2 pt)
+- 3.1d Weg uit GPX, samen met 4.1 (3 pt)
+- 3.1e Prestaties: weg in stukken opdelen en alleen het zichtbare deel tekenen, 60 fps (3 pt)
+
 #### 3.2 Terrein dat past bij de klim
 
 Epic: E3 · Fase: MVP · Prio: Must · Punten: 8
