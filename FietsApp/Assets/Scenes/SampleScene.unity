@@ -295,8 +295,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.036767356, y: 0, z: 0, w: 0.99932384}
+  m_LocalPosition: {x: 0, y: 2.6, z: -7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -990,6 +990,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1397060719}
   - component: {fileID: 1397060718}
+  - component: {fileID: 1397060720}
   m_Layer: 0
   m_Name: Wereld
   m_TagString: Untagged
@@ -1011,11 +1012,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.RouteView
   roadMaterial: {fileID: 2100000, guid: dfa939faa73906b4a852c5983406341c, type: 2}
   vergeMaterial: {fileID: 2100000, guid: 1dac1084efd53ec40bac53331cbe36ba, type: 2}
-  slopeMaterial: {fileID: 2100000, guid: cb5d10b895eaee14884f0e8594d7bee0, type: 2}
   roadWidth: 6
   vergeWidth: 2.5
-  slopeWidth: 25
-  slopeDrop: 18
 --- !u!4 &1397060719
 Transform:
   m_ObjectHideFlags: 0
@@ -1031,6 +1029,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1397060720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397060717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0e3df091be88749a2e87b5db84345e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.TerrainView
+  routeView: {fileID: 1397060718}
+  grassMaterial: {fileID: 2100000, guid: caaaffd3d68fab74f867d126b2363295, type: 2}
+  darkGrassMaterial: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
+  rockMaterial: {fileID: 2100000, guid: fb0a0a11cc33e034c9fbd66d4fceb414, type: 2}
+  trunkMaterial: {fileID: 2100000, guid: 9a6c0a435b374504a91bd8cf5e68f78a, type: 2}
+  leavesMaterial: {fileID: 2100000, guid: 3b901b215139b24498d587b1f3df0f80, type: 2}
+  stoneMaterial: {fileID: 2100000, guid: aff483c4dd7c9184dbd1ede8ea43187a, type: 2}
+  seed: 42
 --- !u!1 &1609879895
 GameObject:
   m_ObjectHideFlags: 0
