@@ -1,0 +1,54 @@
+# Tekstbestanden: line endings door Git laten normaliseren
+* text=auto
+
+# Unity YAML-bestanden (Force Text): als tekst bewaren, mergen via UnityYAMLMerge indien ingesteld
+*.unity     text merge=unityyamlmerge eol=lf
+*.prefab    text merge=unityyamlmerge eol=lf
+*.asset     text merge=unityyamlmerge eol=lf
+*.mat       text merge=unityyamlmerge eol=lf
+*.anim      text merge=unityyamlmerge eol=lf
+*.controller text merge=unityyamlmerge eol=lf
+*.meta      text merge=unityyamlmerge eol=lf
+*.cs        text diff=csharp
+
+# Git LFS: grote binaire bestanden (story 13.4)
+# 3D-modellen
+*.fbx   filter=lfs diff=lfs merge=lfs -text
+*.obj   filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.gltf  filter=lfs diff=lfs merge=lfs -text
+*.glb   filter=lfs diff=lfs merge=lfs -text
+*.dae   filter=lfs diff=lfs merge=lfs -text
+*.3ds   filter=lfs diff=lfs merge=lfs -text
+*.max   filter=lfs diff=lfs merge=lfs -text
+# Afbeeldingen en textures
+*.png   filter=lfs diff=lfs merge=lfs -text
+*.jpg   filter=lfs diff=lfs merge=lfs -text
+*.jpeg  filter=lfs diff=lfs merge=lfs -text
+*.tga   filter=lfs diff=lfs merge=lfs -text
+*.tif   filter=lfs diff=lfs merge=lfs -text
+*.tiff  filter=lfs diff=lfs merge=lfs -text
+*.psd   filter=lfs diff=lfs merge=lfs -text
+*.exr   filter=lfs diff=lfs merge=lfs -text
+*.hdr   filter=lfs diff=lfs merge=lfs -text
+*.raw   filter=lfs diff=lfs merge=lfs -text
+# Audio en video
+*.wav   filter=lfs diff=lfs merge=lfs -text
+*.mp3   filter=lfs diff=lfs merge=lfs -text
+*.ogg   filter=lfs diff=lfs merge=lfs -text
+*.mp4   filter=lfs diff=lfs merge=lfs -text
+*.mov   filter=lfs diff=lfs merge=lfs -text
+# Lettertypen
+*.ttf   filter=lfs diff=lfs merge=lfs -text
+*.otf   filter=lfs diff=lfs merge=lfs -text
+# Unity-binaire data (lightmaps, terrein, navmesh)
+*.cubemap filter=lfs diff=lfs merge=lfs -text
+*.unitypackage filter=lfs diff=lfs merge=lfs -text
+LightingData.asset filter=lfs diff=lfs merge=lfs -text
+# Hoogtedata (DEM/GeoTIFF) voor de klim-pijplijn
+*.dem   filter=lfs diff=lfs merge=lfs -text
+*.geotiff filter=lfs diff=lfs merge=lfs -text
+# Native plugins
+*.dll   filter=lfs diff=lfs merge=lfs -text
+*.so    filter=lfs diff=lfs merge=lfs -text
+*.a     filter=lfs diff=lfs merge=lfs -text
