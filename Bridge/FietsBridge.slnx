@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="FietsBridge.Core/FietsBridge.Core.csproj" />
+  <Project Path="FietsBridge.Tests/FietsBridge.Tests.csproj" />
+  <Project Path="FietsBridge/FietsBridge.csproj" />
+</Solution>

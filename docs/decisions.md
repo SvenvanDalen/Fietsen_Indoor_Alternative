@@ -24,3 +24,10 @@ Vastgelegd op 2026-10-15, uit de antwoorden van de eigenaar (bron: [backlog.md](
 | Strava | Ja |
 | Garmin Connect, Intervals.icu | Automatisch waar mogelijk |
 | Budget | Geen, alles gratis |
+
+## Later vastgelegd
+
+| Datum | Onderwerp | Besluit | Reden |
+|---|---|---|---|
+| 2026-10-15 | Bluetooth LE op Windows | Eigen .NET-brug (`Bridge/FietsBridge`): de Windows-Bluetooth-API in een apart programma, dat JSON via een lokale WebSocket (`ws://localhost:8765/`) aan Unity geeft | Volledig eigen, testbare code; later ook de plek voor ANT+. Alternatief BleWinrtDll (C++-DLL, WTFPL) afgewezen vanwege een vooraf gebouwde DLL van derden en een beperkte poll-API |
+| 2026-10-15 | Draaien op de achtergrond | `Run In Background` aan | Een rit mag niet stilvallen als je een ander venster aanklikt |
