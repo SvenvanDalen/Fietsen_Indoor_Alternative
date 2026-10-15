@@ -20,13 +20,26 @@ namespace FietsApp
         [SerializeField] Material trunkMaterial;
         [SerializeField] Material leavesMaterial;
         [SerializeField] Material stoneMaterial;
+        [Tooltip("Kale grond boven de boomgrens, zoals de witte kalksteen van de Mont Ventoux.")]
+        [SerializeField] Material bareMaterial;
+        [Tooltip("Bosbodem: van gezien op afstand donker bos, zonder dat er overal bomen hoeven te staan.")]
+        [SerializeField] Material forestMaterial;
+        [Tooltip("Boomgrens in meter boven zeeniveau; erboven geen bomen maar kale grond.")]
+        [SerializeField] float treeLine = 100000f;
+        [Tooltip("Vanaf deze hoogte (tot de boomgrens) bosbodem in plaats van gras.")]
+        [SerializeField] float forestFrom = 100000f;
         [SerializeField] int seed = 42;
 
-        const int ChunkCells = 48;
+        const int ChunkCells = 32;
+        const float FarChunkDistance = 200f; // m van de weg; verder weg grovere driehoeken
+        const float DetailedTreeDistance = 120f;
+        const int FarStep = 4;
+        const float SkirtDepth = 25f;
         const float RockSlopeNormalY = 0.8f; // steiler dan ~37° wordt rots
 
         readonly TerrainSettings _settings = new TerrainSettings();
         readonly GeneratedContent _generated = new GeneratedContent();
+        Biome _biome;
 
         void OnDisable() => _generated.DestroyAll();
 
@@ -35,9 +48,12 @@ namespace FietsApp
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             if (routeView == null) return;
             _settings.Seed = seed;
+            _settings.TreeLine = treeLine;
+            _settings.ForestFrom = forestFrom;
+            _biome = new Biome(_settings);
 
             float t0 = Time.realtimeSinceStartup;
-            var grid = TerrainHeights.Generate(routeView.Route, _settings);
+            var grid = TerrainHeights.Generate(routeView.Route, _settings, routeView.NaturalHeights);
             var items = Scatter.Place(routeView.Route, grid, _settings);
             float t1 = Time.realtimeSinceStartup;
 
@@ -50,20 +66,29 @@ namespace FietsApp
         void BuildTerrain(HeightGrid grid)
         {
             var root = _generated.NewObject("Terrein", transform).transform;
-            var materials = new[] { grassMaterial, darkGrassMaterial, rockMaterial };
+            var materials = new[] { grassMaterial, darkGrassMaterial, rockMaterial, bareMaterial, forestMaterial };
 
             for (int cz = 0; cz < grid.CountZ - 1; cz += ChunkCells)
             for (int cx = 0; cx < grid.CountX - 1; cx += ChunkCells)
             {
                 var vertices = new List<Vector3>();
                 var normals = new List<Vector3>();
-                var triangles = new[] { new List<int>(), new List<int>(), new List<int>() };
+                var triangles = new[] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
                 int maxX = Mathf.Min(cx + ChunkCells, grid.CountX - 1), maxZ = Mathf.Min(cz + ChunkCells, grid.CountZ - 1);
-                for (int z = cz; z < maxZ; z++)
-                for (int x = cx; x < maxX; x++)
+
+                // Ver van de weg ziet niemand detail: daar driehoeken van FarStep cellen.
+                float nearest = float.MaxValue;
+                for (int z = cz; z <= maxZ; z++)
+                for (int x = cx; x <= maxX; x++)
+                    nearest = Mathf.Min(nearest, grid.RoadDistance(x, z));
+                int step = nearest > FarChunkDistance ? FarStep : 1;
+
+                for (int z = cz; z < maxZ; z += step)
+                for (int x = cx; x < maxX; x += step)
                 {
-                    Vector3 a = Corner(grid, x, z), b = Corner(grid, x, z + 1), c = Corner(grid, x + 1, z + 1), d = Corner(grid, x + 1, z);
+                    int x2 = Mathf.Min(x + step, maxX), z2 = Mathf.Min(z + step, maxZ);
+                    Vector3 a = Corner(grid, x, z), b = Corner(grid, x, z2), c = Corner(grid, x2, z2), d = Corner(grid, x2, z);
                     // Diagonaal afwisselen geeft een minder streperig patroon.
                     if (((x + z) & 1) == 0)
                     {
@@ -76,27 +101,69 @@ namespace FietsApp
                         AddTriangle(b, c, d, x, z, 1, vertices, normals, triangles);
                     }
                 }
+                AddSkirts(grid, cx, cz, maxX, maxZ, step, vertices, normals, triangles[2]);
 
                 var mesh = _generated.Track(new Mesh { name = $"Terrein {cx},{cz}", indexFormat = IndexFormat.UInt32 });
                 mesh.SetVertices(vertices);
                 mesh.SetNormals(normals);
-                mesh.subMeshCount = 3;
-                for (int i = 0; i < 3; i++) mesh.SetTriangles(triangles[i], i);
+                mesh.subMeshCount = triangles.Length;
+                for (int i = 0; i < triangles.Length; i++) mesh.SetTriangles(triangles[i], i);
                 mesh.RecalculateBounds();
                 AddRenderer(root, mesh.name, mesh, materials);
+            }
+        }
+
+        /// <summary>
+        /// Verticale rand ("rok") langs de vier zijden van een stuk, naar beneden. Waar een grof en een fijn stuk
+        /// aan elkaar grenzen kloppen de randhoogtes niet precies; de rok verbergt de naad. Beide kanten zichtbaar.
+        /// </summary>
+        static void AddSkirts(HeightGrid grid, int cx, int cz, int maxX, int maxZ, int step,
+            List<Vector3> vertices, List<Vector3> normals, List<int> triangles)
+        {
+            void Edge(int x0, int z0, int x1, int z1)
+            {
+                Vector3 p = Corner(grid, x0, z0), q = Corner(grid, x1, z1);
+                Vector3 pd = p + Vector3.down * SkirtDepth, qd = q + Vector3.down * SkirtDepth;
+                Vector3 n = Vector3.Cross(q - p, Vector3.down).normalized;
+                foreach (var (v0, v1, v2, normal) in new[] { (p, q, qd, n), (p, qd, pd, n), (p, qd, q, -n), (p, pd, qd, -n) })
+                {
+                    int i = vertices.Count;
+                    vertices.Add(v0); vertices.Add(v1); vertices.Add(v2);
+                    normals.Add(normal); normals.Add(normal); normals.Add(normal);
+                    triangles.Add(i); triangles.Add(i + 1); triangles.Add(i + 2);
+                }
+            }
+
+            for (int x = cx; x < maxX; x += step)
+            {
+                int x2 = Mathf.Min(x + step, maxX);
+                Edge(x, cz, x2, cz);
+                Edge(x, maxZ, x2, maxZ);
+            }
+            for (int z = cz; z < maxZ; z += step)
+            {
+                int z2 = Mathf.Min(z + step, maxZ);
+                Edge(cx, z, cx, z2);
+                Edge(maxX, z, maxX, z2);
             }
         }
 
         static Vector3 Corner(HeightGrid grid, int x, int z) =>
             new Vector3(grid.MinX + x * grid.CellSize, grid[x, z], grid.MinZ + z * grid.CellSize);
 
-        /// <summary>Driehoek met eigen hoekpunten (platte belichting) in de submesh die bij de helling past.</summary>
-        static void AddTriangle(Vector3 a, Vector3 b, Vector3 c, int x, int z, int half,
+        /// <summary>
+        /// Driehoek met eigen hoekpunten (platte belichting) in de submesh die erbij past:
+        /// 0 gras, 1 donker gras, 2 rots (steil), 3 kale grond (boven de boomgrens), 4 bosbodem.
+        /// </summary>
+        void AddTriangle(Vector3 a, Vector3 b, Vector3 c, int x, int z, int half,
             List<Vector3> vertices, List<Vector3> normals, List<int>[] triangles)
         {
             Vector3 normal = Vector3.Cross(b - a, c - a).normalized;
+            Vector3 center = (a + b + c) / 3f;
             int submesh;
             if (normal.y < RockSlopeNormalY) submesh = 2;
+            else if (_biome.IsAboveTreeLine(center.x, center.z, center.y)) submesh = 3;
+            else if (_biome.IsForest(center.x, center.z, center.y)) submesh = 4;
             else submesh = (Hash(x, z, half) % 100) < 22 ? 1 : 0; // plekken donker gras
 
             int i = vertices.Count;
@@ -129,7 +196,11 @@ namespace FietsApp
                 {
                     var pose = Matrix4x4.TRS(new Vector3(item.X, item.Y, item.Z),
                         Quaternion.Euler(0f, item.RotationDegrees, 0f), Vector3.one * item.Scale);
-                    if (item.Kind == ScatterKind.Tree) AddTree(trees, pose);
+                    if (item.Kind == ScatterKind.Tree)
+                    {
+                        if (item.RoadDistance < DetailedTreeDistance) AddTree(trees, pose);
+                        else AddSimpleTree(trees, pose);
+                    }
                     else AddRock(rocks, pose);
                 }
                 if (trees.HasGeometry)
@@ -140,6 +211,10 @@ namespace FietsApp
         }
 
         /// <summary>Low-poly den: zeskantige stam en twee kegels naalden, ongeveer 8 m hoog bij schaal 1.</summary>
+        /// <summary>Verre den: één kegel zonder stam, ruim drie keer minder hoekpunten.</summary>
+        static void AddSimpleTree(MeshBuilder b, Matrix4x4 pose) =>
+            b.Cone(1, pose, radius: 2.2f, bottom: 0.5f, top: 8.5f, sides: 5);
+
         static void AddTree(MeshBuilder b, Matrix4x4 pose)
         {
             b.Prism(0, pose, radius: 0.25f, bottom: -0.5f, top: 2f, sides: 5);

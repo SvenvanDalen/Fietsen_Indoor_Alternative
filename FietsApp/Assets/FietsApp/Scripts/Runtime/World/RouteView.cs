@@ -14,17 +14,40 @@ namespace FietsApp
     {
         [SerializeField] Material roadMaterial;
         [SerializeField] Material vergeMaterial;
+        [Tooltip("Berm boven de boomgrens: grind in plaats van gras.")]
+        [SerializeField] Material bareVergeMaterial;
+        [Tooltip("Vanaf deze hoogte (m) de kale berm; gelijk houden aan de boomgrens van het terrein.")]
+        [SerializeField] float bareVergeFrom = 100000f;
         [SerializeField, Min(2f)] float roadWidth = 6f;
         [SerializeField, Min(0f)] float vergeWidth = 2.5f;
 
+        [Tooltip("GPX van de klim (via tools/route_from_osm.py). Leeg = de oefenklim.")]
+        [SerializeField] TextAsset routeGpx;
+        [Tooltip("Echt landschap rond de klim (.bytes via tools/terrain_from_tiles.py). Leeg = verzonnen heuvels.")]
+        [SerializeField] TextAsset terrainHeights;
+
         readonly GeneratedContent _generated = new GeneratedContent();
         Route _route;
+        IHeightSource _naturalHeights;
 
-        // Tot er GPX-routes zijn (story 3.1d) rijden we de oefenklim. Lui aangemaakt, zodat andere
-        // componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
-        public Route Route => _route ?? (_route = TestRoutes.Testklim());
+        // Lui aangemaakt, zodat andere componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
+        public Route Route => _route ?? (_route = routeGpx != null
+            ? ClimbImport.FromGpx(Gpx.Parse(routeGpx.text))
+            : TestRoutes.Testklim());
 
-        void OnEnable() => Build();
+        /// <summary>Echt landschap in de lokale meters van de route, of null als er geen is.</summary>
+        public IHeightSource NaturalHeights =>
+            _naturalHeights ?? (_naturalHeights = terrainHeights != null && Route.Projection != null
+                ? new LocalHeights(GeoHeightField.Parse(terrainHeights.bytes), Route.Projection)
+                : null);
+
+        void OnEnable()
+        {
+            // Opnieuw inlezen, voor als de GPX of het landschap in de inspector is gewisseld.
+            _route = null;
+            _naturalHeights = null;
+            Build();
+        }
 
         void OnDisable() => _generated.DestroyAll();
 
@@ -41,19 +64,23 @@ namespace FietsApp
                 new Vector2(half, 0f), new Vector2(half + vergeWidth, -0.15f),
             };
 
-            AddStrip("Weg", road, roadMaterial, pts);
-            AddStrip("Berm", verges, vergeMaterial, pts);
+            AddStrip("Weg", road, new[] { roadMaterial }, pts, i => 0);
+            AddStrip("Berm", verges, new[] { vergeMaterial, bareVergeMaterial ?? vergeMaterial }, pts,
+                i => pts[i].Elevation > bareVergeFrom ? 1 : 0);
         }
 
         /// <summary>
         /// Maakt een strook langs de route. Het profiel bestaat uit paren punten (links, rechts);
         /// elk paar wordt een eigen band, zodat de berm aan beide kanten in één mesh past.
+        /// <paramref name="submeshOf"/> kiest per routesegment het materiaal.
         /// </summary>
-        void AddStrip(string name, Vector2[] profile, Material material, IReadOnlyList<RoutePoint> pts)
+        void AddStrip(string name, Vector2[] profile, Material[] materials, IReadOnlyList<RoutePoint> pts,
+            System.Func<int, int> submeshOf)
         {
             var vertices = new List<Vector3>(pts.Count * profile.Length);
             var uvs = new List<Vector2>(pts.Count * profile.Length);
-            var triangles = new List<int>();
+            var triangles = new List<int>[materials.Length];
+            for (int m = 0; m < materials.Length; m++) triangles[m] = new List<int>();
 
             for (int i = 0; i < pts.Count; i++)
             {
@@ -72,20 +99,21 @@ namespace FietsApp
                 for (int band = 0; band < stride; band += 2)
                 {
                     int a = i * stride + band, b = a + 1, c = a + stride, d = b + stride;
-                    triangles.AddRange(new[] { a, c, b, b, c, d });
+                    triangles[submeshOf(i)].AddRange(new[] { a, c, b, b, c, d });
                 }
             }
 
             var mesh = _generated.Track(new Mesh { name = name, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 });
             mesh.SetVertices(vertices);
             mesh.SetUVs(0, uvs);
-            mesh.SetTriangles(triangles, 0);
+            mesh.subMeshCount = materials.Length;
+            for (int m = 0; m < materials.Length; m++) mesh.SetTriangles(triangles[m], m);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
 
             var go = _generated.NewObject(name, transform, typeof(MeshFilter), typeof(MeshRenderer));
             go.GetComponent<MeshFilter>().sharedMesh = mesh;
-            go.GetComponent<MeshRenderer>().sharedMaterial = material;
+            go.GetComponent<MeshRenderer>().sharedMaterials = materials;
         }
 
         /// <summary>Rechtervector op punt i, uit de richting tussen buurpunten (vloeiend in bochten).</summary>
