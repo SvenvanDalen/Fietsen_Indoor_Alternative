@@ -34,6 +34,24 @@ namespace FietsApp.Bluetooth
         public string[] kinds; // "trainer", "power", "heartRate", "speedCadence"
     }
 
+    [Serializable]
+    public class DataMessage : BridgeMessage
+    {
+        public string id;
+        public float power;     // -1 = niet meegestuurd
+        public float cadence;   // -1 = niet meegestuurd
+        public float heartRate; // -1 = niet meegestuurd
+    }
+
+    [Serializable]
+    public class ConnectionMessage : BridgeMessage
+    {
+        public string id;
+        public string name;
+        public string state; // "connecting", "connected", "disconnected" of "failed"
+        public string message;
+    }
+
     public static class BridgeMessages
     {
         /// <summary>Leest een bericht van de brug; null bij onbekende of ongeldige invoer.</summary>
@@ -45,6 +63,8 @@ namespace FietsApp.Bluetooth
                 {
                     case "status": return JsonUtility.FromJson<StatusMessage>(json);
                     case "devices": return JsonUtility.FromJson<DevicesMessage>(json);
+                    case "data": return JsonUtility.FromJson<DataMessage>(json);
+                    case "connection": return JsonUtility.FromJson<ConnectionMessage>(json);
                     default: return null;
                 }
             }
@@ -56,6 +76,10 @@ namespace FietsApp.Bluetooth
 
         public static string Scan(bool enabled, bool all) =>
             $"{{\"type\":\"scan\",\"enabled\":{Bool(enabled)},\"all\":{Bool(all)}}}";
+
+        public static string Connect(string id) => $"{{\"type\":\"connect\",\"id\":\"{id}\"}}";
+
+        public static string Disconnect(string id) => $"{{\"type\":\"disconnect\",\"id\":\"{id}\"}}";
 
         /// <summary>Signaalsterkte in woorden; grenzen zijn vuistregels voor Bluetooth LE binnenshuis.</summary>
         public static string SignalLabel(int rssi) =>

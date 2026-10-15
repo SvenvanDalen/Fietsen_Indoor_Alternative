@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,26 +9,38 @@ using UnityEngine.UI;
 namespace FietsApp.Bluetooth
 {
     /// <summary>
-    /// Paneel om Bluetooth-apparaten te zoeken (story 1.1): lijst met trainers en sensoren
-    /// en hun signaalsterkte. Toets B toont of verbergt het paneel.
+    /// Paneel om Bluetooth-apparaten te zoeken en te verbinden (stories 1.1 en 1.3): lijst met
+    /// trainers en sensoren en hun signaalsterkte; klik op een apparaat om te verbinden of te
+    /// ontkoppelen. Toets B toont of verbergt het paneel.
     /// </summary>
     public sealed class DeviceScanPanel : MonoBehaviour
     {
         [SerializeField] BridgeClient bridge;
+        [SerializeField] BridgeTrainerLink link;
         [SerializeField] bool visibleAtStart = true;
 
         const int MaxRows = 12;
-        const float Width = 520f;
-        const float RowHeight = 30f;
+        const float Width = 620f;
+        const float RowHeight = 34f;
 
         GameObject _panel;
         Text _status, _scanLabel, _allLabel;
-        Text[] _rows;
+        Row[] _rows;
+        DeviceEntry[] _scanned = new DeviceEntry[0];
         bool _scanWanted, _showAll;
+
+        sealed class Row
+        {
+            public Button Button;
+            public Image Background;
+            public Text Label;
+            public string Id, Name;
+        }
 
         void Awake()
         {
             if (bridge == null) bridge = FindAnyObjectByType<BridgeClient>();
+            if (link == null) link = FindAnyObjectByType<BridgeTrainerLink>();
             EnsureEventSystem();
             Build();
             _panel.SetActive(visibleAtStart);
@@ -38,6 +51,7 @@ namespace FietsApp.Bluetooth
             bridge.ConnectionChanged += OnConnectionChanged;
             bridge.StatusReceived += OnStatus;
             bridge.DevicesReceived += OnDevices;
+            link.Changed += ShowRows;
             Refresh();
         }
 
@@ -46,6 +60,7 @@ namespace FietsApp.Bluetooth
             bridge.ConnectionChanged -= OnConnectionChanged;
             bridge.StatusReceived -= OnStatus;
             bridge.DevicesReceived -= OnDevices;
+            link.Changed -= ShowRows;
         }
 
         void Update()
@@ -58,13 +73,17 @@ namespace FietsApp.Bluetooth
         {
             // Na herverbinden het zoeken hervatten als dat de bedoeling was.
             if (connected && _scanWanted) bridge.SetScanning(true, _showAll);
-            if (!connected) ShowDevices(new DeviceEntry[0]);
+            if (!connected) _scanned = new DeviceEntry[0];
             Refresh();
         }
 
         void OnStatus(StatusMessage status) => Refresh();
 
-        void OnDevices(DevicesMessage message) => ShowDevices(message.devices ?? new DeviceEntry[0]);
+        void OnDevices(DevicesMessage message)
+        {
+            _scanned = message.devices ?? new DeviceEntry[0];
+            ShowRows();
+        }
 
         void ToggleScan()
         {
@@ -80,6 +99,11 @@ namespace FietsApp.Bluetooth
             Refresh();
         }
 
+        void OnRowClicked(Row row)
+        {
+            if (!string.IsNullOrEmpty(row.Id)) link.Toggle(row.Id, row.Name);
+        }
+
         void Refresh()
         {
             var status = bridge.LastStatus;
@@ -88,29 +112,52 @@ namespace FietsApp.Bluetooth
                 status == null ? "Verbonden met brug..." :
                 status.bluetooth == "unavailable" ? "Geen Bluetooth LE op deze pc." :
                 status.bluetooth == "off" ? "Bluetooth staat uit." :
-                status.scanning ? "Zoeken..." : "Klaar om te zoeken.";
+                status.scanning ? "Zoeken... Klik op een apparaat om te verbinden." : "Klaar om te zoeken.";
 
             _scanLabel.text = _scanWanted ? "Stoppen" : "Zoeken";
             _allLabel.text = _showAll ? "Alle apparaten: aan" : "Alle apparaten: uit";
+            ShowRows();
         }
 
-        void ShowDevices(DeviceEntry[] devices)
+        /// <summary>Verbonden apparaten bovenaan (die adverteren vaak niet meer), daarna de zoekresultaten.</summary>
+        void ShowRows()
         {
-            for (int i = 0; i < _rows.Length; i++)
+            var lines = new List<(string id, string name, string text, Color color)>();
+
+            foreach (var c in link.Connections)
             {
-                if (i >= devices.Length)
-                {
-                    _rows[i].text = i == 0 && _scanWanted && bridge.IsConnected ? "Nog geen apparaten gevonden." : "";
-                    continue;
-                }
-                var d = devices[i];
-                string name = string.IsNullOrEmpty(d.name) ? $"(naamloos) {d.id}" : d.name;
+                string state =
+                    c.State == "connected" ? "<color=#7d7>verbonden</color>" :
+                    c.State == "connecting" ? "<color=#fd6>verbinden...</color>" :
+                    $"<color=#f77>mislukt: {c.Message}</color>";
+                lines.Add((c.Id, c.Name, $"{DisplayName(c.Name, c.Id)}  {state}", new Color(0.15f, 0.3f, 0.15f, 0.9f)));
+            }
+
+            foreach (var d in _scanned.Where(d => !link.Connections.Any(c => c.Id == d.id)))
+            {
                 string kinds = d.kinds != null && d.kinds.Length > 0
                     ? string.Join(", ", d.kinds.Select(BridgeMessages.KindLabel))
                     : "onbekend";
-                _rows[i].text = $"{name}  <color=#9ad>{kinds}</color>  <color=#bbb>{d.rssi} dBm ({BridgeMessages.SignalLabel(d.rssi)})</color>";
+                lines.Add((d.id, d.name,
+                    $"{DisplayName(d.name, d.id)}  <color=#9ad>{kinds}</color>  <color=#bbb>{d.rssi} dBm ({BridgeMessages.SignalLabel(d.rssi)})</color>",
+                    new Color(1f, 1f, 1f, 0.08f)));
+            }
+
+            if (lines.Count == 0 && _scanWanted && bridge.IsConnected)
+                lines.Add((null, null, "Nog geen apparaten gevonden.", Color.clear));
+
+            for (int i = 0; i < _rows.Length; i++)
+            {
+                var row = _rows[i];
+                bool used = i < lines.Count;
+                row.Button.gameObject.SetActive(used);
+                if (!used) continue;
+                (row.Id, row.Name, row.Label.text, row.Background.color) = lines[i];
+                row.Button.interactable = row.Id != null;
             }
         }
+
+        static string DisplayName(string name, string id) => string.IsNullOrEmpty(name) ? $"(naamloos) {id}" : name;
 
         static void EnsureEventSystem()
         {
@@ -130,7 +177,7 @@ namespace FietsApp.Bluetooth
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.matchWidthOrHeight = 0.5f;
 
-            float height = 140f + MaxRows * RowHeight;
+            float height = 150f + MaxRows * (RowHeight + 4f);
             var panel = new GameObject("Paneel", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
             panel.SetParent(canvasGo.transform, false);
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0f, 0f);
@@ -147,15 +194,22 @@ namespace FietsApp.Bluetooth
             _status = AddText(panel, "Status", 18, y, 26f);
             y -= 34f;
 
-            _scanLabel = AddButton(panel, "Zoeken", new Vector2(16f, y), 160f, ToggleScan);
-            _allLabel = AddButton(panel, "Alle", new Vector2(188f, y), 240f, ToggleAll);
-            y -= 52f;
+            _scanLabel = AddButton(panel, "Zoeken", new Vector2(16f, y), 160f, ToggleScan).label;
+            _allLabel = AddButton(panel, "Alle", new Vector2(188f, y), 240f, ToggleAll).label;
+            y -= 56f;
 
-            _rows = new Text[MaxRows];
+            _rows = new Row[MaxRows];
             for (int i = 0; i < MaxRows; i++)
             {
-                _rows[i] = AddText(panel, $"Rij {i}", 18, y, RowHeight);
-                y -= RowHeight;
+                var (button, label) = AddButton(panel, $"Rij {i}", new Vector2(16f, y), Width - 32f, null);
+                label.alignment = TextAnchor.MiddleLeft;
+                label.supportRichText = true;
+                label.rectTransform.offsetMin = new Vector2(10f, 0f);
+                var row = new Row { Button = button, Background = button.GetComponent<Image>(), Label = label };
+                button.onClick.AddListener(() => OnRowClicked(row));
+                button.gameObject.SetActive(false);
+                _rows[i] = row;
+                y -= RowHeight + 4f;
             }
         }
 
@@ -179,15 +233,17 @@ namespace FietsApp.Bluetooth
             return text;
         }
 
-        static Text AddButton(RectTransform parent, string name, Vector2 topLeft, float width, UnityEngine.Events.UnityAction onClick)
+        static (Button button, Text label) AddButton(RectTransform parent, string name, Vector2 topLeft, float width,
+            UnityEngine.Events.UnityAction onClick)
         {
             var rt = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button)).GetComponent<RectTransform>();
             rt.SetParent(parent, false);
             rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0f, 1f);
             rt.anchoredPosition = topLeft;
-            rt.sizeDelta = new Vector2(width, 40f);
+            rt.sizeDelta = new Vector2(width, RowHeight + 6f);
             rt.GetComponent<Image>().color = new Color(0.2f, 0.45f, 0.8f, 1f);
-            rt.GetComponent<Button>().onClick.AddListener(onClick);
+            var button = rt.GetComponent<Button>();
+            if (onClick != null) button.onClick.AddListener(onClick);
 
             var label = new GameObject("Label", typeof(RectTransform), typeof(Text)).GetComponent<Text>();
             label.rectTransform.SetParent(rt, false);
@@ -198,7 +254,8 @@ namespace FietsApp.Bluetooth
             label.fontSize = 18;
             label.alignment = TextAnchor.MiddleCenter;
             label.color = Color.white;
-            return label;
+            label.raycastTarget = false;
+            return (button, label);
         }
     }
 }

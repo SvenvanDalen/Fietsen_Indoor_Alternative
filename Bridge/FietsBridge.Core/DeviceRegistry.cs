@@ -51,7 +51,7 @@ public sealed class DeviceRegistry(TimeSpan? expiry = null)
             return _devices
                 .Where(d => now - d.Value.LastSeen <= _expiry)
                 .Select(d => new DeviceInfo(
-                    FormatAddress(d.Key),
+                    DeviceAddress.Format(d.Key),
                     d.Value.Name,
                     d.Value.Rssi,
                     GattServices.Classify(d.Value.Services)))
@@ -61,7 +61,4 @@ public sealed class DeviceRegistry(TimeSpan? expiry = null)
                 .ToList();
         }
     }
-
-    static string FormatAddress(ulong address) =>
-        string.Join(":", Enumerable.Range(0, 6).Select(i => ((address >> (8 * (5 - i))) & 0xFF).ToString("X2")));
 }

@@ -13,6 +13,7 @@ namespace FietsBridge;
 sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
 {
     readonly ConcurrentDictionary<WebSocket, byte> _clients = new();
+    readonly ConcurrentDictionary<string, SensorConnection> _sensors = new();
     readonly SemaphoreSlim _sendLock = new(1, 1);
     volatile bool _includeUnknown;
 
@@ -54,6 +55,8 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
         try
         {
             await SendAsync(socket, Protocol.Status(await BleScanner.GetStateAsync(), scanner.IsScanning), ct);
+            foreach (var sensor in _sensors.Values)
+                await SendAsync(socket, Protocol.Connection(sensor.Id, sensor.Name, ConnectionState.Connected), ct);
 
             var buffer = new byte[4096];
             while (socket.State == WebSocketState.Open && !ct.IsCancellationRequested)
@@ -72,7 +75,12 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
             _clients.TryRemove(socket, out _);
             socket.Dispose();
             Console.WriteLine($"Unity losgekoppeld ({_clients.Count} client(s))");
-            if (_clients.IsEmpty) scanner.Stop();
+            if (_clients.IsEmpty)
+            {
+                // Unity is weg: apparaten vrijgeven zodat andere apps ze kunnen gebruiken.
+                scanner.Stop();
+                foreach (var id in _sensors.Keys) Disconnect(id);
+            }
         }
     }
 
@@ -88,10 +96,53 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
                 Console.WriteLine(scanner.IsScanning ? "Zoeken gestart" : "Zoeken gestopt");
                 await BroadcastAsync(Protocol.Status(state, scanner.IsScanning), ct);
                 break;
+            case ConnectCommand connect:
+                await ConnectAsync(connect.Id, ct);
+                break;
+            case DisconnectCommand disconnect:
+                if (Disconnect(disconnect.Id) is { } name)
+                    await BroadcastAsync(Protocol.Connection(disconnect.Id, name, ConnectionState.Disconnected), ct);
+                break;
             default:
                 Console.WriteLine($"Onbekend bericht genegeerd: {message}");
                 break;
         }
+    }
+
+    async Task ConnectAsync(string id, CancellationToken ct)
+    {
+        if (_sensors.ContainsKey(id)) return;
+        string name = registry.Snapshot(DateTimeOffset.Now, includeUnknown: true).FirstOrDefault(d => d.Id == id)?.Name ?? "";
+        Console.WriteLine($"Verbinden met {id} {name}");
+        await BroadcastAsync(Protocol.Connection(id, name, ConnectionState.Connecting), ct);
+
+        try
+        {
+            var sensor = await SensorConnection.ConnectAsync(id, m => _ = BroadcastAsync(Protocol.Data(id, m), ct));
+            sensor.Disconnected += () =>
+            {
+                if (Disconnect(id) is not { } lostName) return; // al bewust ontkoppeld
+                Console.WriteLine($"Verbinding met {id} verbroken");
+                _ = BroadcastAsync(Protocol.Connection(id, lostName, ConnectionState.Disconnected), ct);
+            };
+            _sensors[id] = sensor;
+            Console.WriteLine($"Verbonden met {id} {sensor.Name}");
+            await BroadcastAsync(Protocol.Connection(id, sensor.Name, ConnectionState.Connected), ct);
+        }
+        catch (Exception e) when (e is InvalidOperationException or System.Runtime.InteropServices.COMException)
+        {
+            Console.WriteLine($"Verbinden met {id} mislukt: {e.Message}");
+            await BroadcastAsync(Protocol.Connection(id, name, ConnectionState.Failed, e.Message), ct);
+        }
+    }
+
+    /// <summary>Verbreekt de verbinding; geeft de naam terug, of null als er geen verbinding was.</summary>
+    string? Disconnect(string id)
+    {
+        if (!_sensors.TryRemove(id, out var sensor)) return null;
+        string name = sensor.Name;
+        sensor.Dispose();
+        return name;
     }
 
     async Task BroadcastLoopAsync(CancellationToken ct)

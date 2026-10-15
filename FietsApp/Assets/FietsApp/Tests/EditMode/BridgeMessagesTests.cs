@@ -30,6 +30,39 @@ namespace FietsApp.Tests
             Assert.That(status.scanning, Is.False);
         }
 
+        [Test]
+        public void Parse_DataMessage()
+        {
+            var data = BridgeMessages.Parse(
+                "{\"type\":\"data\",\"id\":\"AA:BB:CC:DD:EE:FF\",\"power\":250,\"cadence\":90.5,\"heartRate\":-1}") as DataMessage;
+
+            Assert.That(data, Is.Not.Null);
+            Assert.That(data.id, Is.EqualTo("AA:BB:CC:DD:EE:FF"));
+            Assert.That(data.power, Is.EqualTo(250f));
+            Assert.That(data.cadence, Is.EqualTo(90.5f));
+            Assert.That(data.heartRate, Is.EqualTo(-1f));
+        }
+
+        [Test]
+        public void Parse_ConnectionMessage()
+        {
+            var connection = BridgeMessages.Parse(
+                "{\"type\":\"connection\",\"id\":\"AA:BB:CC:DD:EE:FF\",\"name\":\"Smart Drive\",\"state\":\"connected\",\"message\":\"\"}") as ConnectionMessage;
+
+            Assert.That(connection, Is.Not.Null);
+            Assert.That(connection.name, Is.EqualTo("Smart Drive"));
+            Assert.That(connection.state, Is.EqualTo("connected"));
+        }
+
+        [Test]
+        public void ConnectCommands_MatchBridgeFormat()
+        {
+            Assert.That(BridgeMessages.Connect("AA:BB:CC:DD:EE:FF"),
+                Is.EqualTo("{\"type\":\"connect\",\"id\":\"AA:BB:CC:DD:EE:FF\"}"));
+            Assert.That(BridgeMessages.Disconnect("AA:BB:CC:DD:EE:FF"),
+                Is.EqualTo("{\"type\":\"disconnect\",\"id\":\"AA:BB:CC:DD:EE:FF\"}"));
+        }
+
         [TestCase("{\"type\":\"onbekend\"}")]
         [TestCase("geen json")]
         public void Parse_UnknownOrInvalid_ReturnsNull(string json)
