@@ -322,6 +322,8 @@ Als rijder wil ik 5 startklimmen, waaronder vier echte iconen.
 - [ ] Stelvio, Alpe d'Huez, Mont Ventoux en Colle delle Finestre
 - [ ] Plus één fantasieklim
 
+**Stand (2026-10-15):** Mont Ventoux vanaf Bédoin is nagemaakt (21,4 km, 313 → 1887 m, gemiddeld 7,4%, max 12,5% per 100 m) met echte weg, echt landschap, boomgrens en zendmast. Bronnen in `docs/bronnen.md`. De pijplijn voor 4.1 en 4.2 is daarmee ook gebouwd.
+
 #### 4.5 Bibliotheek met 50+ klimmen
 
 Epic: E4 · Fase: V1 · Prio: Should · Punten: 13 (eerst splitsen)

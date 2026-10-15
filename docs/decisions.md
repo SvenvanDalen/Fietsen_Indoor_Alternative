@@ -31,3 +31,6 @@ Vastgelegd op 2026-10-15, uit de antwoorden van de eigenaar (bron: [backlog.md](
 |---|---|---|---|
 | 2026-10-15 | Bluetooth LE op Windows | Eigen .NET-brug (`Bridge/FietsBridge`): de Windows-Bluetooth-API in een apart programma, dat JSON via een lokale WebSocket (`ws://localhost:8765/`) aan Unity geeft | Volledig eigen, testbare code; later ook de plek voor ANT+. Alternatief BleWinrtDll (C++-DLL, WTFPL) afgewezen vanwege een vooraf gebouwde DLL van derden en een beperkte poll-API |
 | 2026-10-15 | Draaien op de achtergrond | `Run In Background` aan | Een rit mag niet stilvallen als je een ander venster aanklikt |
+| 2026-10-15 | Klimmen namaken | Weg uit OpenStreetMap (wegnummer), hoogte langs de weg uit SRTM 30 m, landschap uit open Terrain Tiles; alles via scripts in `tools/` | Alleen open data; herhaalbaar voor elke klim; bronnen in `docs/bronnen.md` |
+| 2026-10-15 | Gladstrijken hoogteprofiel | Mediaan (±100 m) gevolgd door Gauss (σ 80 m), met puntgespiegelde randen | Mediaan haalt uitschieters van het hoogtemodel weg zonder de helling af te vlakken; spiegelen houdt begin en eind van een klim kloppend |
+| 2026-10-15 | Mont Ventoux | Vanaf Bédoin (zuidkant) als eerste | De klassieke beklimming; Malaucène en Sault kunnen later met dezelfde scripts |
