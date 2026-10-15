@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "FietsApp.Physics",
-        "FietsApp.Trainers"
+        "FietsApp.Trainers",
+        "FietsApp.Runtime"
     ],
     "includePlatforms": [
         "Editor"
