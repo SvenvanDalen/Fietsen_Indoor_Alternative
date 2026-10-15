@@ -50,6 +50,8 @@ Er is geen command-line testrunner; draai tests met `Unity_RunCommand` via `Test
 
 - Unity's AI Assistant-pakket wijzigt soms vanzelf `ProjectSettings/` (bijvoorbeeld `APP_UI_EDITOR_ONLY`, `SceneTemplateSettings.json`). Commit die niet mee met eigen werk.
 - Als de Unity-editor op de achtergrond draait, loopt de Play-modus niet door (ook niet met Run In Background). Zet de editor op pauze (`EditorApplication.isPaused = true`) en roep per `Unity_RunCommand` één keer `EditorApplication.Step()` aan: elke opdracht draait dan ongeveer één frame van 20 ms, inclusief async-voortzettingen en WebSocket-berichten. Herhaal de opdracht tot de toestand er is; een lus van `Step()` binnen één opdracht levert niet meer frames op.
+- Beeld controleren: render `Camera.main` naar een `RenderTexture`, sla die op als PNG in de scratchpad en bekijk hem met Read. Overlay-UI komt alleen in beeld als je de canvassen tijdelijk op `ScreenSpaceCamera` zet (en `Canvas.ForceUpdateCanvases()` aanroept). Met `RideController.StartAt(afstand)` spring je naar een plek op de route.
+- UI in code: geef een eigen `Graphic`-subklasse expliciet een `CanvasRenderer` mee bij `new GameObject(...)`, anders tekent hij niets (bij `Image` gaat het vanzelf).
 - `Unity_RunCommand` staat `System.Reflection` niet toe. Druk knoppen in via `Button.onClick.Invoke()`.
 - `PlayerSettings` via de MCP wijzigen komt niet altijd op schijf; controleer `ProjectSettings.asset` met git diff.
 - Referentiewaarden in tests reken je los van de code uit (bijvoorbeeld met een Python-script), anders test je de code tegen zichzelf.

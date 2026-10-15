@@ -882,6 +882,7 @@ GameObject:
   - component: {fileID: 1293722324}
   - component: {fileID: 1293722323}
   - component: {fileID: 1293722327}
+  - component: {fileID: 1293722328}
   m_Layer: 0
   m_Name: Rit
   m_TagString: Untagged
@@ -964,6 +965,21 @@ MonoBehaviour:
   cameraOffset: {x: 0, y: 2.6, z: -7}
   lookAhead: 12
   cameraSmoothing: 4
+--- !u!114 &1293722328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293722322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc004bb2febe410459145c167e9760be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.ElevationProfileHud
+  ride: {fileID: 0}
+  routeView: {fileID: 0}
+  visibleAtStart: 1
 --- !u!1 &1397060717
 GameObject:
   m_ObjectHideFlags: 0
