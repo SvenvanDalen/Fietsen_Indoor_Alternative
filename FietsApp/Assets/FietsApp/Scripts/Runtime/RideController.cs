@@ -54,6 +54,14 @@ namespace FietsApp
             Trainer.SetGrade(_gradePercent);
         }
 
+        /// <summary>Begin de rit opnieuw op een afstand langs de route, stilstaand.</summary>
+        public void StartAt(float distanceM)
+        {
+            DistanceM = distanceM;
+            SpeedMs = 0f;
+            ElapsedSeconds = 0f;
+        }
+
         void Update()
         {
             float dt = Time.deltaTime;
