@@ -22,7 +22,8 @@ Unity heeft op Windows geen Bluetooth LE; `Bridge/FietsBridge` (.NET 10, Windows
 - `FietsBridge.Core`: platformloze logica (service-herkenning, apparatenregister, protocol), gedekt door `dotnet test Bridge`.
 - `FietsBridge`: de Windows-kant (`BleScanner`, `BridgeServer`). Starten: `dotnet run --project Bridge/FietsBridge`.
 - Het protocol staat aan twee kanten: `Bridge/FietsBridge.Core/Protocol.cs` en `FietsApp/Assets/FietsApp/Scripts/Runtime/Bluetooth/BridgeMessages.cs` (veldnamen gelijk voor `JsonUtility`). Wijzig ze samen en houd de voorbeeldberichten in beide testsets gelijk.
-- Bluetooth-UUID's controleer je tegen de Bluetooth SIG assigned numbers (`bitbucket.org/bluetooth-SIG/public`, map `assigned_numbers/uuids`).
+- Zonder fietsapparaat test je de Unity-kant met een nepbrug: een klein script dat op `localhost:8765` luistert en `connection`- en `data`-berichten stuurt. Het echte verbindingspad test je door met een willekeurig Bluetooth-apparaat te verbinden; dat moet eindigen in een nette `failed`-melding.
+- Bluetooth-UUID's en berichtindelingen controleer je tegen de Bluetooth SIG assigned numbers (`bitbucket.org/bluetooth-SIG/public`: `assigned_numbers/uuids` voor UUID's, `gss/` voor de veldindeling per characteristic). Let op: de huidige GSS wijkt soms af van FTMS 1.0, dat trainers in de praktijk volgen (zie Resistance Level in `IndoorBikeData`).
 
 ## Unity-project (`FietsApp/`)
 
@@ -48,7 +49,7 @@ Er is geen command-line testrunner; draai tests met `Unity_RunCommand` via `Test
 ### Valkuilen
 
 - Unity's AI Assistant-pakket wijzigt soms vanzelf `ProjectSettings/` (bijvoorbeeld `APP_UI_EDITOR_ONLY`, `SceneTemplateSettings.json`). Commit die niet mee met eigen werk.
-- Als de Unity-editor op de achtergrond draait, loopt de Play-modus niet door (ook niet met Run In Background). Laat frames lopen met `EditorApplication.isPaused = true` plus een lus van `EditorApplication.Step()` in één `Unity_RunCommand`; dan lopen ook async-voortzettingen en WebSocket-berichten.
+- Als de Unity-editor op de achtergrond draait, loopt de Play-modus niet door (ook niet met Run In Background). Zet de editor op pauze (`EditorApplication.isPaused = true`) en roep per `Unity_RunCommand` één keer `EditorApplication.Step()` aan: elke opdracht draait dan ongeveer één frame van 20 ms, inclusief async-voortzettingen en WebSocket-berichten. Herhaal de opdracht tot de toestand er is; een lus van `Step()` binnen één opdracht levert niet meer frames op.
 - `Unity_RunCommand` staat `System.Reflection` niet toe. Druk knoppen in via `Button.onClick.Invoke()`.
 - `PlayerSettings` via de MCP wijzigen komt niet altijd op schijf; controleer `ProjectSettings.asset` met git diff.
 - Referentiewaarden in tests reken je los van de code uit (bijvoorbeeld met een Python-script), anders test je de code tegen zichzelf.
