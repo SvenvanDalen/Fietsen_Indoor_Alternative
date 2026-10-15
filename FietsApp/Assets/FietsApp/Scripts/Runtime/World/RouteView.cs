@@ -6,8 +6,10 @@ namespace FietsApp
 {
     /// <summary>
     /// Bouwt de weg als mesh langs de route (story 3.1b): asfalt en berm. Het terrein eromheen
-    /// komt van <see cref="TerrainView"/> (story 3.2).
+    /// komt van <see cref="TerrainView"/> (story 3.2). Ook zichtbaar in de bewerkmodus, zonder in de scène
+    /// te worden opgeslagen.
     /// </summary>
+    [ExecuteAlways]
     public sealed class RouteView : MonoBehaviour
     {
         [SerializeField] Material roadMaterial;
@@ -15,14 +17,16 @@ namespace FietsApp
         [SerializeField, Min(2f)] float roadWidth = 6f;
         [SerializeField, Min(0f)] float vergeWidth = 2.5f;
 
-        public Route Route { get; private set; }
+        readonly GeneratedContent _generated = new GeneratedContent();
+        Route _route;
 
-        void Awake()
-        {
-            // Tot er GPX-routes zijn (story 3.1d) rijden we de oefenklim.
-            Route = TestRoutes.Testklim();
-            Build();
-        }
+        // Tot er GPX-routes zijn (story 3.1d) rijden we de oefenklim. Lui aangemaakt, zodat andere
+        // componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
+        public Route Route => _route ?? (_route = TestRoutes.Testklim());
+
+        void OnEnable() => Build();
+
+        void OnDisable() => _generated.DestroyAll();
 
         void Build()
         {
@@ -72,15 +76,14 @@ namespace FietsApp
                 }
             }
 
-            var mesh = new Mesh { name = name, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+            var mesh = _generated.Track(new Mesh { name = name, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 });
             mesh.SetVertices(vertices);
             mesh.SetUVs(0, uvs);
             mesh.SetTriangles(triangles, 0);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
 
-            var go = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
-            go.transform.SetParent(transform, false);
+            var go = _generated.NewObject(name, transform, typeof(MeshFilter), typeof(MeshRenderer));
             go.GetComponent<MeshFilter>().sharedMesh = mesh;
             go.GetComponent<MeshRenderer>().sharedMaterial = material;
         }

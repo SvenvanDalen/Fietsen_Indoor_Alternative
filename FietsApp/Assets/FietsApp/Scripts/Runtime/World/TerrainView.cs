@@ -8,8 +8,9 @@ namespace FietsApp
     /// <summary>
     /// Bouwt terrein, bomen en rotsen rond de route (story 3.2) in low-poly-stijl: platte driehoeken,
     /// gras op vlakke stukken en rots op steile hellingen. Alles in stukken (chunks), zodat Unity
-    /// wat buiten beeld valt niet tekent.
+    /// wat buiten beeld valt niet tekent. Ook zichtbaar in de bewerkmodus, zonder in de scène te worden opgeslagen.
     /// </summary>
+    [ExecuteAlways]
     public sealed class TerrainView : MonoBehaviour
     {
         [SerializeField] RouteView routeView;
@@ -25,11 +26,14 @@ namespace FietsApp
         const float RockSlopeNormalY = 0.8f; // steiler dan ~37° wordt rots
 
         readonly TerrainSettings _settings = new TerrainSettings();
+        readonly GeneratedContent _generated = new GeneratedContent();
 
-        void Start()
+        void OnDisable() => _generated.DestroyAll();
+
+        void OnEnable()
         {
-            // RouteView maakt de route in Awake.
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
+            if (routeView == null) return;
             _settings.Seed = seed;
 
             float t0 = Time.realtimeSinceStartup;
@@ -45,8 +49,7 @@ namespace FietsApp
 
         void BuildTerrain(HeightGrid grid)
         {
-            var root = new GameObject("Terrein").transform;
-            root.SetParent(transform, false);
+            var root = _generated.NewObject("Terrein", transform).transform;
             var materials = new[] { grassMaterial, darkGrassMaterial, rockMaterial };
 
             for (int cz = 0; cz < grid.CountZ - 1; cz += ChunkCells)
@@ -74,7 +77,7 @@ namespace FietsApp
                     }
                 }
 
-                var mesh = new Mesh { name = $"Terrein {cx},{cz}", indexFormat = IndexFormat.UInt32 };
+                var mesh = _generated.Track(new Mesh { name = $"Terrein {cx},{cz}", indexFormat = IndexFormat.UInt32 });
                 mesh.SetVertices(vertices);
                 mesh.SetNormals(normals);
                 mesh.subMeshCount = 3;
@@ -106,8 +109,7 @@ namespace FietsApp
 
         void BuildScatter(HeightGrid grid, List<ScatterItem> items)
         {
-            var root = new GameObject("Begroeiing").transform;
-            root.SetParent(transform, false);
+            var root = _generated.NewObject("Begroeiing", transform).transform;
 
             // Per chunk één mesh voor bomen (stam + naalden) en één voor rotsen.
             float chunkSize = ChunkCells * grid.CellSize;
@@ -131,9 +133,9 @@ namespace FietsApp
                     else AddRock(rocks, pose);
                 }
                 if (trees.HasGeometry)
-                    AddRenderer(root, $"Bomen {group.Key}", trees.ToMesh($"Bomen {group.Key}"), new[] { trunkMaterial, leavesMaterial });
+                    AddRenderer(root, $"Bomen {group.Key}", _generated.Track(trees.ToMesh($"Bomen {group.Key}")), new[] { trunkMaterial, leavesMaterial });
                 if (rocks.HasGeometry)
-                    AddRenderer(root, $"Rotsen {group.Key}", rocks.ToMesh($"Rotsen {group.Key}"), new[] { stoneMaterial });
+                    AddRenderer(root, $"Rotsen {group.Key}", _generated.Track(rocks.ToMesh($"Rotsen {group.Key}")), new[] { stoneMaterial });
             }
         }
 
@@ -152,10 +154,9 @@ namespace FietsApp
             b.Octahedron(0, shape);
         }
 
-        static void AddRenderer(Transform parent, string name, Mesh mesh, Material[] materials)
+        void AddRenderer(Transform parent, string name, Mesh mesh, Material[] materials)
         {
-            var go = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
-            go.transform.SetParent(parent, false);
+            var go = _generated.NewObject(name, parent, typeof(MeshFilter), typeof(MeshRenderer));
             go.GetComponent<MeshFilter>().sharedMesh = mesh;
             go.GetComponent<MeshRenderer>().sharedMaterials = materials;
         }
