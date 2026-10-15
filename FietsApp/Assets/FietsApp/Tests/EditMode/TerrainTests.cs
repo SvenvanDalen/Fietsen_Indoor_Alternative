@@ -120,6 +120,21 @@ namespace FietsApp.Tests
         }
 
         [Test]
+        public void NoTreesAboveTheTreeLine()
+        {
+            // Route stijgt tot ±48 m; boomgrens rond 25 m (± variatie).
+            var settings = new TerrainSettings { Margin = 200f, TreeLine = 25f, TreeLineVariation = 5f };
+            var grid = TerrainHeights.Generate(Route, settings);
+
+            var items = Scatter.Place(Route, grid, settings);
+
+            Assert.That(items.Exists(i => i.Kind == ScatterKind.Tree), Is.True, "onder de grens wel bos");
+            foreach (var item in items)
+                if (item.Kind == ScatterKind.Tree)
+                    Assert.That(item.Y, Is.LessThanOrEqualTo(settings.TreeLine + settings.TreeLineVariation));
+        }
+
+        [Test]
         public void ItemsStandOnTheTerrain()
         {
             foreach (var item in Scatter.Place(Route, Grid, Settings))

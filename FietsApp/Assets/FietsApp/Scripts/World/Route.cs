@@ -41,8 +41,9 @@ namespace FietsApp.World
     {
         readonly RoutePoint[] _points;
 
-        public Route(IReadOnlyList<RoutePoint> points)
+        public Route(IReadOnlyList<RoutePoint> points, GeoProjection projection = null)
         {
+            Projection = projection;
             if (points == null || points.Count < 2) throw new ArgumentException("Een route heeft minstens twee punten nodig.");
             _points = new RoutePoint[points.Count];
             for (int i = 0; i < points.Count; i++) _points[i] = points[i];
@@ -53,6 +54,9 @@ namespace FietsApp.World
         }
 
         public IReadOnlyList<RoutePoint> Points => _points;
+
+        /// <summary>Geografische ligging (uit een GPX); null voor verzonnen routes.</summary>
+        public GeoProjection Projection { get; }
         public float Length => _points[_points.Length - 1].Distance;
         public float MaxGradePercent { get; }
 
