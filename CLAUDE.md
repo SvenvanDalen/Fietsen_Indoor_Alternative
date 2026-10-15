@@ -25,6 +25,10 @@ Unity heeft op Windows geen Bluetooth LE; `Bridge/FietsBridge` (.NET 10, Windows
 - Zonder fietsapparaat test je de Unity-kant met een nepbrug: een klein script dat op `localhost:8765` luistert en `connection`- en `data`-berichten stuurt. Het echte verbindingspad test je door met een willekeurig Bluetooth-apparaat te verbinden; dat moet eindigen in een nette `failed`-melding.
 - Bluetooth-UUID's en berichtindelingen controleer je tegen de Bluetooth SIG assigned numbers (`bitbucket.org/bluetooth-SIG/public`: `assigned_numbers/uuids` voor UUID's, `gss/` voor de veldindeling per characteristic). Let op: de huidige GSS wijkt soms af van FTMS 1.0, dat trainers in de praktijk volgen (zie Resistance Level in `IndoorBikeData`).
 
+## Klimmen namaken (`tools/`)
+
+Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, hoogte uit SRTM) en een hoogtebestand van het landschap (`tools/terrain_from_tiles.py`), beide in `FietsApp/Assets/FietsApp/Routes/`. Koppel ze aan `RouteView`. Leg bij elke klim de bron vast in `docs/bronnen.md`, en controleer het profiel tegen de bekende cijfers van de klim met een test (zie `MontVentouxTests`). Alleen open data; geen Strava-segmenten.
+
 ## Unity-project (`FietsApp/`)
 
 Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:

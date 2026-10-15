@@ -10,6 +10,10 @@
 *.controller text merge=unityyamlmerge eol=lf
 *.meta      text merge=unityyamlmerge eol=lf
 *.cs        text diff=csharp
+*.gpx       text eol=lf
+
+# Binaire data zonder LFS (klein genoeg): hoogtebestanden van tools/terrain_from_tiles.py
+*.bytes     binary
 
 # Git LFS: grote binaire bestanden (story 13.4)
 # 3D-modellen

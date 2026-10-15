@@ -26,6 +26,10 @@ namespace FietsApp.World
         public float TreeSpacing = 18f;
         public float TreeBand = 350f;        // bomen tot zo ver van de weg
         public float RockSpacing = 45f;
+        public float RockBand = 700f;        // rotsen tot zo ver van de weg
+        public float TreeLine = float.MaxValue; // m boven zeeniveau; daarboven kale grond
+        public float TreeLineVariation = 80f;   // hoeveel de boomgrens op en neer golft
+        public float ForestFrom = float.MaxValue; // m; daarboven (tot de boomgrens) bosbodem in plaats van gras
     }
 
     /// <summary>Hoogteraster: CountX × CountZ hoekpunten, beginnend op (MinX, MinZ).</summary>
@@ -100,7 +104,10 @@ namespace FietsApp.World
     /// </summary>
     public static class TerrainHeights
     {
-        public static HeightGrid Generate(Route route, TerrainSettings s)
+        /// <param name="natural">
+        /// Echt landschap (bijv. <see cref="LocalHeights"/>); null = verzonnen heuvels uit ruis rond de routehoogte.
+        /// </param>
+        public static HeightGrid Generate(Route route, TerrainSettings s, IHeightSource natural = null)
         {
             float minX = float.MaxValue, maxX = float.MinValue, minZ = float.MaxValue, maxZ = float.MinValue;
             foreach (var p in route.Points)
@@ -119,18 +126,35 @@ namespace FietsApp.World
             var anchors = SmoothingAnchors(route, s.SmoothingRadius / 2f);
 
             // Stap 1: exacte afstand en weghoogte, maar alleen dicht bij de weg (waar het terrein de weg volgt).
+            // We lopen langs de route en bekijken alleen de rasterpunten in een venster eromheen.
             float nearRange = s.ClearWidth + s.Falloff + s.CellSize;
             var roadElevation = new float[countX * countZ];
-            for (int iz = 0; iz < countZ; iz++)
-            for (int ix = 0; ix < countX; ix++)
+            var done = new bool[countX * countZ];
+            for (int i = 0; i < countX * countZ; i++) grid.SetRoadDistance(i % countX, i / countX, float.MaxValue);
+            int reach = (int)Math.Ceiling(nearRange / s.CellSize) + 1;
+            foreach (var p in route.Points)
             {
-                var road = index.Nearest(minX + ix * s.CellSize, minZ + iz * s.CellSize, nearRange);
-                grid.SetRoadDistance(ix, iz, road.Distance <= nearRange ? road.Distance : float.MaxValue);
-                roadElevation[iz * countX + ix] = road.Elevation;
+                int px = (int)Math.Round((p.X - minX) / s.CellSize), pz = (int)Math.Round((p.Z - minZ) / s.CellSize);
+                for (int iz = Math.Max(0, pz - reach); iz <= Math.Min(countZ - 1, pz + reach); iz++)
+                for (int ix = Math.Max(0, px - reach); ix <= Math.Min(countX - 1, px + reach); ix++)
+                {
+                    int k = iz * countX + ix;
+                    if (done[k]) continue;
+                    done[k] = true;
+                    var road = index.Nearest(minX + ix * s.CellSize, minZ + iz * s.CellSize, nearRange);
+                    if (road.Distance > nearRange) continue;
+                    grid.SetRoadDistance(ix, iz, road.Distance);
+                    roadElevation[k] = road.Elevation;
+                }
             }
 
             // Stap 2: verder weg een benaderde afstand; die bepaalt alleen hoe groot de bergen worden.
             ChamferDistance(grid);
+
+            // Stap 3: de vloeiende routehoogte is van zichzelf glad (straal ~120 m), dus die rekenen we op een
+            // grof rooster uit en interpoleren we daartussen. Scheelt een factor 16 aan rekenwerk.
+            var smooth = natural != null ? null : CoarseField(countX, countZ, SmoothStride,
+                (ix, iz) => SmoothElevation(anchors, minX + ix * s.CellSize, minZ + iz * s.CellSize, s.SmoothingRadius));
 
             for (int iz = 0; iz < countZ; iz++)
             for (int ix = 0; ix < countX; ix++)
@@ -142,16 +166,64 @@ namespace FietsApp.World
                 float height = roadElevation[iz * countX + ix] - s.RoadDepth;
                 if (t > 0f)
                 {
-                    float amplitude = Math.Min(distance * s.AmplitudePerMeter, s.MaxAmplitude);
-                    float rise = Math.Min(distance * s.RisePerMeter, s.MaxRise);
-                    float natural = SmoothElevation(anchors, x, z, s.SmoothingRadius)
+                    float landscape;
+                    if (natural != null)
+                    {
+                        landscape = natural.HeightAt(x, z);
+                    }
+                    else
+                    {
+                        float amplitude = Math.Min(distance * s.AmplitudePerMeter, s.MaxAmplitude);
+                        float rise = Math.Min(distance * s.RisePerMeter, s.MaxRise);
+                        landscape = smooth[iz * countX + ix]
                                     + noise.Fbm(x / s.NoiseScale, z / s.NoiseScale) * amplitude
                                     + rise;
-                    height += (natural - height) * t;
+                    }
+                    height += (landscape - height) * t;
                 }
                 grid[ix, iz] = height;
             }
             return grid;
+        }
+
+        const int SmoothStride = 4;
+
+        /// <summary>
+        /// Rekent <paramref name="f"/> uit op elk <paramref name="stride"/>-de punt (plus de laatste rij en kolom)
+        /// en vult de rest bilineair in.
+        /// </summary>
+        static float[] CoarseField(int countX, int countZ, int stride, Func<int, int, float> f)
+        {
+            int[] xs = LatticeIndices(countX, stride), zs = LatticeIndices(countZ, stride);
+            var coarse = new float[xs.Length, zs.Length];
+            for (int j = 0; j < zs.Length; j++)
+            for (int i = 0; i < xs.Length; i++)
+                coarse[i, j] = f(xs[i], zs[j]);
+
+            var field = new float[countX * countZ];
+            for (int j = 0; j < zs.Length - 1; j++)
+            for (int i = 0; i < xs.Length - 1; i++)
+            {
+                for (int iz = zs[j]; iz <= zs[j + 1]; iz++)
+                for (int ix = xs[i]; ix <= xs[i + 1]; ix++)
+                {
+                    float tx = (ix - xs[i]) / (float)(xs[i + 1] - xs[i]);
+                    float tz = (iz - zs[j]) / (float)(zs[j + 1] - zs[j]);
+                    float a = coarse[i, j] + (coarse[i + 1, j] - coarse[i, j]) * tx;
+                    float b = coarse[i, j + 1] + (coarse[i + 1, j + 1] - coarse[i, j + 1]) * tx;
+                    field[iz * countX + ix] = a + (b - a) * tz;
+                }
+            }
+            return field;
+        }
+
+        static int[] LatticeIndices(int count, int stride)
+        {
+            var list = new System.Collections.Generic.List<int>();
+            for (int i = 0; i < count - 1; i += stride) list.Add(i);
+            list.Add(count - 1);
+            if (list.Count == 1) list.Insert(0, 0);
+            return list.ToArray();
         }
 
         /// <summary>

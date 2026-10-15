@@ -9,10 +9,12 @@ namespace FietsApp.World
     {
         public readonly ScatterKind Kind;
         public readonly float X, Y, Z, Scale, RotationDegrees;
+        public readonly float RoadDistance; // benaderd; voor eenvoudiger modellen ver van de weg
 
-        public ScatterItem(ScatterKind kind, float x, float y, float z, float scale, float rotationDegrees)
+        public ScatterItem(ScatterKind kind, float x, float y, float z, float scale, float rotationDegrees, float roadDistance = 0f)
         {
             Kind = kind;
+            RoadDistance = roadDistance;
             X = x;
             Y = y;
             Z = z;
@@ -35,13 +37,14 @@ namespace FietsApp.World
         {
             var items = new List<ScatterItem>();
             var index = new RouteIndex(route);
-            PlaceKind(items, ScatterKind.Tree, s.TreeSpacing, route, grid, s, index);
-            PlaceKind(items, ScatterKind.Rock, s.RockSpacing, route, grid, s, index);
+            var biome = new Biome(s);
+            PlaceKind(items, ScatterKind.Tree, s.TreeSpacing, grid, s, index, biome);
+            PlaceKind(items, ScatterKind.Rock, s.RockSpacing, grid, s, index, biome);
             return items;
         }
 
-        static void PlaceKind(List<ScatterItem> items, ScatterKind kind, float spacing, Route route,
-            HeightGrid grid, TerrainSettings s, RouteIndex index)
+        static void PlaceKind(List<ScatterItem> items, ScatterKind kind, float spacing,
+            HeightGrid grid, TerrainSettings s, RouteIndex index, Biome biome)
         {
             int nx = (int)((grid.MaxX - grid.MinX) / spacing), nz = (int)((grid.MaxZ - grid.MinZ) / spacing);
             for (int iz = 0; iz < nz; iz++)
@@ -51,27 +54,31 @@ namespace FietsApp.World
                 float x = grid.MinX + (ix + Unit(h, 0)) * spacing;
                 float z = grid.MinZ + (iz + Unit(h, 1)) * spacing;
 
-                // Exact controleren dat niets op of naast de weg staat; verder is de benaderde afstand goed genoeg.
-                float keepOff = s.ClearWidth + KeepOffRoad;
-                if (index.Nearest(x, z, keepOff).Distance <= keepOff) continue;
+                // Eerst de goedkope, benaderde afstand; exact controleren alleen vlak bij de weg.
                 float distance = grid.RoadDistanceAt(x, z);
+                if (distance > (kind == ScatterKind.Tree ? s.TreeBand : s.RockBand)) continue;
+                float keepOff = s.ClearWidth + KeepOffRoad;
+                if (distance < keepOff + 2f * grid.CellSize && index.Nearest(x, z, keepOff).Distance <= keepOff) continue;
 
                 float slope = grid.SlopeAt(x, z);
+                bool bare = biome.IsAboveTreeLine(x, z, grid.HeightAt(x, z));
                 float chance;
                 if (kind == ScatterKind.Tree)
                 {
-                    if (distance > s.TreeBand || slope > TreeMaxSlope) continue;
+                    if (bare || distance > s.TreeBand || slope > TreeMaxSlope) continue;
                     // Dichter bij de weg dichter bos; verder weg wordt het open.
                     chance = 0.75f * (1f - distance / s.TreeBand) + 0.1f;
                 }
                 else
                 {
-                    chance = slope > RockMinSlope ? 0.7f : 0.08f;
+                    if (distance > s.RockBand) continue;
+                    // Boven de boomgrens ligt overal los gesteente.
+                    chance = slope > RockMinSlope ? 0.7f : bare ? 0.45f : 0.08f;
                 }
                 if (Unit(h, 2) > chance) continue;
 
                 items.Add(new ScatterItem(kind, x, grid.HeightAt(x, z), z,
-                    0.7f + Unit(h, 3) * 0.7f, Unit(h, 4) * 360f));
+                    0.7f + Unit(h, 3) * 0.7f, Unit(h, 4) * 360f, distance));
             }
         }
 
