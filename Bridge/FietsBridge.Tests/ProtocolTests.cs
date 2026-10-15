@@ -37,8 +37,35 @@ public class ProtocolTests
         Assert.Equal(all, command.All);
     }
 
+    [Fact]
+    public void Data_UsesMinusOneForMissingValues()
+    {
+        // JsonUtility kent geen null; -1 betekent "niet meegestuurd".
+        Assert.Equal(
+            """{"type":"data","id":"AA:BB:CC:DD:EE:FF","power":250,"cadence":90.5,"heartRate":-1}""",
+            Protocol.Data("AA:BB:CC:DD:EE:FF", new Measurement(250, 90.5f, null)));
+    }
+
+    [Fact]
+    public void Connection_Serializes()
+    {
+        Assert.Equal(
+            """{"type":"connection","id":"AA:BB:CC:DD:EE:FF","name":"Smart Drive","state":"connected","message":""}""",
+            Protocol.Connection("AA:BB:CC:DD:EE:FF", "Smart Drive", ConnectionState.Connected));
+    }
+
+    [Fact]
+    public void Parse_ConnectAndDisconnect()
+    {
+        Assert.Equal(new ConnectCommand("AA:BB:CC:DD:EE:FF"),
+            Protocol.Parse("""{"type":"connect","id":"AA:BB:CC:DD:EE:FF"}"""));
+        Assert.Equal(new DisconnectCommand("AA:BB:CC:DD:EE:FF"),
+            Protocol.Parse("""{"type":"disconnect","id":"AA:BB:CC:DD:EE:FF"}"""));
+    }
+
     [Theory]
     [InlineData("""{"type":"onbekend"}""")]
+    [InlineData("""{"type":"connect"}""")]
     [InlineData("geen json")]
     [InlineData("")]
     public void Parse_InvalidInput_ReturnsNull(string json)
