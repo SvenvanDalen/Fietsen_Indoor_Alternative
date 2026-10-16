@@ -8,6 +8,7 @@ Herkomst en licentie van alle route-, hoogte- en terreindata (story 13.5). Voeg 
 |---|---|---|---|---|---|
 | Mont Ventoux vanaf Bédoin | `FietsApp/Assets/FietsApp/Routes/MontVentoux_Bedoin.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 974` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-15 |
 | Alpe d'Huez | `FietsApp/Assets/FietsApp/Routes/AlpeDHuez.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 211` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
+| Passo dello Stelvio vanaf Prato | `FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.gpx`, `.terrain.bytes` | OpenStreetMap, weg `SS38` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
 
 Opnieuw maken:
 
@@ -17,6 +18,9 @@ python tools/terrain_from_tiles.py --gpx FietsApp/Assets/FietsApp/Routes/MontVen
 
 python tools/route_from_osm.py --ref "D 211" --bbox 45.04,6.00,45.11,6.09 --start 45.0594,6.0379 --end 45.0909,6.0654 --name "Alpe d'Huez" --out FietsApp/Assets/FietsApp/Routes/AlpeDHuez.gpx
 python tools/terrain_from_tiles.py --gpx FietsApp/Assets/FietsApp/Routes/AlpeDHuez.gpx --out FietsApp/Assets/FietsApp/Routes/AlpeDHuez.terrain.bytes
+
+python tools/route_from_osm.py --ref "SS38" --bbox 46.52,10.44,46.65,10.62 --start 46.6195,10.5925 --end 46.5287,10.4530 --name "Passo dello Stelvio (Prato)" --out FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.gpx
+python tools/terrain_from_tiles.py --gpx FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.gpx --out FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.terrain.bytes
 ```
 
 Alpe d'Huez loopt hier van het begin van de D 211 tot het dorp (12,9 km, 723 → 1791 m). De bekende 13,8 km eindigt bij de Tour-finish, via straten van het skidorp die geen D 211 heten.

@@ -196,8 +196,45 @@ namespace FietsApp.Tests
         [Test]
         public void HasTheFamousHairpins()
         {
-            // 21 genummerde bochten; tel plekken waar de weg binnen 60 m bijna omkeert.
-            var route = Load();
+            // 21 genummerde bochten.
+            Assert.That(Hairpins.Count(Load()), Is.InRange(18, 23));
+        }
+    }
+
+    public class StelvioTests
+    {
+        const string GpxPath = "Assets/FietsApp/Routes/Stelvio_Prato.gpx";
+
+        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+
+        [Test]
+        public void MatchesTheKnownClimbFromPrato()
+        {
+            var stats = ClimbStats.Of(Load());
+
+            // Prato allo Stelvio (±910 m) tot de pas (2757 m): ±24,5 km aan gemiddeld ±7,4%, steilste km rond 9-10%.
+            Assert.That(stats.LengthMeters / 1000f, Is.EqualTo(24.6f).Within(0.4f));
+            Assert.That(stats.StartElevation, Is.EqualTo(910f).Within(25f));
+            Assert.That(stats.EndElevation, Is.EqualTo(2757f).Within(25f));
+            Assert.That(stats.AverageGradePercent, Is.EqualTo(7.5f).Within(0.3f));
+            Assert.That(stats.MaxGradePercent, Is.InRange(9f, 13f));
+            Assert.That(stats.MinGradePercent, Is.GreaterThan(-1f));
+            Assert.That(ClimbCategories.Of(stats), Is.EqualTo(ClimbCategory.HC));
+        }
+
+        [Test]
+        public void HasTheFamousHairpins()
+        {
+            // 48 genummerde bochten vanaf Prato.
+            Assert.That(Hairpins.Count(Load()), Is.InRange(42, 52));
+        }
+    }
+
+    static class Hairpins
+    {
+        /// <summary>Plekken waar de weg binnen 60 m bijna omkeert, minstens 120 m uit elkaar.</summary>
+        public static int Count(Route route)
+        {
             int hairpins = 0;
             float last = float.MinValue;
             for (float d = 30f; d < route.Length - 30f; d += 5f)
@@ -211,8 +248,7 @@ namespace FietsApp.Tests
                     last = d;
                 }
             }
-
-            Assert.That(hairpins, Is.InRange(18, 23));
+            return hairpins;
         }
     }
 }
