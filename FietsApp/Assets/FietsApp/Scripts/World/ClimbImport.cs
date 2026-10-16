@@ -8,7 +8,9 @@ namespace FietsApp.World
     {
         public float Spacing = 10f;          // m tussen routepunten
         public float MedianRadius = 100f;    // m; mediaan haalt losse uitschieters weg
-        public float SmoothingSigma = 80f;   // m; Gauss maakt de helling vloeiend
+        // m; Gauss maakt de helling vloeiend. Zo breed omdat hoogtemodellen in haarspeldbochten hoogtes van de
+        // bocht erboven of eronder oppikken (Alpe d'Huez: 16% gevolgd door 5% per 100 m); 150 m middelt dat uit.
+        public float SmoothingSigma = 150f;
     }
 
     /// <summary>
