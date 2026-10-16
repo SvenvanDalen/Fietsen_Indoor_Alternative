@@ -10,6 +10,7 @@ namespace FietsApp
     public sealed class Hud : MonoBehaviour
     {
         [SerializeField] RideController ride;
+        [SerializeField] RideRecorder recorder;
         [SerializeField, Range(0.5f, 2f)] float scale = 1f;
 
         const float TileWidth = 220f;
@@ -21,6 +22,7 @@ namespace FietsApp
         void Awake()
         {
             if (ride == null) ride = FindAnyObjectByType<RideController>();
+            if (recorder == null) recorder = FindAnyObjectByType<RideRecorder>();
             BuildCanvas();
         }
 
@@ -41,7 +43,8 @@ namespace FietsApp
                 $"{t.Name}{(t.IsConnected ? "" : " (niet verbonden)")}   " +
                 $"helling {ride.GradePercent:0.0}% (trainer {t.GradePercent:0.0}%)   " +
                 $"{ride.DistanceM / 1000f:0.00} km   {seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}" +
-                (ride.Brake > 0f ? "   <color=#ff6060>remmen</color>" : "");
+                (ride.Brake > 0f ? "   <color=#ff6060>remmen</color>" : "") +
+                (recorder != null && recorder.Status.Length > 0 ? $"   <color=#ff9090>●</color> {recorder.Status}" : "");
         }
 
         void ApplyScale()

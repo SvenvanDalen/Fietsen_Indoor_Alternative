@@ -57,9 +57,13 @@ namespace FietsApp
             Trainer.SetGrade(_gradePercent);
         }
 
+        /// <summary>Een nieuwe rit begint (na <see cref="StartAt"/>); de vorige is dan voorbij.</summary>
+        public event System.Action RideStarting;
+
         /// <summary>Begin de rit opnieuw op een afstand langs de route, stilstaand.</summary>
         public void StartAt(float distanceM)
         {
+            RideStarting?.Invoke();
             DistanceM = distanceM;
             SpeedMs = 0f;
             ElapsedSeconds = 0f;
