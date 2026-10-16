@@ -14,6 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.ClimbLibrary
   climbs:
   - {fileID: 11400000, guid: 76645dc24f7f7ab41a20f61cecc793d0, type: 2}
+  - {fileID: 11400000, guid: 1d17ee17d52409e49a3678cf4168437e, type: 2}
+  - {fileID: 11400000, guid: a8bd1147ba1fa3345aa73571fe22cb26, type: 2}
+  - {fileID: 11400000, guid: 7d10c9bec596d3d4caf4f73bff597a3b, type: 2}
   - {fileID: 11400000, guid: 4c914bf2c92267e43b5430039e452761, type: 2}
   - {fileID: 11400000, guid: 19d1455b4c332614b9ecb0c6b5105c92, type: 2}
+  - {fileID: 11400000, guid: ae7449a2a124cf6419e0bdc8ae298b9e, type: 2}
   - {fileID: 11400000, guid: 983c6b2dde51fd343bef26a790dca975, type: 2}
+  - {fileID: 11400000, guid: 8bfe69d36ef13c8429a1e64cc90c9235, type: 2}

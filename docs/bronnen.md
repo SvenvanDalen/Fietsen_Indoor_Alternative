@@ -10,6 +10,13 @@ Herkomst en licentie van alle route-, hoogte- en terreindata (story 13.5). Voeg 
 | Alpe d'Huez | `FietsApp/Assets/FietsApp/Routes/AlpeDHuez.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 211` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
 | Colle delle Finestre vanaf Susa | `FietsApp/Assets/FietsApp/Routes/Finestre_Susa.gpx`, `.terrain.bytes` | OpenStreetMap, wegen "Via Meana", "Via Colle delle Finestre", "Strada Provinciale del Colle delle Finestre" en naamloos verbindingsstuk way 330898189 (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
 | Passo dello Stelvio vanaf Prato | `FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.gpx`, `.terrain.bytes` | OpenStreetMap, weg `SS38` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
+| Mont Ventoux vanaf Sault | `FietsApp/Assets/FietsApp/Routes/MontVentoux_Sault.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 164`, `D 974` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/build_climbs.py` op 2026-10-16 |
+| Col de la Colombière vanaf Scionzier | `FietsApp/Assets/FietsApp/Routes/Colombiere.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 4` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/build_climbs.py` op 2026-10-16 |
+| Col de Joux Plane vanaf Samoëns | `FietsApp/Assets/FietsApp/Routes/JouxPlane.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 354` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/build_climbs.py` op 2026-10-16 |
+| Grand Colombier vanaf Culoz | `FietsApp/Assets/FietsApp/Routes/GrandColombier_Culoz.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 120` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/build_climbs.py` op 2026-10-16 |
+| Col du Granon vanaf Saint-Chaffrey | `FietsApp/Assets/FietsApp/Routes/Granon.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 234`, `D 234t` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/build_climbs.py` op 2026-10-16 |
+
+Klimmen uit de catalogus `tools/climbs.json` maak je opnieuw met `python tools/build_climbs.py --force --only <id>`; de klimmen hieronder met losse opdrachten.
 
 Opnieuw maken:
 
