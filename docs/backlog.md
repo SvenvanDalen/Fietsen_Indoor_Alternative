@@ -213,6 +213,8 @@ Als rijder wil ik dat afdalingen realistisch aanvoelen.
 - [ ] Versnelling en vrijloop
 - [ ] Optioneel remmen
 
+**Stand (2026-10-16):** vrijloop en versnellen volgen uit het fysicamodel (eindsnelheid getest: 63 km/u op -8% bij 80 kg); remmen met de spatiebalk (vol remmen 4 m/s², houdt je stil zonder achteruit te duwen), ook met de echte trainer. De trainer krijgt de negatieve helling via FTMS (1.2).
+
 #### 2.5 Uitrusting kiezen (aero, licht)
 
 Epic: E2 · Fase: MVP · Prio: Could · Punten: 3
