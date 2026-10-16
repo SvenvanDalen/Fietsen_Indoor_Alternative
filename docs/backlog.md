@@ -342,6 +342,13 @@ Als rijder wil ik 50+ klimmen in de bibliotheek.
 
 - [ ] Gevarieerd: Alpen, Pyreneeën, Dolomieten, lokale heuvels
 
+**Gesplitst (2026-10-16):**
+- 4.5a Gereedschap: catalogus `tools/climbs.json` en `tools/build_climbs.py` (weg controleren tegen bekende lengte, dan hoogte en landschap) — gebouwd
+- 4.5b Unity: `ClimbLibrary`, FietsApp > Klimmen bijwerken, ritmenu met gebiedsfilter en pagina's — gebouwd
+- 4.5c Inhoud: de klimmen uit de catalogus bouwen en nalopen — bezig
+
+**Stand 4.5c (2026-10-16):** 55 klimmen in de catalogus (o.a. op verzoek Col d'Allos, Col du Granon, Col de Mantet). Wegcontrole half gedaan: Ventoux Sault, Colombière, Joux Plane en Grand Colombier kloppen; te herstellen: Galibier (geen verbinding via D 902), Bonette (wegnummer D 64 niet gevonden), Télégraphe (start 500 m naast de weg). Overpass was erg druk (veel 502's). Verder: `python -u tools/build_climbs.py --check`, fouten herstellen in `climbs.json`, dan `python -u tools/build_climbs.py` en in Unity FietsApp > Klimmen bijwerken.
+
 #### 4.6 Klimmen op naam vinden
 
 Epic: E4 · Fase: V1 · Prio: Should · Punten: 3
