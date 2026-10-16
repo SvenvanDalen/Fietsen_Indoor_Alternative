@@ -148,6 +148,12 @@ namespace FietsApp.Tests
         }
 
         [Test]
+        public void IsHorsCategorie()
+        {
+            Assert.That(ClimbCategories.Of(ClimbStats.Of(Load())), Is.EqualTo(ClimbCategory.HC));
+        }
+
+        [Test]
         public void HasNoFakeDescents()
         {
             // De klim vanaf Bédoin gaat nergens noemenswaardig omlaag; een daling wijst op meetruis.
