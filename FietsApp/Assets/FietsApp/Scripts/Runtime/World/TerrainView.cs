@@ -38,12 +38,28 @@ namespace FietsApp
         readonly GeneratedContent _generated = new GeneratedContent();
         Biome _biome;
 
-        void OnDisable() => _generated.DestroyAll();
-
         void OnEnable()
         {
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             if (routeView == null) return;
+            routeView.ClimbChanged += Rebuild;
+            Build();
+        }
+
+        void OnDisable()
+        {
+            if (routeView != null) routeView.ClimbChanged -= Rebuild;
+            _generated.DestroyAll();
+        }
+
+        void Rebuild()
+        {
+            _generated.DestroyAll();
+            Build();
+        }
+
+        void Build()
+        {
             _settings.Seed = seed;
             // Boomgrens en bos komen van de klim; de oefenklim heeft overal gras.
             var climb = routeView.Climb;

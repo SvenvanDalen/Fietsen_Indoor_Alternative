@@ -19,6 +19,18 @@ namespace FietsApp
         void OnEnable()
         {
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
+            if (routeView != null) routeView.ClimbChanged += Rebuild;
+            Build();
+        }
+
+        void Rebuild()
+        {
+            _generated.DestroyAll();
+            Build();
+        }
+
+        void Build()
+        {
             var route = routeView != null ? routeView.Route : null;
             var heights = routeView != null ? routeView.NaturalHeights : null;
             var climb = routeView != null ? routeView.Climb : null;
@@ -36,7 +48,11 @@ namespace FietsApp
                     i % 2 == 0 ? redMaterial : wallMaterial);
         }
 
-        void OnDisable() => _generated.DestroyAll();
+        void OnDisable()
+        {
+            if (routeView != null) routeView.ClimbChanged -= Rebuild;
+            _generated.DestroyAll();
+        }
 
         void Part(Transform parent, PrimitiveType type, Vector3 position, Vector3 scale, Material material)
         {

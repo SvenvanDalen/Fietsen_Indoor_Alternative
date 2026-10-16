@@ -475,7 +475,9 @@ Epic: E6 · Fase: MVP · Prio: Must · Punten: 5
 
 Als rijder wil ik een ritmenu met klimmen kiezen.
 
-- [ ] Lijst met filter op lengte, gemiddelde helling en categorie
+- [x] Lijst met filter op lengte, gemiddelde helling en categorie
+
+**Stand (2026-10-16):** `RideMenu` opent bij de start en met M; filterknoppen voor lengte, helling en categorie; een klim kiezen (klik of 1-9) bouwt weg, terrein en profiel opnieuw op en zet je aan de voet. Zolang het menu open is staat de rit stil.
 
 #### 6.4 Pauzeren
 

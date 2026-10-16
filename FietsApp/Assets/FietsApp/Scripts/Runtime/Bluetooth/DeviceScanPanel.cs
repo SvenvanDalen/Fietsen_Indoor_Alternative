@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 namespace FietsApp.Bluetooth
@@ -42,7 +40,7 @@ namespace FietsApp.Bluetooth
         {
             if (bridge == null) bridge = FindAnyObjectByType<BridgeClient>();
             if (link == null) link = FindAnyObjectByType<BridgeTrainerLink>();
-            EnsureEventSystem();
+            UiFactory.EnsureEventSystem();
             Build();
             _panel.SetActive(visibleAtStart);
         }
@@ -166,27 +164,13 @@ namespace FietsApp.Bluetooth
 
         static string DisplayName(string name, string id) => string.IsNullOrEmpty(name) ? $"(naamloos) {id}" : name;
 
-        static void EnsureEventSystem()
-        {
-            if (FindAnyObjectByType<EventSystem>() != null) return;
-            new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
-        }
-
         void Build()
         {
-            var canvasGo = new GameObject("Apparaten Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            canvasGo.transform.SetParent(transform, false);
-            var canvas = canvasGo.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 10;
-            var scaler = canvasGo.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = 0.5f;
+            var canvas = UiFactory.Canvas(transform, "Apparaten Canvas", 10);
 
             float height = HeaderHeight;
             var panel = new GameObject("Paneel", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
-            panel.SetParent(canvasGo.transform, false);
+            panel.SetParent(canvas, false);
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0f, 0f);
             panel.anchoredPosition = new Vector2(24f, 24f);
             panel.sizeDelta = new Vector2(Width, height);
@@ -194,21 +178,21 @@ namespace FietsApp.Bluetooth
             _panel = panel.gameObject;
 
             float y = -12f;
-            var title = AddText(panel, "Titel", 26, y, 34f);
+            var title = UiFactory.Text(panel, "Titel", 26, y, 34f);
             title.text = "Bluetooth-apparaten  <size=16><color=#bbb>(B verbergt)</color></size>";
             y -= 38f;
 
-            _status = AddText(panel, "Status", 18, y, 26f);
+            _status = UiFactory.Text(panel, "Status", 18, y, 26f);
             y -= 34f;
 
-            _scanLabel = AddButton(panel, "Zoeken", new Vector2(16f, y), 160f, ToggleScan).label;
-            _allLabel = AddButton(panel, "Alle", new Vector2(188f, y), 240f, ToggleAll).label;
+            _scanLabel = UiFactory.Button(panel, "Zoeken", new Vector2(16f, y), 160f, RowHeight + 6f, ToggleScan).label;
+            _allLabel = UiFactory.Button(panel, "Alle", new Vector2(188f, y), 240f, RowHeight + 6f, ToggleAll).label;
             y -= 56f;
 
             _rows = new Row[MaxRows];
             for (int i = 0; i < MaxRows; i++)
             {
-                var (button, label) = AddButton(panel, $"Rij {i}", new Vector2(16f, y), Width - 32f, null);
+                var (button, label) = UiFactory.Button(panel, $"Rij {i}", new Vector2(16f, y), Width - 32f, RowHeight + 6f, null);
                 label.alignment = TextAnchor.MiddleLeft;
                 label.supportRichText = true;
                 label.rectTransform.offsetMin = new Vector2(10f, 0f);
@@ -218,51 +202,6 @@ namespace FietsApp.Bluetooth
                 _rows[i] = row;
                 y -= RowHeight + 4f;
             }
-        }
-
-        static Text AddText(RectTransform parent, string name, int size, float y, float height)
-        {
-            var text = new GameObject(name, typeof(RectTransform), typeof(Text)).GetComponent<Text>();
-            var rt = text.rectTransform;
-            rt.SetParent(parent, false);
-            rt.anchorMin = new Vector2(0f, 1f);
-            rt.anchorMax = new Vector2(1f, 1f);
-            rt.pivot = new Vector2(0.5f, 1f);
-            rt.offsetMin = new Vector2(16f, y - height);
-            rt.offsetMax = new Vector2(-16f, y);
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            text.fontSize = size;
-            text.color = Color.white;
-            text.supportRichText = true;
-            text.horizontalOverflow = HorizontalWrapMode.Overflow;
-            text.alignment = TextAnchor.MiddleLeft;
-            text.raycastTarget = false;
-            return text;
-        }
-
-        static (Button button, Text label) AddButton(RectTransform parent, string name, Vector2 topLeft, float width,
-            UnityEngine.Events.UnityAction onClick)
-        {
-            var rt = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button)).GetComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0f, 1f);
-            rt.anchoredPosition = topLeft;
-            rt.sizeDelta = new Vector2(width, RowHeight + 6f);
-            rt.GetComponent<Image>().color = new Color(0.2f, 0.45f, 0.8f, 1f);
-            var button = rt.GetComponent<Button>();
-            if (onClick != null) button.onClick.AddListener(onClick);
-
-            var label = new GameObject("Label", typeof(RectTransform), typeof(Text)).GetComponent<Text>();
-            label.rectTransform.SetParent(rt, false);
-            label.rectTransform.anchorMin = Vector2.zero;
-            label.rectTransform.anchorMax = Vector2.one;
-            label.rectTransform.offsetMin = label.rectTransform.offsetMax = Vector2.zero;
-            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            label.fontSize = 18;
-            label.alignment = TextAnchor.MiddleCenter;
-            label.color = Color.white;
-            label.raycastTarget = false;
-            return (button, label);
         }
     }
 }

@@ -36,6 +36,18 @@ namespace FietsApp
         /// <summary>De gekozen klim, of null voor de oefenklim.</summary>
         public Climb Climb => climb;
 
+        /// <summary>Na <see cref="SetClimb"/>: de weg is opnieuw gebouwd; terrein en HUD bouwen zich hierop opnieuw op.</summary>
+        public event System.Action ClimbChanged;
+
+        /// <summary>Kies een andere klim tijdens het spelen (ritmenu, story 6.3).</summary>
+        public void SetClimb(Climb value)
+        {
+            climb = value;
+            _generated.DestroyAll();
+            OnEnable();
+            ClimbChanged?.Invoke();
+        }
+
         /// <summary>Echt landschap in de lokale meters van de route, of null als er geen is.</summary>
         public IHeightSource NaturalHeights =>
             _naturalHeights ?? (_naturalHeights = climb != null && climb.terrain != null && Route.Projection != null
