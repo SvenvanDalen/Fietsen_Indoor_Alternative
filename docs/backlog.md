@@ -813,7 +813,7 @@ Alle eerdere vragen zijn beantwoord (zie sectie 2). Nog open of te verifiëren:
 - [ ] Biedt de FitBike Smart Drive 50 Bluetooth FTMS aan, of alleen ANT+ FE-C en een eigen Bluetooth-protocol? (story 1.8)
 - [x] Is er een gratis Unity-pakket voor Bluetooth LE op Windows, of is een eigen .NET-brug nodig? (sectie 8, stap 4) **Besloten 2026-10-15:** eigen .NET-brug (`Bridge/`), zie `docs/decisions.md`.
 - [ ] Staat Garmin Connect automatische upload toe voor een hobbyproject, of alleen handmatig via .fit? (story 5.4)
-- [ ] Zijn de Bluetooth-identificaties in sectie 8 (UUID's en opcodes) gecontroleerd tegen de officiële Bluetooth-specificatie? **Deels (2026-10-15):** alle service- en characteristic-UUID's kloppen met de Bluetooth SIG assigned numbers; de Control Point-opcodes en ANT+-pagina 51 nog controleren bij 1.2/1.8.
+- [ ] Zijn de Bluetooth-identificaties in sectie 8 (UUID's en opcodes) gecontroleerd tegen de officiële Bluetooth-specificatie? **Deels (2026-10-15):** alle service- en characteristic-UUID's kloppen met de Bluetooth SIG assigned numbers; de Control Point-opcodes (0x00, 0x07, 0x11, antwoord 0x80) zijn bij 1.2 gecontroleerd tegen GoldenCheetah en Auuki (de FTMS-specificatie zelf is niet vrij te downloaden); ANT+-pagina 51 nog controleren bij 1.7/1.8.
 
 ## 8. Sprint 1 in detail: trainer koppelen
 

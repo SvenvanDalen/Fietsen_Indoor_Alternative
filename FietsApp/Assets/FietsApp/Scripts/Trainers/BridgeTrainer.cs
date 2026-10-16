@@ -1,3 +1,5 @@
+using System;
+
 namespace FietsApp.Trainers
 {
     /// <summary>
@@ -26,15 +28,22 @@ namespace FietsApp.Trainers
         public float MaxGradePercent { get; }
         public float GradePercent => _gradePercent;
 
+        /// <summary>De (begrensde) helling is veranderd en moet naar de trainer (story 1.2).</summary>
+        public event Action<float> GradeChanged;
+
         public BridgeTrainer(float maxGradePercent = 20f)
         {
             MaxGradePercent = maxGradePercent;
         }
 
-        // De helling naar de trainer sturen volgt in story 1.2 (FTMS Control Point).
-        public void SetGrade(float gradePercent) =>
-            _gradePercent = gradePercent < -MaxGradePercent ? -MaxGradePercent
+        public void SetGrade(float gradePercent)
+        {
+            float clamped = gradePercent < -MaxGradePercent ? -MaxGradePercent
                 : gradePercent > MaxGradePercent ? MaxGradePercent : gradePercent;
+            if (clamped == _gradePercent) return;
+            _gradePercent = clamped;
+            GradeChanged?.Invoke(clamped);
+        }
 
         /// <summary>
         /// Verwerk een meting. -1 betekent "niet meegestuurd" (afspraak met de brug);

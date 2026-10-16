@@ -99,6 +99,9 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
             case ConnectCommand connect:
                 await ConnectAsync(connect.Id, ct);
                 break;
+            case GradeCommand grade:
+                if (_sensors.TryGetValue(grade.Id, out var sensor)) sensor.SetGrade(grade.Grade);
+                break;
             case DisconnectCommand disconnect:
                 if (Disconnect(disconnect.Id) is { } name)
                     await BroadcastAsync(Protocol.Connection(disconnect.Id, name, ConnectionState.Disconnected), ct);
@@ -124,6 +127,11 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
                 if (Disconnect(id) is not { } lostName) return; // al bewust ontkoppeld
                 Console.WriteLine($"Verbinding met {id} verbroken");
                 _ = BroadcastAsync(Protocol.Connection(id, lostName, ConnectionState.Disconnected), ct);
+            };
+            sensor.ControlStatus += message =>
+            {
+                Console.WriteLine($"{id}: {message}");
+                _ = BroadcastAsync(Protocol.Connection(id, sensor.Name, ConnectionState.Connected, message), ct);
             };
             _sensors[id] = sensor;
             Console.WriteLine($"Verbonden met {id} {sensor.Name}");

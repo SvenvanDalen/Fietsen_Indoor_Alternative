@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using UnityEngine;
 
 namespace FietsApp.Bluetooth
@@ -78,6 +79,10 @@ namespace FietsApp.Bluetooth
             $"{{\"type\":\"scan\",\"enabled\":{Bool(enabled)},\"all\":{Bool(all)}}}";
 
         public static string Connect(string id) => $"{{\"type\":\"connect\",\"id\":\"{id}\"}}";
+
+        /// <summary>Helling voor de trainer; altijd met een punt als decimaalteken, ongeacht de taal van Windows.</summary>
+        public static string Grade(string id, float gradePercent) =>
+            $"{{\"type\":\"grade\",\"id\":\"{id}\",\"grade\":{gradePercent.ToString("0.##", CultureInfo.InvariantCulture)}}}";
 
         public static string Disconnect(string id) => $"{{\"type\":\"disconnect\",\"id\":\"{id}\"}}";
 

@@ -63,6 +63,13 @@ public class ProtocolTests
             Protocol.Parse("""{"type":"disconnect","id":"AA:BB:CC:DD:EE:FF"}"""));
     }
 
+    [Fact]
+    public void Parse_GradeCommand()
+    {
+        Assert.Equal(new GradeCommand("AA:BB:CC:DD:EE:FF", 8.5f),
+            Protocol.Parse("""{"type":"grade","id":"AA:BB:CC:DD:EE:FF","grade":8.5}"""));
+    }
+
     [Theory]
     [InlineData("""{"type":"onbekend"}""")]
     [InlineData("""{"type":"connect"}""")]
