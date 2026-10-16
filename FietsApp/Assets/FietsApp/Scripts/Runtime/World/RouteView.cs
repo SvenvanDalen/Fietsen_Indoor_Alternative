@@ -16,29 +16,28 @@ namespace FietsApp
         [SerializeField] Material vergeMaterial;
         [Tooltip("Berm boven de boomgrens: grind in plaats van gras.")]
         [SerializeField] Material bareVergeMaterial;
-        [Tooltip("Vanaf deze hoogte (m) de kale berm; gelijk houden aan de boomgrens van het terrein.")]
-        [SerializeField] float bareVergeFrom = 100000f;
         [SerializeField, Min(2f)] float roadWidth = 6f;
         [SerializeField, Min(0f)] float vergeWidth = 2.5f;
 
-        [Tooltip("GPX van de klim (via tools/route_from_osm.py). Leeg = de oefenklim.")]
-        [SerializeField] TextAsset routeGpx;
-        [Tooltip("Echt landschap rond de klim (.bytes via tools/terrain_from_tiles.py). Leeg = verzonnen heuvels.")]
-        [SerializeField] TextAsset terrainHeights;
+        [Tooltip("De klim (Assets/FietsApp/Routes). Leeg = de oefenklim.")]
+        [SerializeField] Climb climb;
 
         readonly GeneratedContent _generated = new GeneratedContent();
         Route _route;
         IHeightSource _naturalHeights;
 
         // Lui aangemaakt, zodat andere componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
-        public Route Route => _route ?? (_route = routeGpx != null
-            ? ClimbImport.FromGpx(Gpx.Parse(routeGpx.text))
+        public Route Route => _route ?? (_route = climb != null && climb.gpx != null
+            ? ClimbImport.FromGpx(Gpx.Parse(climb.gpx.text))
             : TestRoutes.Testklim());
+
+        /// <summary>De gekozen klim, of null voor de oefenklim.</summary>
+        public Climb Climb => climb;
 
         /// <summary>Echt landschap in de lokale meters van de route, of null als er geen is.</summary>
         public IHeightSource NaturalHeights =>
-            _naturalHeights ?? (_naturalHeights = terrainHeights != null && Route.Projection != null
-                ? new LocalHeights(GeoHeightField.Parse(terrainHeights.bytes), Route.Projection)
+            _naturalHeights ?? (_naturalHeights = climb != null && climb.terrain != null && Route.Projection != null
+                ? new LocalHeights(GeoHeightField.Parse(climb.terrain.bytes), Route.Projection)
                 : null);
 
         void OnEnable()
@@ -65,8 +64,9 @@ namespace FietsApp
             };
 
             AddStrip("Weg", road, new[] { roadMaterial }, pts, i => 0);
+            float gravelFrom = climb != null && climb.gravelVergeAboveTreeLine ? climb.treeLine : float.MaxValue;
             AddStrip("Berm", verges, new[] { vergeMaterial, bareVergeMaterial ?? vergeMaterial }, pts,
-                i => pts[i].Elevation > bareVergeFrom ? 1 : 0);
+                i => pts[i].Elevation > gravelFrom ? 1 : 0);
         }
 
         /// <summary>

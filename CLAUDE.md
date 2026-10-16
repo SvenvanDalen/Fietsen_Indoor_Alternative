@@ -27,7 +27,7 @@ Unity heeft op Windows geen Bluetooth LE; `Bridge/FietsBridge` (.NET 10, Windows
 
 ## Klimmen namaken (`tools/`)
 
-Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, hoogte uit SRTM) en een hoogtebestand van het landschap (`tools/terrain_from_tiles.py`), beide in `FietsApp/Assets/FietsApp/Routes/`. Koppel ze aan `RouteView`. Leg bij elke klim de bron vast in `docs/bronnen.md`, en controleer het profiel tegen de bekende cijfers van de klim met een test (zie `MontVentouxTests`). Alleen open data; geen Strava-segmenten.
+Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, hoogte uit SRTM) en een hoogtebestand van het landschap (`tools/terrain_from_tiles.py`), beide in `FietsApp/Assets/FietsApp/Routes/`. Maak daar een `Climb`-asset (menu *FietsApp/Klim*) met de bestanden, de boom- en bosgrens en de grond boven de boomgrens, en koppel die aan `RouteView`. Leg bij elke klim de bron vast in `docs/bronnen.md`, en controleer het profiel tegen de bekende cijfers van de klim met een test (zie `MontVentouxTests`). Alleen open data; geen Strava-segmenten.
 
 ## Unity-project (`FietsApp/`)
 

@@ -1,0 +1,36 @@
+using UnityEngine;
+
+namespace FietsApp
+{
+    /// <summary>
+    /// Alles wat één klim eigen is (story 4.4): de weg, het landschap, de begroeiing en een eventueel
+    /// herkenningspunt op de top. <see cref="RouteView"/>, <see cref="TerrainView"/> en <see cref="SummitTower"/>
+    /// lezen hieruit, zodat een andere klim kiezen één veld is.
+    /// </summary>
+    [CreateAssetMenu(menuName = "FietsApp/Klim", fileName = "Klim")]
+    public sealed class Climb : ScriptableObject
+    {
+        [Tooltip("Naam zoals de rijder hem ziet, bijv. \"Mont Ventoux (Bédoin)\".")]
+        public string displayName;
+        [Tooltip("GPX van de klim (via tools/route_from_osm.py).")]
+        public TextAsset gpx;
+        [Tooltip("Echt landschap rond de klim (.bytes via tools/terrain_from_tiles.py). Leeg = verzonnen heuvels.")]
+        public TextAsset terrain;
+
+        [Header("Begroeiing")]
+        [Tooltip("Boomgrens in meter boven zeeniveau; erboven geen bomen.")]
+        public float treeLine = 100000f;
+        [Tooltip("Vanaf deze hoogte (tot de boomgrens) bosbodem in plaats van gras.")]
+        public float forestFrom = 100000f;
+        [Tooltip("Grond boven de boomgrens. Leeg = de kale grond van TerrainView (witte kalksteen); gras voor een alpenweide.")]
+        public Material aboveTreeLine;
+        [Tooltip("Grindberm boven de boomgrens, zoals op de kale top van de Ventoux.")]
+        public bool gravelVergeAboveTreeLine = true;
+
+        [Header("Herkenningspunt")]
+        [Tooltip("Zendmast op de top, zoals op de Mont Ventoux.")]
+        public bool summitTower;
+        public double summitLatitude;
+        public double summitLongitude;
+    }
+}
