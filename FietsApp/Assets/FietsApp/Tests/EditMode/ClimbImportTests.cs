@@ -162,4 +162,57 @@ namespace FietsApp.Tests
             Assert.That(stats.MinGradePercent, Is.GreaterThan(-2f));
         }
     }
+
+    public class AlpeDHuezTests
+    {
+        const string GpxPath = "Assets/FietsApp/Routes/AlpeDHuez.gpx";
+
+        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+
+        [Test]
+        public void MatchesTheKnownClimb()
+        {
+            var stats = ClimbStats.Of(Load());
+
+            // Van de voet bij Le Bourg-d'Oisans (±720 m) tot het dorp (±1790 m); de bekende 13,8 km aan 8,1%
+            // loopt nog een stuk verder door het skidorp naar de Tour-finish.
+            Assert.That(stats.LengthMeters / 1000f, Is.EqualTo(12.9f).Within(0.3f));
+            Assert.That(stats.StartElevation, Is.EqualTo(720f).Within(25f));
+            Assert.That(stats.EndElevation, Is.EqualTo(1790f).Within(25f));
+            Assert.That(stats.AverageGradePercent, Is.EqualTo(8.3f).Within(0.3f));
+            Assert.That(ClimbCategories.Of(stats), Is.EqualTo(ClimbCategory.HC));
+        }
+
+        [Test]
+        public void HairpinErrorsOfTheElevationModelAreSmoothedOut()
+        {
+            // Met te weinig gladstrijken gaf SRTM in de haarspelden 16-17% per 100 m; de steilste echte stukken zijn ±12%.
+            var stats = ClimbStats.Of(Load());
+
+            Assert.That(stats.MaxGradePercent, Is.InRange(10f, 14.5f));
+            Assert.That(stats.MinGradePercent, Is.GreaterThan(-2.5f)); // het vlakke dal aan het begin
+        }
+
+        [Test]
+        public void HasTheFamousHairpins()
+        {
+            // 21 genummerde bochten; tel plekken waar de weg binnen 60 m bijna omkeert.
+            var route = Load();
+            int hairpins = 0;
+            float last = float.MinValue;
+            for (float d = 30f; d < route.Length - 30f; d += 5f)
+            {
+                var before = route.Sample(d - 30f);
+                var after = route.Sample(d + 30f);
+                float dot = before.HeadingX * after.HeadingX + before.HeadingZ * after.HeadingZ;
+                if (dot < -0.85f && d - last > 120f)
+                {
+                    hairpins++;
+                    last = d;
+                }
+            }
+
+            Assert.That(hairpins, Is.InRange(18, 23));
+        }
+    }
 }

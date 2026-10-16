@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: AlpeDHuez
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Alpe d'Huez
+  gpx: {fileID: 6176564803743436627, guid: 035aaea132a4af24bbcb9c653c4d040e, type: 3}
+  terrain: {fileID: 4900000, guid: 0c30e39b5146c1b4999362315f6005a2, type: 3}
+  treeLine: 1600
+  forestFrom: 760
+  aboveTreeLine: {fileID: 2100000, guid: caaaffd3d68fab74f867d126b2363295, type: 2}
+  gravelVergeAboveTreeLine: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0
