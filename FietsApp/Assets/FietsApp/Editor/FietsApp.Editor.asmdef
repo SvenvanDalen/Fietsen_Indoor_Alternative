@@ -2,7 +2,8 @@
     "name": "FietsApp.Editor",
     "rootNamespace": "FietsApp.Editor",
     "references": [
-        "FietsApp.Runtime"
+        "FietsApp.Runtime",
+        "FietsApp.World"
     ],
     "includePlatforms": [
         "Editor"

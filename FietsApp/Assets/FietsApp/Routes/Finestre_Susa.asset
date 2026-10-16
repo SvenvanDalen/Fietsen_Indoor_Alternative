@@ -15,6 +15,10 @@ MonoBehaviour:
   displayName: Colle delle Finestre (Susa)
   gpx: {fileID: 6176564803743436627, guid: d2f83f72443d2c047a6daa48bbccf9a3, type: 3}
   terrain: {fileID: 4900000, guid: df44a8643964d114ca415738e88ef416, type: 3}
+  region: Alpen
+  lengthMeters: 17890
+  averageGradePercent: 9.3515005
+  elevationGain: 1672.9834
   treeLine: 2000
   forestFrom: 700
   aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}

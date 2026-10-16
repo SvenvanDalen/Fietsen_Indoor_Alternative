@@ -16,6 +16,14 @@ namespace FietsApp
         public TextAsset gpx;
         [Tooltip("Echt landschap rond de klim (.bytes via tools/terrain_from_tiles.py). Leeg = verzonnen heuvels.")]
         public TextAsset terrain;
+        [Tooltip("Gebied voor het filter in het ritmenu, bijv. \"Alpen\" of \"Pyreneeën\".")]
+        public string region;
+
+        [Header("Kerncijfers (FietsApp > Klimmen bijwerken)")]
+        [Tooltip("Uit de GPX berekend en hier bewaard, zodat het ritmenu niet elke klim hoeft in te lezen.")]
+        public float lengthMeters;
+        public float averageGradePercent;
+        public float elevationGain;
 
         [Header("Begroeiing")]
         [Tooltip("Boomgrens in meter boven zeeniveau; erboven geen bomen.")]
