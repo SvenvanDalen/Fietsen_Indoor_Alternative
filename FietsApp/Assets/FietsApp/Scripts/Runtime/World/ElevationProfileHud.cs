@@ -7,7 +7,7 @@ namespace FietsApp
     /// <summary>
     /// Hoogteprofiel van de hele route met de positie van de rijder (story 6.2):
     /// stukken van 100 m gekleurd naar helling, een stip op de huidige plek, en de helling,
-    /// hoogte en afstand tot de top als tekst. Toets P toont of verbergt het paneel.
+    /// hoogte, afstand tot de top en klimcategorie (story 4.3) als tekst. Toets P toont of verbergt het paneel.
     /// </summary>
     public sealed class ElevationProfileHud : MonoBehaviour
     {
@@ -22,6 +22,7 @@ namespace FietsApp
         ProfileGraphic _graph;
         RectTransform _dot, _marker;
         Text _grade, _details;
+        string _category;
 
         void Awake()
         {
@@ -36,6 +37,8 @@ namespace FietsApp
             // RouteView maakt de route in Awake; hier is die er zeker.
             _profile = ElevationProfile.Build(routeView.Route);
             _graph.Profile = _profile;
+            string label = ClimbCategories.Label(ClimbCategories.Of(ClimbStats.Of(routeView.Route)));
+            _category = label.Length > 0 ? $"<b>{label}</b>   " : "";
         }
 
         void Update()
@@ -66,7 +69,7 @@ namespace FietsApp
             {
                 toSummit = $"nog {(route.Length - distance) / 1000f:0.0} km tot de finish";
             }
-            _details.text = $"hoogte {here.Elevation:0} m   {toSummit}";
+            _details.text = $"{_category}hoogte {here.Elevation:0} m   {toSummit}";
         }
 
         void Build()
