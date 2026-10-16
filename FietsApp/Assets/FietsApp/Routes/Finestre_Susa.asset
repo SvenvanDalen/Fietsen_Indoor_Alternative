@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: Finestre_Susa
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Colle delle Finestre (Susa)
+  gpx: {fileID: 6176564803743436627, guid: d2f83f72443d2c047a6daa48bbccf9a3, type: 3}
+  terrain: {fileID: 4900000, guid: df44a8643964d114ca415738e88ef416, type: 3}
+  treeLine: 2000
+  forestFrom: 700
+  aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
+  gravelVergeAboveTreeLine: 1
+  unpavedFrom: 10480
+  unpavedTo: 100000
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

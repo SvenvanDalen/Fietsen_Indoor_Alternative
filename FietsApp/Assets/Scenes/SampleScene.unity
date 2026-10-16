@@ -1012,6 +1012,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.RouteView
   roadMaterial: {fileID: 2100000, guid: dfa939faa73906b4a852c5983406341c, type: 2}
+  unpavedRoadMaterial: {fileID: 2100000, guid: 2e6f8007637125c418edc5a664931230, type: 2}
   vergeMaterial: {fileID: 2100000, guid: 1dac1084efd53ec40bac53331cbe36ba, type: 2}
   bareVergeMaterial: {fileID: 2100000, guid: d2713d57375d58549a8b79c61ec2d47a, type: 2}
   roadWidth: 6
