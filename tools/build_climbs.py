@@ -17,8 +17,8 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(__file__))
-from route_from_osm import (OVERPASS, distance_m, fetch_elevations, http_json, resample, route_path,  # noqa: E402
-                            write_gpx)
+from route_from_osm import (OVERPASS, bridge_structures, distance_m, fetch_elevations, fetch_structures,  # noqa: E402
+                            http_json, osrm_path, repair_bumps, resample, route_path, trim_to_climb, write_gpx)
 from terrain_from_tiles import build_terrain  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,7 +53,50 @@ def find_named_point(name, near, radius_m=4000):
     return best["lat"], best["lon"]
 
 
-def build(climb, check_only, force, cache):
+def route_problems(path, offsets, known):
+    """Lengte van de route en wat er niet klopt aan start, finish of lengte."""
+    length = sum(distance_m(a, b) for a, b in zip(path, path[1:])) / 1000.0
+    problems = []
+    if max(offsets) > 400:
+        problems.append("start/finish " + "/".join(f"{o:.0f}" for o in offsets) + " m van de weg")
+    if abs(length - known["length_km"]) > LENGTH_TOLERANCE * known["length_km"]:
+        problems.append(f"lengte {length:.1f} km, bekend {known['length_km']} km")
+    return length, problems
+
+
+def find_route(climb, router):
+    """
+    De weg van de klim: eerst over wegnummer of filter via Overpass (zeker de juiste weg), en als dat mislukt of
+    niet klopt via de OSRM-routeplanner (router "auto"). Een klim kan in de catalogus zelf "router" kiezen.
+    Geeft (pad, lengte in km, problemen, bron).
+    """
+    router = climb.get("router", router)
+    start, end = tuple(climb["start"]), tuple(climb["end"])
+    via = [tuple(v) for v in climb.get("via", [])]
+    attempts = []
+    if router in ("auto", "overpass"):
+        try:
+            if climb.get("end_name"):
+                end = find_named_point(climb["end_name"], end) or end
+                time.sleep(1)
+            selector = dict(ref=None, tag_filter=climb.get("filter") or ref_filter(climb["ref"]))
+            path, offsets = route_path(bbox_around([start, end] + via), start, end, via,
+                                       extra_ids=climb.get("ways", []), **selector)
+            length, problems = route_problems(path, offsets, climb["known"])
+            if not problems or router == "overpass":
+                return path, length, problems, "overpass"
+            attempts.append(("overpass", problems))
+        except (SystemExit, Exception) as error:
+            if router == "overpass":
+                raise
+            attempts.append(("overpass", [str(error)]))
+    path, offsets = osrm_path(start, end, via, climb.get("osrm", "auto"))
+    length, problems = route_problems(path, offsets, climb["known"])
+    problems += [f"{source}: {'; '.join(p)}" for source, p in attempts] if problems else []
+    return path, length, problems, "osrm"
+
+
+def build(climb, check_only, force, cache, router="auto"):
     gpx = os.path.join(ROUTES, climb["id"] + ".gpx")
     terrain = os.path.join(ROUTES, climb["id"] + ".terrain.bytes")
     known = climb["known"]
@@ -62,23 +105,9 @@ def build(climb, check_only, force, cache):
             build_terrain(gpx, terrain)
         return "bestaat"
 
-    start, end = tuple(climb["start"]), tuple(climb["end"])
-    if climb.get("end_name"):
-        found = find_named_point(climb["end_name"], end)
-        if found:
-            end = found
-        time.sleep(1)
-    via = [tuple(v) for v in climb.get("via", [])]
-    selector = dict(ref=None, tag_filter=climb.get("filter") or ref_filter(climb["ref"]))
-    path, offsets = route_path(bbox_around([start, end] + via), start, end, via, extra_ids=climb.get("ways", []), **selector)
-    length = sum(distance_m(a, b) for a, b in zip(path, path[1:])) / 1000.0
-    problems = []
-    if max(offsets) > 400:
-        problems.append("start/finish " + "/".join(f"{o:.0f}" for o in offsets) + " m van de weg")
-    if abs(length - known["length_km"]) > LENGTH_TOLERANCE * known["length_km"]:
-        problems.append(f"lengte {length:.1f} km, bekend {known['length_km']} km")
+    path, length, problems, source = find_route(climb, router)
     if check_only:
-        return f"{length:.1f} km" + ("  !! " + "; ".join(problems) if problems else "  ok")
+        return f"{length:.1f} km ({source})" + ("  !! " + "; ".join(problems) if problems else "  ok")
     if problems:
         return "overgeslagen: " + "; ".join(problems)
 
@@ -86,11 +115,20 @@ def build(climb, check_only, force, cache):
     elevations = fetch_elevations(points, "srtm30m", cache)
     if elevations[-1] < elevations[0]:  # start en finish omgedraaid opgegeven
         points, elevations = points[::-1], elevations[::-1]
+    try:
+        elevations, structures = bridge_structures(points, elevations, fetch_structures(bbox_around(points, 200)))
+    except Exception as error:  # Overpass overbelast: dan alleen de bultenreparatie
+        print(f"   tunnels en bruggen niet opgehaald: {error}")
+        structures = 0
+    elevations, repairs = repair_bumps(points, elevations)
+    points, elevations = trim_to_climb(points, elevations)
+    length = sum(distance_m(a, b) for a, b in zip(points, points[1:])) / 1000.0
     avg = (elevations[-1] - elevations[0]) / (length * 1000.0) * 100.0
     write_gpx(gpx, climb["name"], points, elevations, "srtm30m")
     build_terrain(gpx, terrain)
     note = "" if abs(avg - known["avg"]) <= GRADE_TOLERANCE else f"  !! gemiddeld {avg:.1f}%, bekend {known['avg']}%"
-    return f"{length:.1f} km, {elevations[0]:.0f} -> {elevations[-1]:.0f} m, {avg:.1f}%{note}"
+    fixed = f", {structures} tunnels/bruggen, {repairs} bulten"
+    return f"{length:.1f} km, {elevations[0]:.0f} -> {elevations[-1]:.0f} m, {avg:.1f}%{fixed}{note}"
 
 
 def main():
@@ -98,6 +136,8 @@ def main():
     parser.add_argument("--check", action="store_true", help="alleen de weg controleren, geen hoogtes ophalen")
     parser.add_argument("--only", help="komma-gescheiden id's")
     parser.add_argument("--force", action="store_true", help="bestaande GPX opnieuw maken")
+    parser.add_argument("--router", choices=["auto", "overpass", "osrm"], default="auto",
+                        help="waar de weg vandaan komt (auto: Overpass, bij falen OSRM)")
     args = parser.parse_args()
 
     climbs = json.load(open(CATALOG, encoding="utf-8"))["climbs"]
@@ -111,7 +151,7 @@ def main():
     for climb in climbs:
         print(f"== {climb['name']}")
         try:
-            outcome = build(climb, args.check, args.force, cache)
+            outcome = build(climb, args.check, args.force, cache, args.router)
         except (SystemExit, Exception) as error:  # één klim mag de rest niet tegenhouden
             outcome = f"FOUT: {error}"
         finally:

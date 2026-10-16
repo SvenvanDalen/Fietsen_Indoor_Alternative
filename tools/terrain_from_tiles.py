@@ -17,6 +17,8 @@ import argparse
 import math
 import re
 import struct
+import time
+import urllib.error
 import urllib.request
 import zlib
 
@@ -80,8 +82,15 @@ class Tiles:
         if key not in self.cache:
             url = TILE_URL.format(z=self.zoom, x=tx, y=ty)
             request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-            with urllib.request.urlopen(request, timeout=60) as response:
-                width, rows = read_png_rgb(response.read())
+            for attempt in range(1, 5):  # netwerk of S3 even weg: opnieuw proberen
+                try:
+                    with urllib.request.urlopen(request, timeout=60) as response:
+                        width, rows = read_png_rgb(response.read())
+                    break
+                except (urllib.error.URLError, TimeoutError, ConnectionError):
+                    if attempt == 4:
+                        raise
+                    time.sleep(30 * attempt)
             self.cache[key] = [[r[3 * x] * 256 + r[3 * x + 1] + r[3 * x + 2] / 256.0 - 32768.0 for x in range(width)]
                                for r in rows]
             print(f"  tile {self.zoom}/{tx}/{ty}")
