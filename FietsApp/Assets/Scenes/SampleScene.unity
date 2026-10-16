@@ -702,6 +702,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &884605690
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 884605692}
+  - component: {fileID: 884605691}
+  m_Layer: 0
+  m_Name: Ritmenu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &884605691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884605690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02dfb96a3f2633242bde31c67c39dcdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.RideMenu
+  climbs:
+  - {fileID: 11400000, guid: 983c6b2dde51fd343bef26a790dca975, type: 2}
+  - {fileID: 11400000, guid: 76645dc24f7f7ab41a20f61cecc793d0, type: 2}
+  - {fileID: 11400000, guid: 19d1455b4c332614b9ecb0c6b5105c92, type: 2}
+  - {fileID: 11400000, guid: 4c914bf2c92267e43b5430039e452761, type: 2}
+  routeView: {fileID: 1397060718}
+  ride: {fileID: 1293722325}
+  openAtStart: 1
+--- !u!4 &884605692
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884605690}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &991110975
 GameObject:
   m_ObjectHideFlags: 0
@@ -1389,3 +1441,4 @@ SceneRoots:
   - {fileID: 991110978}
   - {fileID: 1397060719}
   - {fileID: 1614283189}
+  - {fileID: 884605692}
