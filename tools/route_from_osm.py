@@ -1,8 +1,11 @@
 """Maakt een GPX-klim uit OpenStreetMap-wegen en een open hoogtemodel (stories 4.1 en 4.4).
 
 Werkwijze:
-  1. Haalt alle wegen met een bepaald wegnummer (bijv. "D 974") in een gebied op via de Overpass API.
-  2. Knoopt ze aan elkaar tot een netwerk en zoekt de kortste weg van start naar finish.
+  1. Haalt alle wegen met een bepaald wegnummer (bijv. "D 974") in een gebied op via de Overpass API,
+     of, als een klim geen doorlopend wegnummer heeft, de wegen die aan een Overpass-tagfilter voldoen
+     (--filter, bijv. op straatnaam).
+  2. Knoopt ze aan elkaar tot een netwerk en zoekt de kortste weg van start naar finish, eventueel via
+     tussenpunten (--via) die de juiste weg afdwingen als er kortere zijwegen zijn.
   3. Bemonstert die weg om de --spacing meter.
   4. Haalt per punt de hoogte op bij OpenTopoData (standaard SRTM 30 m) en schrijft een GPX.
 
@@ -15,6 +18,8 @@ behandeling krijgt. Alleen standaardbibliotheek, dus zonder installatie te draai
   python tools/route_from_osm.py --ref "D 974" --bbox 44.10,5.15,44.20,5.32 \\
       --start 44.1245,5.1793 --end 44.1740,5.2788 \\
       --name "Mont Ventoux (Bédoin)" --out FietsApp/Assets/FietsApp/Routes/MontVentoux_Bedoin.gpx
+
+Zie docs/bronnen.md voor de opdrachten per klim, ook met --highway en --via.
 
 Bronnen en licenties: zie docs/bronnen.md. Wegen © OpenStreetMap-bijdragers (ODbL).
 """
@@ -57,11 +62,15 @@ def distance_m(a, b):
     return 2 * EARTH_RADIUS * math.asin(math.sqrt(h))
 
 
-def fetch_ways(ref, bbox):
-    query = f'[out:json][timeout:60];way["ref"="{ref}"]({bbox});out geom;'
+def fetch_ways(bbox, ref=None, tag_filter=None, extra_ids=()):
+    """Wegen met wegnummer ref, of anders de wegen die aan een Overpass-tagfilter voldoen, plus losse wegen
+    op OSM-id (voor een naamloos verbindingsstuk)."""
+    selector = f'["ref"="{ref}"]' if ref else f'["highway"]{tag_filter}'
+    extra = f'way(id:{",".join(map(str, extra_ids))});' if extra_ids else ""
+    query = f'[out:json][timeout:90];(way{selector}({bbox});{extra});out geom;'
     ways = http_json(OVERPASS, {"data": query})["elements"]
     if not ways:
-        raise SystemExit(f"Geen wegen gevonden met ref={ref!r} in {bbox}")
+        raise SystemExit(f"Geen wegen gevonden met {selector} in {bbox}")
     return ways
 
 
@@ -199,10 +208,14 @@ def write_gpx(path, name, points, elevations, dataset):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--ref", required=True, help='wegnummer in OSM, bijv. "D 974"')
+    which = parser.add_mutually_exclusive_group(required=True)
+    which.add_argument("--ref", help='wegnummer in OSM, bijv. "D 974"')
+    which.add_argument("--filter", help="Overpass-tagfilter als er geen doorlopend wegnummer is, bijv. '[\"name\"~\"Finestre\"]'")
     parser.add_argument("--bbox", required=True, help="zuid,west,noord,oost")
     parser.add_argument("--start", required=True, help="lat,lon van de start")
     parser.add_argument("--end", required=True, help="lat,lon van de finish")
+    parser.add_argument("--via", action="append", default=[], help="lat,lon van een tussenpunt; mag vaker")
+    parser.add_argument("--way", action="append", type=int, default=[], help="OSM-id van een extra weg; mag vaker")
     parser.add_argument("--name", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--spacing", type=float, default=20.0, help="meter tussen punten")
@@ -213,14 +226,19 @@ def main():
     start = tuple(map(float, args.start.split(",")))
     end = tuple(map(float, args.end.split(",")))
 
-    ways = fetch_ways(args.ref, args.bbox)
+    ways = fetch_ways(args.bbox, ref=args.ref, tag_filter=args.filter, extra_ids=args.way)
     coords, edges = build_graph(ways)
     joined = join_gaps(coords, edges, args.join)
-    start_node, end_node = nearest_node(coords, start), nearest_node(coords, end)
-    print(f"{len(ways)} wegen, {len(coords)} knooppunten, {joined} verbindingen over gaten; start op {distance_m(coords[start_node], start):.0f} m "
-          f"van het opgegeven punt, finish op {distance_m(coords[end_node], end):.0f} m")
+    stops = [start] + [tuple(map(float, v.split(","))) for v in args.via] + [end]
+    nodes = [nearest_node(coords, p) for p in stops]
+    offsets = ", ".join(f"{distance_m(coords[n], p):.0f}" for n, p in zip(nodes, stops))
+    print(f"{len(ways)} wegen, {len(coords)} knooppunten, {joined} verbindingen over gaten; "
+          f"afstand van start, tussenpunten en finish tot de weg: {offsets} m")
 
-    path = [coords[n] for n in shortest_path(edges, start_node, end_node)]
+    route = [nodes[0]]
+    for a, b in zip(nodes, nodes[1:]):
+        route += shortest_path(edges, a, b)[1:]
+    path = [coords[n] for n in route]
     length = sum(distance_m(a, b) for a, b in zip(path, path[1:]))
     points = resample(path, args.spacing)
     print(f"route {length / 1000:.2f} km, {len(points)} punten; hoogtes ophalen ({args.dataset})...")
