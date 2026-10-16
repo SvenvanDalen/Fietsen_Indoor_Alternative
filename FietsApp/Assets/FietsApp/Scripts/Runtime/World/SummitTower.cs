@@ -5,14 +5,12 @@ namespace FietsApp
     /// <summary>
     /// Herkenningspunt op een top, zoals de zendmast van de Mont Ventoux: een laag gebouw, een witte toren en
     /// een rood-witte antenne, low-poly uit eenvoudige vormen. Staat op echte coördinaten en op de hoogte
-    /// van het echte landschap (vereist een route uit GPX met een hoogtebestand).
+    /// van het echte landschap. Alleen bij een klim met <see cref="Climb.summitTower"/> en een hoogtebestand.
     /// </summary>
     [ExecuteAlways]
     public sealed class SummitTower : MonoBehaviour
     {
         [SerializeField] RouteView routeView;
-        [SerializeField] double latitude = 44.17390;
-        [SerializeField] double longitude = 5.27843;
         [SerializeField] Material wallMaterial;
         [SerializeField] Material redMaterial;
 
@@ -23,9 +21,10 @@ namespace FietsApp
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             var route = routeView != null ? routeView.Route : null;
             var heights = routeView != null ? routeView.NaturalHeights : null;
-            if (route?.Projection == null || heights == null) return;
+            var climb = routeView != null ? routeView.Climb : null;
+            if (climb == null || !climb.summitTower || route?.Projection == null || heights == null) return;
 
-            var (x, z) = route.Projection.ToLocal(latitude, longitude);
+            var (x, z) = route.Projection.ToLocal(climb.summitLatitude, climb.summitLongitude);
             var root = _generated.NewObject("Zendmast", transform).transform;
             root.position = new Vector3(x, heights.HeightAt(x, z) - 1f, z);
 

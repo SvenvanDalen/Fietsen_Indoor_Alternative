@@ -24,10 +24,6 @@ namespace FietsApp
         [SerializeField] Material bareMaterial;
         [Tooltip("Bosbodem: van gezien op afstand donker bos, zonder dat er overal bomen hoeven te staan.")]
         [SerializeField] Material forestMaterial;
-        [Tooltip("Boomgrens in meter boven zeeniveau; erboven geen bomen maar kale grond.")]
-        [SerializeField] float treeLine = 100000f;
-        [Tooltip("Vanaf deze hoogte (tot de boomgrens) bosbodem in plaats van gras.")]
-        [SerializeField] float forestFrom = 100000f;
         [SerializeField] int seed = 42;
 
         const int ChunkCells = 32;
@@ -38,6 +34,7 @@ namespace FietsApp
         const float RockSlopeNormalY = 0.8f; // steiler dan ~37° wordt rots
 
         readonly TerrainSettings _settings = new TerrainSettings();
+        Material _aboveTreeLine;
         readonly GeneratedContent _generated = new GeneratedContent();
         Biome _biome;
 
@@ -48,8 +45,11 @@ namespace FietsApp
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             if (routeView == null) return;
             _settings.Seed = seed;
-            _settings.TreeLine = treeLine;
-            _settings.ForestFrom = forestFrom;
+            // Boomgrens en bos komen van de klim; de oefenklim heeft overal gras.
+            var climb = routeView.Climb;
+            _settings.TreeLine = climb != null ? climb.treeLine : float.MaxValue;
+            _settings.ForestFrom = climb != null ? climb.forestFrom : float.MaxValue;
+            _aboveTreeLine = climb != null && climb.aboveTreeLine != null ? climb.aboveTreeLine : bareMaterial;
             _biome = new Biome(_settings);
 
             float t0 = Time.realtimeSinceStartup;
@@ -66,7 +66,7 @@ namespace FietsApp
         void BuildTerrain(HeightGrid grid)
         {
             var root = _generated.NewObject("Terrein", transform).transform;
-            var materials = new[] { grassMaterial, darkGrassMaterial, rockMaterial, bareMaterial, forestMaterial };
+            var materials = new[] { grassMaterial, darkGrassMaterial, rockMaterial, _aboveTreeLine, forestMaterial };
 
             for (int cz = 0; cz < grid.CountZ - 1; cz += ChunkCells)
             for (int cx = 0; cx < grid.CountX - 1; cx += ChunkCells)
