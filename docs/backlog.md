@@ -113,8 +113,8 @@ Epic: E1 · Fase: MVP · Prio: Must · Punten: 5
 
 Als rijder wil ik Bluetooth-apparaten zoeken, zodat ik mijn trainer kan kiezen.
 
-- [ ] Lijst met FTMS-trainers en sensoren
-- [ ] Signaalsterkte zichtbaar
+- [x] Lijst met FTMS-trainers en sensoren
+- [x] Signaalsterkte zichtbaar
 
 #### 1.2 Trainer bootst de helling na
 
@@ -122,8 +122,8 @@ Epic: E1 · Fase: MVP · Prio: Must · Punten: 8
 
 Als rijder wil ik dat mijn trainer de helling nabootst.
 
-- [ ] Helling wordt via FTMS gezet
-- [ ] Vertraging onder 1 seconde
+- [x] Helling wordt via FTMS gezet
+- [x] Vertraging onder 1 seconde
 
 #### 1.3 Vermogen en cadans live zien
 
@@ -131,7 +131,7 @@ Epic: E1 · Fase: MVP · Prio: Must · Punten: 3
 
 Als rijder wil ik vermogen en cadans live zien.
 
-- [ ] Waarden verversen minstens 1 keer per seconde
+- [x] Waarden verversen minstens 1 keer per seconde
 
 #### 1.4 Hartslagband koppelen
 
@@ -139,8 +139,8 @@ Epic: E1 · Fase: MVP · Prio: Must · Punten: 2
 
 Als rijder wil ik een hartslagband koppelen.
 
-- [ ] BLE-hartslagprofiel werkt
-- [ ] Hartslag getoond in HUD
+- [x] BLE-hartslagprofiel werkt
+- [x] Hartslag getoond in HUD
 
 #### 1.5 Verbinding herstelt automatisch
 
@@ -156,7 +156,7 @@ Epic: E1 · Fase: MVP · Prio: Should · Punten: 2
 
 Als rijder zonder trainer wil ik vermogen simuleren (voor testen).
 
-- [ ] Handmatig wattage of toetsenbord-invoer
+- [x] Handmatig wattage of toetsenbord-invoer
 
 #### 1.7 ANT+ gebruiken
 
@@ -183,8 +183,8 @@ Epic: E2 · Fase: MVP · Prio: Must · Punten: 5
 
 Als rijder wil ik dat snelheid uit mijn vermogen volgt.
 
-- [ ] Model uit de formule in sectie 3
-- [ ] Gewicht van fiets en rijder instelbaar
+- [x] Model uit de formule in sectie 3
+- [x] Gewicht van fiets en rijder instelbaar
 
 #### 2.2 Helling uit het routeprofiel
 
@@ -192,8 +192,8 @@ Epic: E2 · Fase: MVP · Prio: Must · Punten: 3
 
 Als rijder wil ik dat de helling uit het routeprofiel komt.
 
-- [ ] Helling per 10 meter
-- [ ] Gladgestreken tegen schokken
+- [x] Helling per 10 meter
+- [x] Gladgestreken tegen schokken
 
 #### 2.3 Instelbare weerstandsgevoeligheid
 
@@ -210,8 +210,8 @@ Epic: E2 · Fase: MVP · Prio: Must · Punten: 3
 
 Als rijder wil ik dat afdalingen realistisch aanvoelen.
 
-- [ ] Versnelling en vrijloop
-- [ ] Optioneel remmen
+- [x] Versnelling en vrijloop
+- [x] Optioneel remmen
 
 **Stand (2026-10-16):** vrijloop en versnellen volgen uit het fysicamodel (eindsnelheid getest: 63 km/u op -8% bij 80 kg); remmen met de spatiebalk (vol remmen 4 m/s², houdt je stil zonder achteruit te duwen), ook met de echte trainer. De trainer krijgt de negatieve helling via FTMS (1.2).
 
@@ -257,7 +257,7 @@ Epic: E3 · Fase: MVP · Prio: Must · Punten: 8
 
 Als rijder wil ik terrein dat past bij de klim.
 
-- [ ] Bergen, bomen, rotsen langs de weg
+- [x] Bergen, bomen, rotsen langs de weg
 
 #### 3.3 Dag, avond en weer
 
@@ -296,8 +296,8 @@ Epic: E4 · Fase: MVP · Prio: Must · Punten: 8
 
 Als ontwikkelaar wil ik een pijplijn die GPX omzet naar een klim.
 
-- [ ] Input GPX, output route met hoogteprofiel
-- [ ] Afstand, gemiddelde en maximale helling berekend
+- [x] Input GPX, output route met hoogteprofiel
+- [x] Afstand, gemiddelde en maximale helling berekend
 
 #### 4.2 Hoogtedata gladstrijken
 
@@ -305,7 +305,7 @@ Epic: E4 · Fase: MVP · Prio: Must · Punten: 5
 
 Als ontwikkelaar wil ik hoogtedata gladstrijken.
 
-- [ ] Geen pieken boven 1% per meter door meetruis
+- [x] Geen pieken boven 1% per meter door meetruis
 
 #### 4.3 Klimcategorieën (4, 3, 2, 1, HC)
 
@@ -313,7 +313,7 @@ Epic: E4 · Fase: MVP · Prio: Must · Punten: 2
 
 Als rijder wil ik klimcategorieën.
 
-- [ ] Categorie volgens lengte × gemiddelde helling
+- [x] Categorie volgens lengte × gemiddelde helling
 
 **Stand (2026-10-16):** gebouwd (`ClimbCategories`, grenzen in `docs/decisions.md`); de categorie staat in het hoogteprofiel. Mont Ventoux vanaf Bédoin is HC.
 
@@ -457,8 +457,8 @@ Epic: E6 · Fase: MVP · Prio: Must · Punten: 3
 
 Als rijder wil ik vermogen, cadans, snelheid en hartslag zien.
 
-- [ ] Altijd zichtbaar
-- [ ] Schaalbaar
+- [x] Altijd zichtbaar
+- [x] Schaalbaar
 
 #### 6.2 Hoogteprofiel met mijn positie
 
@@ -466,8 +466,8 @@ Epic: E6 · Fase: MVP · Prio: Must · Punten: 5
 
 Als rijder wil ik een hoogteprofiel met mijn positie.
 
-- [ ] Profiel van de hele klim met voortgangsstip
-- [ ] Helling per segment
+- [x] Profiel van de hele klim met voortgangsstip
+- [x] Helling per segment
 
 #### 6.3 Ritmenu met klimmen kiezen
 
@@ -698,8 +698,8 @@ Epic: E13 · Fase: MVP · Prio: Must · Punten: 3
 
 Als ontwikkelaar wil ik Unity-MCP koppelen zodat Claude scènes en scripts kan maken.
 
-- [ ] Claude maakt een testscène
-- [ ] Claude wijzigt een script via de MCP
+- [x] Claude maakt een testscène
+- [x] Claude wijzigt een script via de MCP
 
 #### 13.3 Unit-tests voor het fysicamodel
 
@@ -707,7 +707,7 @@ Epic: E13 · Fase: MVP · Prio: Must · Punten: 3
 
 Als ontwikkelaar wil ik unit-tests voor het fysicamodel.
 
-- [ ] Bekende vermogen-helling-combinaties geven de verwachte snelheid binnen 1%
+- [x] Bekende vermogen-helling-combinaties geven de verwachte snelheid binnen 1%
 
 #### 13.4 Git met LFS voor assets
 
@@ -715,7 +715,7 @@ Epic: E13 · Fase: MVP · Prio: Should · Punten: 2
 
 Als ontwikkelaar wil ik Git met LFS voor assets.
 
-- [ ] Repository met grote bestanden via LFS
+- [x] Repository met grote bestanden via LFS
 
 #### 13.5 Bronvermelding per klim
 
@@ -723,7 +723,7 @@ Epic: E13 · Fase: MVP · Prio: Should · Punten: 2
 
 Als ontwikkelaar wil ik per klim een bronvermelding bijhouden.
 
-- [ ] Lijst met herkomst en licentie van GPX, hoogtedata en assets
+- [x] Lijst met herkomst en licentie van GPX, hoogtedata en assets
 
 ### E14 Mobiele versie (V1)
 
@@ -815,6 +815,8 @@ Eerste rijdbare versie na ongeveer vier tot vijf sprints van twee weken; elke sp
 - **Later, V2:** multiplayer, racen, content-tools, GitHub-ranglijst.
 
 **Definitie van klaar:** de feature werkt op een echte trainer, is getest met minstens één .fit-rit, en staat in de changelog.
+
+**Werkwijze (2026-10-16):** een story wordt gesloten zodra hij gebouwd, getest en gemerged is volgens zijn criteria. De controle op de echte trainer gebeurt samen in 1.8.
 
 ## 7. Open vragen
 

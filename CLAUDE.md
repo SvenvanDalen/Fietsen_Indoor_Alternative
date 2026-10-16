@@ -13,7 +13,7 @@ Werk altijd op een eigen branch en lever op via een pull request naar `main`:
 1. Branch vanaf een actuele `main`, genoemd naar het werk: `feat/1.1-bluetooth-zoeken`, `docs/...`, `fix/...`.
 2. Commit in kleine stappen; noem het story-nummer in het bericht, zoals `feat: ... (1.6)`.
 3. Push de branch en open een PR met `gh pr create`. Noem in de body de stories (`Story #<issue>`) en hoe het getest is.
-4. Laat het mergen aan de eigenaar. Sluit geen issues: een story is pas klaar als hij werkt op de echte trainer (definitie van klaar, backlog sectie 6).
+4. Laat het mergen aan de eigenaar. Is een story na het mergen gebouwd volgens zijn criteria, vink die dan af in `docs/backlog.md` en sluit het issue met een korte toelichting. Wat nog op de echte trainer gecontroleerd moet worden, gebeurt bij 1.8; noem dat in het commentaar.
 
 ## Bluetooth-brug (`Bridge/`)
 
