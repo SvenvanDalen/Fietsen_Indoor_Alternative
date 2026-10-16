@@ -13,6 +13,8 @@ namespace FietsApp
     public sealed class RouteView : MonoBehaviour
     {
         [SerializeField] Material roadMaterial;
+        [Tooltip("Onverharde weg, voor het stuk dat de klim als onverhard aangeeft.")]
+        [SerializeField] Material unpavedRoadMaterial;
         [SerializeField] Material vergeMaterial;
         [Tooltip("Berm boven de boomgrens: grind in plaats van gras.")]
         [SerializeField] Material bareVergeMaterial;
@@ -63,7 +65,8 @@ namespace FietsApp
                 new Vector2(half, 0f), new Vector2(half + vergeWidth, -0.15f),
             };
 
-            AddStrip("Weg", road, new[] { roadMaterial }, pts, i => 0);
+            AddStrip("Weg", road, new[] { roadMaterial, unpavedRoadMaterial ?? roadMaterial }, pts,
+                i => climb != null && climb.IsUnpaved(pts[i].Distance) ? 1 : 0);
             float gravelFrom = climb != null && climb.gravelVergeAboveTreeLine ? climb.treeLine : float.MaxValue;
             AddStrip("Berm", verges, new[] { vergeMaterial, bareVergeMaterial ?? vergeMaterial }, pts,
                 i => pts[i].Elevation > gravelFrom ? 1 : 0);
