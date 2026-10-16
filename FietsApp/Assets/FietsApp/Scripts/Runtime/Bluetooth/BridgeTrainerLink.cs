@@ -39,6 +39,7 @@ namespace FietsApp.Bluetooth
 
         void OnEnable()
         {
+            Trainer.GradeChanged += SendGrade;
             bridge.ConnectionChanged += OnBridgeConnectionChanged;
             bridge.ConnectionReceived += OnConnection;
             bridge.DataReceived += OnData;
@@ -46,6 +47,7 @@ namespace FietsApp.Bluetooth
 
         void OnDisable()
         {
+            Trainer.GradeChanged -= SendGrade;
             bridge.ConnectionChanged -= OnBridgeConnectionChanged;
             bridge.ConnectionReceived -= OnConnection;
             bridge.DataReceived -= OnData;
@@ -88,6 +90,7 @@ namespace FietsApp.Bluetooth
             else
             {
                 _connections.TryGetValue(message.id, out var known);
+                bool newlyConnected = message.state == "connected" && known?.State != "connected";
                 _connections[message.id] = new DeviceConnection
                 {
                     Id = message.id,
@@ -95,8 +98,20 @@ namespace FietsApp.Bluetooth
                     State = message.state,
                     Message = message.message,
                 };
+                // Een net verbonden trainer krijgt meteen de huidige helling.
+                if (newlyConnected) bridge.SetGrade(message.id, Trainer.GradePercent);
             }
             Apply();
+        }
+
+        /// <summary>
+        /// Helling naar alle verbonden apparaten; de brug stuurt hem alleen door naar trainers met
+        /// FTMS-besturing en zorgt zelf voor geleidelijke stappen.
+        /// </summary>
+        void SendGrade(float gradePercent)
+        {
+            foreach (var c in _connections.Values)
+                if (c.State == "connected") bridge.SetGrade(c.Id, gradePercent);
         }
 
         void OnData(DataMessage data) => Trainer.Apply(data.power, data.cadence, data.heartRate, Now);

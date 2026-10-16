@@ -56,6 +56,21 @@ namespace FietsApp.Tests
         }
 
         [Test]
+        public void GradeChanged_FiresOnlyOnRealChanges()
+        {
+            var trainer = new BridgeTrainer(maxGradePercent: 20f);
+            var sent = new System.Collections.Generic.List<float>();
+            trainer.GradeChanged += sent.Add;
+
+            trainer.SetGrade(5f);
+            trainer.SetGrade(5f);
+            trainer.SetGrade(25f);
+            trainer.SetGrade(30f); // ook begrensd op 20: geen nieuwe melding
+
+            Assert.That(sent, Is.EqualTo(new[] { 5f, 20f }));
+        }
+
+        [Test]
         public void SetGrade_IsClampedToTrainerMaximum()
         {
             var trainer = new BridgeTrainer(maxGradePercent: 20f);

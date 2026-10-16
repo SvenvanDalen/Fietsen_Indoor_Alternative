@@ -63,6 +63,23 @@ namespace FietsApp.Tests
                 Is.EqualTo("{\"type\":\"disconnect\",\"id\":\"AA:BB:CC:DD:EE:FF\"}"));
         }
 
+        [Test]
+        public void GradeCommand_UsesDecimalPointEvenInDutchCulture()
+        {
+            var previous = System.Threading.Thread.CurrentThread.CurrentCulture;
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("nl-NL");
+            try
+            {
+                Assert.That(BridgeMessages.Grade("AA:BB:CC:DD:EE:FF", 8.5f),
+                    Is.EqualTo("{\"type\":\"grade\",\"id\":\"AA:BB:CC:DD:EE:FF\",\"grade\":8.5}"));
+                Assert.That(BridgeMessages.Grade("X", -3.25f), Does.Contain("\"grade\":-3.25}"));
+            }
+            finally
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture = previous;
+            }
+        }
+
         [TestCase("{\"type\":\"onbekend\"}")]
         [TestCase("geen json")]
         public void Parse_UnknownOrInvalid_ReturnsNull(string json)
