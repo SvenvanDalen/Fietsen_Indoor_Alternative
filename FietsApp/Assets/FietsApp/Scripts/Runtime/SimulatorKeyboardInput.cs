@@ -7,6 +7,7 @@ namespace FietsApp
     /// Toetsenbordbesturing voor de simulator (story 1.6):
     /// pijl omhoog/omlaag = vermogen ±10 W (met Shift ±50 W),
     /// Page Up/Page Down = helling ±1%, 0 = vermogen naar nul.
+    /// Spatiebalk ingedrukt = remmen (story 2.4); dat werkt ook met een echte trainer.
     /// </summary>
     [RequireComponent(typeof(RideController))]
     public sealed class SimulatorKeyboardInput : MonoBehaviour
@@ -18,7 +19,9 @@ namespace FietsApp
         void Update()
         {
             var kb = Keyboard.current;
-            if (kb == null || _ride.Trainer != _ride.Simulator) return;
+            if (kb == null) return;
+            _ride.Brake = kb.spaceKey.isPressed ? 1f : 0f;
+            if (_ride.Trainer != _ride.Simulator) return;
 
             float step = kb.shiftKey.isPressed ? 50f : 10f;
             var sim = _ride.Simulator;

@@ -68,6 +68,63 @@ namespace FietsApp.Tests
             Assert.That(v, Is.GreaterThanOrEqualTo(0f));
         }
 
+        // Referenties los uitgerekend (Python): eindsnelheid waar zwaartekracht = rolweerstand + luchtweerstand (+ rem),
+        // 80 kg, Crr 0,004, CdA 0,32, rho 1,225.
+        [TestCase(-5f, 13.561f)]
+        [TestCase(-8f, 17.414f)]
+        [TestCase(-10f, 19.554f)]
+        public void Freewheeling_ReachesTerminalSpeedOnDescent(float grade, float expectedMs)
+        {
+            var physics = new RiderPhysics(new RiderParameters { TotalMassKg = 80f });
+            float v = 0f;
+
+            for (int i = 0; i < 300 * 50; i++)
+                v = physics.Step(v, 0f, grade, 0.02f);
+
+            Assert.That(v, Is.EqualTo(expectedMs).Within(1).Percent);
+        }
+
+        [Test]
+        public void LightBraking_LowersTerminalSpeed()
+        {
+            // 10% remmen = 0,4 m/s² extra; op -8% levert dat 11,831 m/s in plaats van 17,4.
+            var physics = new RiderPhysics(new RiderParameters { TotalMassKg = 80f });
+            float v = 0f;
+
+            for (int i = 0; i < 300 * 50; i++)
+                v = physics.Step(v, 0f, -8f, 0.02f, brake: 0.1f);
+
+            Assert.That(v, Is.EqualTo(11.831f).Within(1).Percent);
+        }
+
+        [Test]
+        public void FullBraking_StopsFromFiftyFourKmhWithinFourSeconds()
+        {
+            // Vlak, vanaf 15 m/s: stil na 3,56 s (los nagerekend).
+            var physics = new RiderPhysics(new RiderParameters { TotalMassKg = 80f });
+            float v = 15f, t = 0f;
+
+            while (v > 0f && t < 10f)
+            {
+                v = physics.Step(v, 0f, 0f, 0.01f, brake: 1f);
+                t += 0.01f;
+            }
+
+            Assert.That(t, Is.EqualTo(3.56f).Within(0.05f));
+        }
+
+        [Test]
+        public void FullBraking_HoldsStillOnSteepDescent()
+        {
+            var physics = new RiderPhysics(new RiderParameters { TotalMassKg = 80f });
+            float v = 0f;
+
+            for (int i = 0; i < 100; i++)
+                v = physics.Step(v, 0f, -10f, 0.02f, brake: 1f);
+
+            Assert.That(v, Is.EqualTo(0f));
+        }
+
         [Test]
         public void Step_WithoutPowerUphill_StopsAtZero()
         {
