@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: MurDeHuy
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Mur de Huy
+  gpx: {fileID: 6176564803743436627, guid: 7a0f3da4bcf523a40b08b72b47f79c9f, type: 3}
+  terrain: {fileID: 4900000, guid: b1d5b62f6ba9b024792d7f455656c5d8, type: 3}
+  region: Ardennen
+  lengthMeters: 1388.2239
+  averageGradePercent: 8.497852
+  elevationGain: 117.969215
+  treeLine: 100000
+  forestFrom: 100000
+  aboveTreeLine: {fileID: 0}
+  gravelVergeAboveTreeLine: 0
+  unpavedFrom: 0
+  unpavedTo: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

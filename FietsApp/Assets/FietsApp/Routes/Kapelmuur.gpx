@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="FietsApp tools/route_from_osm.py" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Muur van Geraardsbergen</name>
+    <desc>Weg: © OpenStreetMap-bijdragers (ODbL). Hoogte: srtm30m via OpenTopoData, ruw.</desc>
+  </metadata>
+  <trk>
+    <name>Muur van Geraardsbergen</name>
+    <trkseg>
+      <trkpt lat="50.774502" lon="3.882427"><ele>34.0</ele></trkpt>
+      <trkpt lat="50.774323" lon="3.882460"><ele>35.0</ele></trkpt>
+      <trkpt lat="50.774146" lon="3.882510"><ele>35.0</ele></trkpt>
+      <trkpt lat="50.773970" lon="3.882567"><ele>34.0</ele></trkpt>
+      <trkpt lat="50.773794" lon="3.882625"><ele>34.0</ele></trkpt>
+      <trkpt lat="50.773685" lon="3.882746"><ele>34.0</ele></trkpt>
+      <trkpt lat="50.773735" lon="3.883019"><ele>36.0</ele></trkpt>
+      <trkpt lat="50.773788" lon="3.883291"><ele>38.0</ele></trkpt>
+      <trkpt lat="50.773845" lon="3.883561"><ele>40.0</ele></trkpt>
+      <trkpt lat="50.773919" lon="3.883818"><ele>41.0</ele></trkpt>
+      <trkpt lat="50.773985" lon="3.884082"><ele>43.0</ele></trkpt>
+      <trkpt lat="50.774042" lon="3.884352"><ele>46.0</ele></trkpt>
+      <trkpt lat="50.774087" lon="3.884628"><ele>48.0</ele></trkpt>
+      <trkpt lat="50.774121" lon="3.884906"><ele>51.0</ele></trkpt>
+      <trkpt lat="50.774129" lon="3.885190"><ele>53.0</ele></trkpt>
+      <trkpt lat="50.774124" lon="3.885474"><ele>54.0</ele></trkpt>
+      <trkpt lat="50.774112" lon="3.885758"><ele>56.0</ele></trkpt>
+      <trkpt lat="50.774104" lon="3.886042"><ele>57.0</ele></trkpt>
+      <trkpt lat="50.774105" lon="3.886326"><ele>58.0</ele></trkpt>
+      <trkpt lat="50.774104" lon="3.886611"><ele>59.0</ele></trkpt>
+      <trkpt lat="50.774099" lon="3.886895"><ele>60.0</ele></trkpt>
+      <trkpt lat="50.774091" lon="3.887179"><ele>61.0</ele></trkpt>
+      <trkpt lat="50.774075" lon="3.887463"><ele>63.0</ele></trkpt>
+      <trkpt lat="50.774060" lon="3.887746"><ele>64.0</ele></trkpt>
+      <trkpt lat="50.774070" lon="3.888029"><ele>66.0</ele></trkpt>
+      <trkpt lat="50.774124" lon="3.888300"><ele>68.0</ele></trkpt>
+      <trkpt lat="50.774190" lon="3.888564"><ele>70.0</ele></trkpt>
+      <trkpt lat="50.774257" lon="3.888828"><ele>72.0</ele></trkpt>
+      <trkpt lat="50.774323" lon="3.889093"><ele>74.0</ele></trkpt>
+      <trkpt lat="50.774383" lon="3.889361"><ele>76.0</ele></trkpt>
+      <trkpt lat="50.774443" lon="3.889629"><ele>77.0</ele></trkpt>
+      <trkpt lat="50.774504" lon="3.889897"><ele>78.0</ele></trkpt>
+      <trkpt lat="50.774366" lon="3.890040"><ele>80.0</ele></trkpt>
+      <trkpt lat="50.774206" lon="3.890168"><ele>83.0</ele></trkpt>
+      <trkpt lat="50.774059" lon="3.890326"><ele>87.0</ele></trkpt>
+      <trkpt lat="50.773908" lon="3.890480"><ele>90.0</ele></trkpt>
+      <trkpt lat="50.773751" lon="3.890612"><ele>93.0</ele></trkpt>
+      <trkpt lat="50.773636" lon="3.890830"><ele>95.0</ele></trkpt>
+      <trkpt lat="50.773522" lon="3.891050"><ele>97.0</ele></trkpt>
+      <trkpt lat="50.773398" lon="3.891093"><ele>100.0</ele></trkpt>
+      <trkpt lat="50.773276" lon="3.890884"><ele>101.0</ele></trkpt>
+      <trkpt lat="50.773170" lon="3.890655"><ele>102.0</ele></trkpt>
+      <trkpt lat="50.773060" lon="3.890543"><ele>103.0</ele></trkpt>
+      <trkpt lat="50.772929" lon="3.890737"><ele>103.0</ele></trkpt>
+      <trkpt lat="50.772801" lon="3.890937"><ele>104.0</ele></trkpt>
+      <trkpt lat="50.772633" lon="3.891014"><ele>105.0</ele></trkpt>
+      <trkpt lat="50.772482" lon="3.890872"><ele>105.0</ele></trkpt>
+      <trkpt lat="50.772348" lon="3.890688"><ele>105.0</ele></trkpt>
+      <trkpt lat="50.772287" lon="3.890421"><ele>105.0</ele></trkpt>
+      <trkpt lat="50.772241" lon="3.890147"><ele>106.0</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

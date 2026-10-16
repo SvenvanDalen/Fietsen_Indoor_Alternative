@@ -16,9 +16,9 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 0184523f71aeee1418c8c8ac95ed1f15, type: 3}
   terrain: {fileID: 4900000, guid: 4fba658874987df4fbc4534c7220340b, type: 3}
   region: Alpen
-  lengthMeters: 16489.982
-  averageGradePercent: 6.706968
-  elevationGain: 1112.6539
+  lengthMeters: 16110
+  averageGradePercent: 6.9198866
+  elevationGain: 1114.7937
   treeLine: 2100
   forestFrom: 800
   aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}

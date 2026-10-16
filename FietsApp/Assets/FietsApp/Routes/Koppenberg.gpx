@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="FietsApp tools/route_from_osm.py" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Koppenberg</name>
+    <desc>Weg: © OpenStreetMap-bijdragers (ODbL). Hoogte: srtm30m via OpenTopoData, ruw.</desc>
+  </metadata>
+  <trk>
+    <name>Koppenberg</name>
+    <trkseg>
+      <trkpt lat="50.812541" lon="3.573031"><ele>13.0</ele></trkpt>
+      <trkpt lat="50.812466" lon="3.573290"><ele>14.0</ele></trkpt>
+      <trkpt lat="50.812394" lon="3.573551"><ele>16.0</ele></trkpt>
+      <trkpt lat="50.812321" lon="3.573811"><ele>19.0</ele></trkpt>
+      <trkpt lat="50.812250" lon="3.574072"><ele>22.0</ele></trkpt>
+      <trkpt lat="50.812179" lon="3.574334"><ele>27.0</ele></trkpt>
+      <trkpt lat="50.812107" lon="3.574595"><ele>31.0</ele></trkpt>
+      <trkpt lat="50.812038" lon="3.574858"><ele>35.0</ele></trkpt>
+      <trkpt lat="50.811969" lon="3.575121"><ele>39.0</ele></trkpt>
+      <trkpt lat="50.811893" lon="3.575378"><ele>41.0</ele></trkpt>
+      <trkpt lat="50.811814" lon="3.575634"><ele>45.0</ele></trkpt>
+      <trkpt lat="50.811738" lon="3.575892"><ele>48.0</ele></trkpt>
+      <trkpt lat="50.811663" lon="3.576151"><ele>50.0</ele></trkpt>
+      <trkpt lat="50.811589" lon="3.576410"><ele>53.0</ele></trkpt>
+      <trkpt lat="50.811514" lon="3.576669"><ele>56.0</ele></trkpt>
+      <trkpt lat="50.811439" lon="3.576928"><ele>57.0</ele></trkpt>
+      <trkpt lat="50.811364" lon="3.577187"><ele>58.0</ele></trkpt>
+      <trkpt lat="50.811290" lon="3.577446"><ele>59.0</ele></trkpt>
+      <trkpt lat="50.811237" lon="3.577717"><ele>62.0</ele></trkpt>
+      <trkpt lat="50.811200" lon="3.577996"><ele>65.0</ele></trkpt>
+      <trkpt lat="50.811147" lon="3.578267"><ele>70.0</ele></trkpt>
+      <trkpt lat="50.811081" lon="3.578532"><ele>72.0</ele></trkpt>
+      <trkpt lat="50.811014" lon="3.578796"><ele>73.0</ele></trkpt>
+      <trkpt lat="50.810950" lon="3.579062"><ele>73.0</ele></trkpt>
+      <trkpt lat="50.810886" lon="3.579328"><ele>74.0</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

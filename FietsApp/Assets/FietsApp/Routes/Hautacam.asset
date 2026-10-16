@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: Hautacam
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: "Hautacam (Argel\xE8s-Gazost)"
+  gpx: {fileID: 6176564803743436627, guid: 3ebde169f1963c84d9f6711c46c0f0fd, type: 3}
+  terrain: {fileID: 4900000, guid: eada94e7c6abe7e40b18e08547a16926, type: 3}
+  region: "Pyrenee\xEBn"
+  lengthMeters: 13465.092
+  averageGradePercent: 8.042938
+  elevationGain: 1082.989
+  treeLine: 1900
+  forestFrom: 700
+  aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
+  gravelVergeAboveTreeLine: 1
+  unpavedFrom: 0
+  unpavedTo: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

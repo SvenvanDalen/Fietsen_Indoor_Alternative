@@ -16,9 +16,9 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: c9adec1135e131a4e9578a224fd545cd, type: 3}
   terrain: {fileID: 4900000, guid: ff37a6a4f5dd04e44b3f5432bb46b62b, type: 3}
   region: Jura
-  lengthMeters: 17238.688
-  averageGradePercent: 7.0943527
-  elevationGain: 1227.1478
+  lengthMeters: 17643.506
+  averageGradePercent: 7.1146264
+  elevationGain: 1259.4363
   treeLine: 1350
   forestFrom: 400
   aboveTreeLine: {fileID: 2100000, guid: caaaffd3d68fab74f867d126b2363295, type: 2}

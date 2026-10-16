@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="FietsApp tools/route_from_osm.py" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Paterberg</name>
+    <desc>Weg: © OpenStreetMap-bijdragers (ODbL). Hoogte: srtm30m via OpenTopoData, ruw.</desc>
+  </metadata>
+  <trk>
+    <name>Paterberg</name>
+    <trkseg>
+      <trkpt lat="50.782700" lon="3.543978"><ele>33.0</ele></trkpt>
+      <trkpt lat="50.782679" lon="3.544194"><ele>34.0</ele></trkpt>
+      <trkpt lat="50.782714" lon="3.544473"><ele>35.0</ele></trkpt>
+      <trkpt lat="50.782722" lon="3.544755"><ele>38.0</ele></trkpt>
+      <trkpt lat="50.782682" lon="3.545032"><ele>40.0</ele></trkpt>
+      <trkpt lat="50.782632" lon="3.545305"><ele>41.0</ele></trkpt>
+      <trkpt lat="50.782583" lon="3.545579"><ele>42.0</ele></trkpt>
+      <trkpt lat="50.782533" lon="3.545852"><ele>43.0</ele></trkpt>
+      <trkpt lat="50.782480" lon="3.546124"><ele>46.0</ele></trkpt>
+      <trkpt lat="50.782426" lon="3.546395"><ele>50.0</ele></trkpt>
+      <trkpt lat="50.782371" lon="3.546666"><ele>55.0</ele></trkpt>
+      <trkpt lat="50.782309" lon="3.546933"><ele>56.0</ele></trkpt>
+      <trkpt lat="50.782245" lon="3.547199"><ele>58.0</ele></trkpt>
+      <trkpt lat="50.782198" lon="3.547473"><ele>61.0</ele></trkpt>
+      <trkpt lat="50.782153" lon="3.547749"><ele>65.0</ele></trkpt>
+      <trkpt lat="50.782111" lon="3.548025"><ele>68.0</ele></trkpt>
+      <trkpt lat="50.782093" lon="3.548308"><ele>70.0</ele></trkpt>
+      <trkpt lat="50.782088" lon="3.548592"><ele>73.0</ele></trkpt>
+      <trkpt lat="50.782059" lon="3.548872"><ele>75.0</ele></trkpt>
+      <trkpt lat="50.782100" lon="3.548998"><ele>76.0</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

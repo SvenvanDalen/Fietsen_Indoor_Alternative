@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: Glandon
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: "Col du Glandon (Saint-\xC9tienne-de-Cuines)"
+  gpx: {fileID: 6176564803743436627, guid: 9a761713c9511c344bd4601ceca64245, type: 3}
+  terrain: {fileID: 4900000, guid: c48af37bea49f4a48a9389cbc9dc7a87, type: 3}
+  region: Alpen
+  lengthMeters: 22340
+  averageGradePercent: 6.6555223
+  elevationGain: 1487.9603
+  treeLine: 2100
+  forestFrom: 800
+  aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
+  gravelVergeAboveTreeLine: 1
+  unpavedFrom: 0
+  unpavedTo: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0
