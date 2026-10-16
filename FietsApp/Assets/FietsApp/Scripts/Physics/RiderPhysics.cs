@@ -31,6 +31,9 @@ namespace FietsApp.Physics
         // Onder deze snelheid rekenen we niet met P/v (deelt door nul bij wegrijden).
         const float MinPropulsionSpeed = 1f;
 
+        /// <summary>Vertraging bij vol remmen (m/s²): stevig, maar zonder te slippen op droog asfalt.</summary>
+        public const float MaxBrakeDeceleration = 4f;
+
         public RiderParameters Parameters { get; set; }
 
         public RiderPhysics(RiderParameters parameters)
@@ -73,11 +76,16 @@ namespace FietsApp.Physics
             return lo;
         }
 
-        /// <summary>Eén tijdstap: m·dv/dt = P/v − F_weerstand. Snelheid wordt nooit negatief.</summary>
-        public float Step(float speed, float powerWatts, float gradePercent, float dt)
+        /// <summary>
+        /// Eén tijdstap: m·dv/dt = P/v − F_weerstand − F_rem. Snelheid wordt nooit negatief, dus remmen
+        /// houdt je ook op een steile afdaling stil zonder achteruit te duwen (story 2.4).
+        /// </summary>
+        /// <param name="brake">0 = niet remmen, 1 = vol remmen (<see cref="MaxBrakeDeceleration"/>).</param>
+        public float Step(float speed, float powerWatts, float gradePercent, float dt, float brake = 0f)
         {
             float propulsion = powerWatts / Math.Max(speed, MinPropulsionSpeed);
             float accel = (propulsion - ResistanceForce(speed, gradePercent)) / Parameters.TotalMassKg;
+            accel -= Math.Clamp(brake, 0f, 1f) * MaxBrakeDeceleration;
             return Math.Max(0f, speed + accel * dt);
         }
     }

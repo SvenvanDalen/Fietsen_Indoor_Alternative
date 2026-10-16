@@ -40,7 +40,8 @@ namespace FietsApp
             _status.text =
                 $"{t.Name}{(t.IsConnected ? "" : " (niet verbonden)")}   " +
                 $"helling {ride.GradePercent:0.0}% (trainer {t.GradePercent:0.0}%)   " +
-                $"{ride.DistanceM / 1000f:0.00} km   {seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}";
+                $"{ride.DistanceM / 1000f:0.00} km   {seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}" +
+                (ride.Brake > 0f ? "   <color=#ff6060>remmen</color>" : "");
         }
 
         void ApplyScale()

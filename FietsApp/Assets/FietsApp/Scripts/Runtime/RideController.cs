@@ -24,6 +24,9 @@ namespace FietsApp
         public float DistanceM { get; private set; }
         public float ElapsedSeconds { get; private set; }
 
+        /// <summary>Remmen, van 0 (los) tot 1 (vol); bijvoorbeeld de spatiebalk. Werkt met elke trainer.</summary>
+        public float Brake { get; set; }
+
         /// <summary>Helling van de route. De trainer krijgt dezelfde waarde, begrensd op zijn maximum.</summary>
         public float GradePercent
         {
@@ -67,7 +70,7 @@ namespace FietsApp
             float dt = Time.deltaTime;
             if (Trainer == Simulator) Simulator.Tick(dt);
 
-            SpeedMs = _physics.Step(SpeedMs, Trainer.PowerWatts, _gradePercent, dt);
+            SpeedMs = _physics.Step(SpeedMs, Trainer.PowerWatts, _gradePercent, dt, Brake);
             DistanceM += SpeedMs * dt;
             ElapsedSeconds += dt;
         }
