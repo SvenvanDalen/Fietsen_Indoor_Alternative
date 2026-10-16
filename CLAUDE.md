@@ -37,6 +37,7 @@ Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
 |---|---|---|
 | `FietsApp.Physics` | Fysicamodel | `noEngineReferences`: puur C#, testbaar zonder Unity |
 | `FietsApp.Trainers` | `ITrainer` en implementaties (simulator, later FTMS en ANT+) | `noEngineReferences` |
+| `FietsApp.Recording` | Ritopname en `.fit`-bestanden (`RideLog`, `FitWriter`) | `noEngineReferences` |
 | `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer, brugclient (`Bluetooth/`) | Mag Unity gebruiken |
 | `FietsApp.Tests.EditMode` | NUnit-tests | |
 

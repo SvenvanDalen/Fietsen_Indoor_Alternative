@@ -421,7 +421,9 @@ Epic: E5 · Fase: MVP · Prio: Must · Punten: 5
 
 Als rijder wil ik dat mijn rit wordt opgeslagen als .fit.
 
-- [ ] Vermogen, hartslag, cadans en hoogte per seconde
+- [x] Vermogen, hartslag, cadans en hoogte per seconde
+
+**Stand (2026-10-16):** `RideRecorder` neemt elke seconde vermogen, cadans, hartslag, snelheid, afstand, hoogte en de echte plek op; `FitWriter` schrijft een FIT-activiteit (fietsen, virtueel) naar `Ritten/` in de persistentDataPath, op de top, bij een nieuwe rit en bij afsluiten. Gecontroleerd met de onafhankelijke lezer fitdecode (inclusief CRC's).
 
 #### 5.2 Automatisch uploaden naar Strava
 
