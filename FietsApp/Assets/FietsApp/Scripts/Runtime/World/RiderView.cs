@@ -27,7 +27,16 @@ namespace FietsApp
             if (chaseCamera == null) chaseCamera = Camera.main;
         }
 
-        void Start() => SnapCamera();
+        void Start()
+        {
+            routeView.ClimbChanged += SnapCamera;
+            SnapCamera();
+        }
+
+        void OnDestroy()
+        {
+            if (routeView != null) routeView.ClimbChanged -= SnapCamera;
+        }
 
         void LateUpdate()
         {

@@ -34,7 +34,17 @@ namespace FietsApp
 
         void Start()
         {
-            // RouteView maakt de route in Awake; hier is die er zeker.
+            routeView.ClimbChanged += ShowClimb;
+            ShowClimb();
+        }
+
+        void OnDestroy()
+        {
+            if (routeView != null) routeView.ClimbChanged -= ShowClimb;
+        }
+
+        void ShowClimb()
+        {
             _profile = ElevationProfile.Build(routeView.Route);
             _graph.Profile = _profile;
             string label = ClimbCategories.Label(ClimbCategories.Of(ClimbStats.Of(routeView.Route)));
