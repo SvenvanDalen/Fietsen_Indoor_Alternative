@@ -21,10 +21,17 @@ sealed class SensorConnection : IDisposable
     readonly List<GattDeviceService> _services = [];
     readonly CrankCadence _crankCadence = new();
     readonly Action<Measurement> _onData;
+    TrainerControl? _control;
 
     public string Id { get; }
     public string Name => _device.Name;
     public event Action? Disconnected;
+
+    /// <summary>Uitleg over de hellingsbesturing, bijv. "helling actief".</summary>
+    public event Action<string>? ControlStatus;
+
+    /// <summary>Helling voor de trainer (story 1.2); apparaten zonder FTMS-besturing negeren dit.</summary>
+    public void SetGrade(float gradePercent) => _control?.SetGrade(gradePercent);
 
     SensorConnection(string id, BluetoothLEDevice device, Action<Measurement> onData)
     {
@@ -68,7 +75,11 @@ sealed class SensorConnection : IDisposable
         bool hasFtms = byUuid.ContainsKey(GattServices.FitnessMachine);
 
         if (hasFtms)
+        {
             await TrySubscribeAsync(byUuid[GattServices.FitnessMachine], IndoorBikeDataUuid, OnIndoorBikeData);
+            _control = await TrainerControl.CreateAsync(byUuid[GattServices.FitnessMachine]);
+            if (_control is not null) _control.StatusChanged += message => ControlStatus?.Invoke(message);
+        }
         else if (byUuid.TryGetValue(GattServices.CyclingPower, out var cps))
             await TrySubscribeAsync(cps, CyclingPowerMeasurementUuid, OnCyclingPower);
 
@@ -120,6 +131,7 @@ sealed class SensorConnection : IDisposable
 
     public void Dispose()
     {
+        _control?.Dispose();
         _subscribed.Clear();
         foreach (var service in _services) service.Dispose();
         _services.Clear();
