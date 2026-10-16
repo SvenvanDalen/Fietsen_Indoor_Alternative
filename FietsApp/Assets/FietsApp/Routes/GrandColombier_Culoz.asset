@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: GrandColombier_Culoz
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Grand Colombier (Culoz)
+  gpx: {fileID: 6176564803743436627, guid: c9adec1135e131a4e9578a224fd545cd, type: 3}
+  terrain: {fileID: 4900000, guid: ff37a6a4f5dd04e44b3f5432bb46b62b, type: 3}
+  region: Jura
+  lengthMeters: 17643.506
+  averageGradePercent: 7.1146264
+  elevationGain: 1259.4363
+  treeLine: 1350
+  forestFrom: 400
+  aboveTreeLine: {fileID: 2100000, guid: caaaffd3d68fab74f867d126b2363295, type: 2}
+  gravelVergeAboveTreeLine: 0
+  unpavedFrom: 0
+  unpavedTo: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

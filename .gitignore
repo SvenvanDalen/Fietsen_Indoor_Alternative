@@ -1,0 +1,4 @@
+
+# Hoogtecache van tools/build_climbs.py
+tools/.cache/
+__pycache__/

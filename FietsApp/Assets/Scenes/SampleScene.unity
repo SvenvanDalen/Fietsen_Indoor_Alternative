@@ -778,11 +778,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02dfb96a3f2633242bde31c67c39dcdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.RideMenu
-  climbs:
-  - {fileID: 11400000, guid: 983c6b2dde51fd343bef26a790dca975, type: 2}
-  - {fileID: 11400000, guid: 76645dc24f7f7ab41a20f61cecc793d0, type: 2}
-  - {fileID: 11400000, guid: 19d1455b4c332614b9ecb0c6b5105c92, type: 2}
-  - {fileID: 11400000, guid: 4c914bf2c92267e43b5430039e452761, type: 2}
+  library: {fileID: 11400000, guid: 69d7db2d21a48034484e354262f60158, type: 2}
+  climbs: []
   routeView: {fileID: 1397060718}
   ride: {fileID: 1293722325}
   openAtStart: 1

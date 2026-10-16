@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: Tourmalet_SainteMarie
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Col du Tourmalet (Sainte-Marie-de-Campan)
+  gpx: {fileID: 6176564803743436627, guid: 39fb4c39014901341a5b1dd1673f6b85, type: 3}
+  terrain: {fileID: 4900000, guid: 84a39bed3b8b8fa4284be50c2ede2b25, type: 3}
+  region: "Pyrenee\xEBn"
+  lengthMeters: 17066.11
+  averageGradePercent: 7.488334
+  elevationGain: 1278.6012
+  treeLine: 1900
+  forestFrom: 700
+  aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
+  gravelVergeAboveTreeLine: 1
+  unpavedFrom: 0
+  unpavedTo: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

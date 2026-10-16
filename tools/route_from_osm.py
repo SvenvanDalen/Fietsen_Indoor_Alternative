@@ -34,7 +34,11 @@ import urllib.request
 from xml.sax.saxutils import escape
 
 OVERPASS = "https://overpass-api.de/api/interpreter"
-OPENTOPODATA = "https://api.opentopodata.org/v1/{dataset}"
+OSRM = {  # dezelfde OSRM-software; de fietsversie neemt ook kasseienstroken waar auto's niet mogen
+    "auto": "https://router.project-osrm.org/route/v1/driving",
+    "fiets": "https://routing.openstreetmap.de/routed-bike/route/v1/driving",
+}
+OPENTOPODATA ="https://api.opentopodata.org/v1/{dataset}"
 USER_AGENT = "FietsApp-hobbyproject (github.com/SvenvanDalen/Fietsen_Indoor_Alternative)"
 EARTH_RADIUS = 6371000.0
 
@@ -52,6 +56,12 @@ def http_json(url, data=None, attempts=4):
                 raise
             wait = 5 * attempt
             print(f"  {url} gaf {error.code}; opnieuw over {wait} s")
+            time.sleep(wait)
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as error:  # netwerk even weg
+            if attempt == attempts:
+                raise
+            wait = 30 * attempt
+            print(f"  {url} niet bereikbaar ({error}); opnieuw over {wait} s")
             time.sleep(wait)
 
 
@@ -171,20 +181,127 @@ def resample(points, spacing):
     return result
 
 
-def fetch_elevations(points, dataset):
-    """OpenTopoData: maximaal 100 punten per verzoek en 1 verzoek per seconde."""
-    elevations = []
-    for i in range(0, len(points), 100):
-        batch = points[i:i + 100]
+def fetch_elevations(points, dataset, cache=None):
+    """OpenTopoData: maximaal 100 punten per verzoek, 1 verzoek per seconde en 1000 per dag. Met een cache
+    (dict van "lat,lon" naar hoogte) worden al bekende punten niet opnieuw gevraagd."""
+    cache = {} if cache is None else cache
+    key = lambda p: f"{dataset}:{p[0]:.6f},{p[1]:.6f}"
+    missing = [p for p in points if key(p) not in cache]
+    for i in range(0, len(missing), 100):
+        batch = missing[i:i + 100]
         locations = "|".join(f"{lat:.6f},{lon:.6f}" for lat, lon in batch)
         answer = http_json(OPENTOPODATA.format(dataset=dataset), {"locations": locations})
         if answer.get("status") != "OK":
             raise SystemExit(f"OpenTopoData gaf een fout: {answer}")
-        elevations.extend(r["elevation"] for r in answer["results"])
+        for p, r in zip(batch, answer["results"]):
+            cache[key(p)] = r["elevation"]
         time.sleep(1.1)
+    elevations = [cache[key(p)] for p in points]
     if any(e is None for e in elevations):
         raise SystemExit("Hoogtemodel heeft gaten op deze route; probeer een andere --dataset.")
     return elevations
+
+
+def fetch_structures(bbox):
+    """Tunnels, galerijen en bruggen van wegen in het gebied, als lijsten (lat, lon)."""
+    query = (f'[out:json][timeout:90];(way["highway"]["tunnel"]["tunnel"!="no"]({bbox});'
+             f'way["highway"]["covered"="yes"]({bbox});way["highway"]["bridge"]["bridge"!="no"]({bbox}););out geom;')
+    return [[(g["lat"], g["lon"]) for g in w["geometry"]] for w in http_json(OVERPASS, {"data": query})["elements"]]
+
+
+def bridge_structures(points, elevations, structures, near=15.0):
+    """
+    Trekt een rechte lijn door het hoogteprofiel waar de route door een tunnel of over een brug gaat: het
+    hoogtemodel meet daar de berg erboven of het dal eronder. Geeft (hoogtes, aantal overbrugde stukken).
+    """
+    lat0 = points[0][0]
+    kx = 111195.0 * math.cos(math.radians(lat0))
+    xy = lambda p: (p[1] * kx, p[0] * 111195.0)
+    segments = [(xy(a), xy(b)) for s in structures for a, b in zip(s, s[1:])]
+
+    def on_structure(p):
+        px, py = xy(p)
+        for (ax, ay), (bx, by) in segments:
+            dx, dy = bx - ax, by - ay
+            t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy or 1.0)))
+            if math.hypot(ax + t * dx - px, ay + t * dy - py) <= near:
+                return True
+        return False
+
+    marked = [on_structure(p) for p in points]
+    d = [0.0]
+    for a, b in zip(points, points[1:]):
+        d.append(d[-1] + distance_m(a, b))
+    result, count, i = list(elevations), 0, 0
+    while i < len(points):
+        if not marked[i]:
+            i += 1
+            continue
+        j = i
+        while j + 1 < len(points) and marked[j + 1]:
+            j += 1
+        a, b = max(0, i - 1), min(len(points) - 1, j + 1)  # de punten net voor en na het bouwwerk
+        if b > a + 1:
+            for k in range(a + 1, b):
+                result[k] = result[a] + (result[b] - result[a]) * (d[k] - d[a]) / (d[b] - d[a])
+            count += 1
+        i = j + 1
+    return result, count
+
+
+def repair_bumps(points, elevations, steep=0.15, span=60.0, gap=800.0):
+    """
+    Haalt tunnels en bruggen uit het hoogteprofiel. Het hoogtemodel meet daar de berg boven de tunnel of het dal
+    onder de brug: een steile bult of kuil van tientallen tot honderden meters. Een echte weg gaat niet binnen
+    800 m steil op en weer steil af, dus zo'n paar wordt vervangen door een rechte lijn tussen de punten ervoor
+    en erna. Steile stukken die alleen omhoog gaan (Angliru) blijven staan. Geeft (hoogtes, aantal reparaties).
+    """
+    d = [0.0]
+    for a, b in zip(points, points[1:]):
+        d.append(d[-1] + distance_m(a, b))
+    n = len(points)
+    slope = [0] * n  # +1 steil omhoog, -1 steil omlaag, over de komende span meter
+    j = 0
+    for i in range(n):
+        while j < n - 1 and d[j] - d[i] < span:
+            j += 1
+        if d[j] > d[i]:
+            grade = (elevations[j] - elevations[i]) / (d[j] - d[i])
+            slope[i] = 1 if grade > steep else -1 if grade < -steep else 0
+    runs = []  # (richting, eerste, laatste index) van aaneengesloten steile stukken
+    for i, s in enumerate(slope):
+        if s and runs and runs[-1][0] == s and d[i] - d[runs[-1][2]] <= 2 * span:  # korte onderbreking hoort erbij
+            runs[-1][2] = i
+        elif s:
+            runs.append([s, i, i])
+    result, repairs, k = list(elevations), 0, 0
+    while k < len(runs) - 1:
+        first, second = runs[k], runs[k + 1]
+        if first[0] != second[0] and d[second[1]] - d[first[2]] <= gap:
+            a = first[1]
+            b = second[2]
+            while b < n - 1 and d[b] - d[second[2]] < span:  # tot na de helling
+                b += 1
+            for i in range(a + 1, b):
+                result[i] = result[a] + (result[b] - result[a]) * (d[i] - d[a]) / (d[b] - d[a])
+            repairs += 1
+            k += 2
+        else:
+            k += 1
+    return result, repairs
+
+
+def trim_to_climb(points, elevations, reach=1500.0):
+    """Begin op het laagste punt in de eerste reach meter en eindig op het hoogste in de laatste: een klim
+    begint niet met een afdaling uit het dorp en eindigt niet voorbij de top."""
+    d = [0.0]
+    for a, b in zip(points, points[1:]):
+        d.append(d[-1] + distance_m(a, b))
+    head = [i for i in range(len(points)) if d[i] <= reach]
+    tail = [i for i in range(len(points)) if d[-1] - d[i] <= reach]
+    start = min(head, key=lambda i: elevations[i])
+    end = max(tail, key=lambda i: elevations[i])
+    return points[start:end + 1], elevations[start:end + 1]
 
 
 def write_gpx(path, name, points, elevations, dataset):
@@ -206,6 +323,35 @@ def write_gpx(path, name, points, elevations, dataset):
         f.write("\n".join(lines))
 
 
+def route_path(bbox, start, end, via=(), ref=None, tag_filter=None, extra_ids=(), join=20.0):
+    """De weg van start via de tussenpunten naar de finish als lijst (lat, lon), plus per stop hoe ver
+    (m) het opgegeven punt van de weg lag; groot betekent meestal een verkeerd punt of de verkeerde weg."""
+    ways = fetch_ways(bbox, ref=ref, tag_filter=tag_filter, extra_ids=extra_ids)
+    coords, edges = build_graph(ways)
+    join_gaps(coords, edges, join)
+    stops = [start] + list(via) + [end]
+    nodes = [nearest_node(coords, p) for p in stops]
+    route = [nodes[0]]
+    for a, b in zip(nodes, nodes[1:]):
+        route += shortest_path(edges, a, b)[1:]
+    return [coords[n] for n in route], [distance_m(coords[n], p) for n, p in zip(nodes, stops)]
+
+
+def osrm_path(start, end, via=(), profile="auto"):
+    """
+    Dezelfde vorm als route_path, maar via de OSRM-routeplanner (ook OpenStreetMap-wegen, ODbL). Snel en
+    betrouwbaarder dan Overpass als die overbelast is; kiest wel de snelste weg voor een auto, dus
+    tussenpunten (via) moeten de klimweg afdwingen. Offsets: hoe ver elk punt van de weg lag.
+    """
+    stops = [start] + list(via) + [end]
+    coordinates = ";".join(f"{lon:.6f},{lat:.6f}" for lat, lon in stops)
+    answer = http_json(f"{OSRM[profile]}/{coordinates}?overview=full&geometries=geojson")
+    if answer.get("code") != "Ok":
+        raise SystemExit(f"OSRM gaf geen route: {answer.get('code')}")
+    path = [(lat, lon) for lon, lat in answer["routes"][0]["geometry"]["coordinates"]]
+    return path, [w["distance"] for w in answer["waypoints"]]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     which = parser.add_mutually_exclusive_group(required=True)
@@ -225,20 +371,11 @@ def main():
 
     start = tuple(map(float, args.start.split(",")))
     end = tuple(map(float, args.end.split(",")))
+    via = [tuple(map(float, v.split(","))) for v in args.via]
 
-    ways = fetch_ways(args.bbox, ref=args.ref, tag_filter=args.filter, extra_ids=args.way)
-    coords, edges = build_graph(ways)
-    joined = join_gaps(coords, edges, args.join)
-    stops = [start] + [tuple(map(float, v.split(","))) for v in args.via] + [end]
-    nodes = [nearest_node(coords, p) for p in stops]
-    offsets = ", ".join(f"{distance_m(coords[n], p):.0f}" for n, p in zip(nodes, stops))
-    print(f"{len(ways)} wegen, {len(coords)} knooppunten, {joined} verbindingen over gaten; "
-          f"afstand van start, tussenpunten en finish tot de weg: {offsets} m")
-
-    route = [nodes[0]]
-    for a, b in zip(nodes, nodes[1:]):
-        route += shortest_path(edges, a, b)[1:]
-    path = [coords[n] for n in route]
+    path, offsets = route_path(args.bbox, start, end, via, ref=args.ref, tag_filter=args.filter,
+                               extra_ids=args.way, join=args.join)
+    print("afstand van start, tussenpunten en finish tot de weg: " + ", ".join(f"{o:.0f}" for o in offsets) + " m")
     length = sum(distance_m(a, b) for a, b in zip(path, path[1:]))
     points = resample(path, args.spacing)
     print(f"route {length / 1000:.2f} km, {len(points)} punten; hoogtes ophalen ({args.dataset})...")

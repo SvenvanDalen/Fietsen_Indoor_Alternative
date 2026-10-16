@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="FietsApp tools/route_from_osm.py" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Cauberg (Valkenburg)</name>
+    <desc>Weg: © OpenStreetMap-bijdragers (ODbL). Hoogte: srtm30m via OpenTopoData, ruw.</desc>
+  </metadata>
+  <trk>
+    <name>Cauberg (Valkenburg)</name>
+    <trkseg>
+      <trkpt lat="50.862518" lon="5.829591"><ele>81.0</ele></trkpt>
+      <trkpt lat="50.862427" lon="5.829347"><ele>81.0</ele></trkpt>
+      <trkpt lat="50.862324" lon="5.829114"><ele>82.0</ele></trkpt>
+      <trkpt lat="50.862238" lon="5.828864"><ele>83.0</ele></trkpt>
+      <trkpt lat="50.862163" lon="5.828605"><ele>86.0</ele></trkpt>
+      <trkpt lat="50.862108" lon="5.828334"><ele>88.0</ele></trkpt>
+      <trkpt lat="50.862054" lon="5.828062"><ele>90.0</ele></trkpt>
+      <trkpt lat="50.861998" lon="5.827791"><ele>91.0</ele></trkpt>
+      <trkpt lat="50.861940" lon="5.827522"><ele>92.0</ele></trkpt>
+      <trkpt lat="50.861878" lon="5.827254"><ele>94.0</ele></trkpt>
+      <trkpt lat="50.861810" lon="5.826991"><ele>96.0</ele></trkpt>
+      <trkpt lat="50.861728" lon="5.826737"><ele>98.0</ele></trkpt>
+      <trkpt lat="50.861638" lon="5.826490"><ele>100.0</ele></trkpt>
+      <trkpt lat="50.861548" lon="5.826244"><ele>102.0</ele></trkpt>
+      <trkpt lat="50.861457" lon="5.825997"><ele>106.0</ele></trkpt>
+      <trkpt lat="50.861366" lon="5.825752"><ele>110.0</ele></trkpt>
+      <trkpt lat="50.861293" lon="5.825493"><ele>114.0</ele></trkpt>
+      <trkpt lat="50.861252" lon="5.825216"><ele>117.0</ele></trkpt>
+      <trkpt lat="50.861246" lon="5.824931"><ele>120.0</ele></trkpt>
+      <trkpt lat="50.861252" lon="5.824647"><ele>122.0</ele></trkpt>
+      <trkpt lat="50.861242" lon="5.824362"><ele>124.0</ele></trkpt>
+      <trkpt lat="50.861196" lon="5.824088"><ele>125.0</ele></trkpt>
+      <trkpt lat="50.861115" lon="5.823834"><ele>126.0</ele></trkpt>
+      <trkpt lat="50.860999" lon="5.823618"><ele>129.0</ele></trkpt>
+      <trkpt lat="50.860861" lon="5.823436"><ele>132.0</ele></trkpt>
+      <trkpt lat="50.860698" lon="5.823314"><ele>133.0</ele></trkpt>
+      <trkpt lat="50.860531" lon="5.823210"><ele>133.0</ele></trkpt>
+      <trkpt lat="50.860363" lon="5.823109"><ele>132.0</ele></trkpt>
+      <trkpt lat="50.860194" lon="5.823009"><ele>132.0</ele></trkpt>
+      <trkpt lat="50.860026" lon="5.822910"><ele>132.0</ele></trkpt>
+      <trkpt lat="50.859857" lon="5.822811"><ele>133.0</ele></trkpt>
+      <trkpt lat="50.859689" lon="5.822711"><ele>135.0</ele></trkpt>
+      <trkpt lat="50.859520" lon="5.822611"><ele>137.0</ele></trkpt>
+      <trkpt lat="50.859352" lon="5.822511"><ele>137.0</ele></trkpt>
+      <trkpt lat="50.859183" lon="5.822411"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.859015" lon="5.822310"><ele>139.0</ele></trkpt>
+      <trkpt lat="50.858847" lon="5.822210"><ele>139.0</ele></trkpt>
+      <trkpt lat="50.858678" lon="5.822110"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.858510" lon="5.822012"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.858340" lon="5.821915"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.858168" lon="5.821832"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.857996" lon="5.821748"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.857825" lon="5.821662"><ele>136.0</ele></trkpt>
+      <trkpt lat="50.857653" lon="5.821576"><ele>134.0</ele></trkpt>
+      <trkpt lat="50.857482" lon="5.821491"><ele>132.0</ele></trkpt>
+      <trkpt lat="50.857310" lon="5.821406"><ele>133.0</ele></trkpt>
+      <trkpt lat="50.857143" lon="5.821302"><ele>133.0</ele></trkpt>
+      <trkpt lat="50.856989" lon="5.821155"><ele>133.0</ele></trkpt>
+      <trkpt lat="50.856852" lon="5.820972"><ele>135.0</ele></trkpt>
+      <trkpt lat="50.856731" lon="5.820761"><ele>137.0</ele></trkpt>
+      <trkpt lat="50.856639" lon="5.820517"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.856569" lon="5.820255"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.856527" lon="5.819979"><ele>138.0</ele></trkpt>
+      <trkpt lat="50.856515" lon="5.819695"><ele>140.0</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

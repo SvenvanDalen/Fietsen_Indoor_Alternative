@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: Cauberg
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Cauberg (Valkenburg)
+  gpx: {fileID: 6176564803743436627, guid: 6e911f7ec4be5f44fa5f0aab8a366b07, type: 3}
+  terrain: {fileID: 4900000, guid: a5ccddf10ceb2b446a99f5a0c74959bb, type: 3}
+  region: Limburg
+  lengthMeters: 1059.1041
+  averageGradePercent: 5.5688095
+  elevationGain: 58.979492
+  treeLine: 100000
+  forestFrom: 100000
+  aboveTreeLine: {fileID: 0}
+  gravelVergeAboveTreeLine: 0
+  unpavedFrom: 0
+  unpavedTo: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

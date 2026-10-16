@@ -79,6 +79,36 @@ namespace FietsApp.Tests
         }
 
         [Test]
+        public void FiltersOnRegion()
+        {
+            var climbs = new[]
+            {
+                new ClimbSummary("Tourmalet", 18800f, 7.4f, 1390f, ClimbCategory.HC, "Pyreneeën"),
+                new ClimbSummary("Galibier", 18100f, 6.9f, 1245f, ClimbCategory.HC, "Alpen"),
+                new ClimbSummary("Cauberg", 1200f, 5.8f, 70f, ClimbCategory.None, "Limburg"),
+            };
+            var filter = new ClimbFilter();
+            filter.SetRegions(climbs.Select(c => c.Region));
+
+            Assert.That(filter.RegionLabel, Is.EqualTo("alle gebieden"));
+            filter.NextRegion(); // op alfabet: Alpen, Limburg, Pyreneeën
+            Assert.That(filter.RegionLabel, Is.EqualTo("Alpen"));
+            Assert.That(filter.Apply(climbs).Select(i => climbs[i].Name), Is.EqualTo(new[] { "Galibier" }));
+            filter.NextRegion();
+            filter.NextRegion();
+            filter.NextRegion(); // weer alles
+            Assert.That(filter.Apply(climbs).Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void SummaryFromStoredNumbers_DerivesTheCategory()
+        {
+            var summary = ClimbSummary.Of("Galibier", 18100f, 6.9f, 1245f, "Alpen");
+
+            Assert.That(summary.Category, Is.EqualTo(ClimbCategory.HC)); // 18100 × 6,9 = 124890
+        }
+
+        [Test]
         public void Details_UseTheGivenCulture()
         {
             var details = Climbs[0].Details(CultureInfo.GetCultureInfo("nl-NL"));

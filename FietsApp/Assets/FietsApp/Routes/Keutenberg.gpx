@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="FietsApp tools/route_from_osm.py" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Keutenberg (Schin op Geul)</name>
+    <desc>Weg: © OpenStreetMap-bijdragers (ODbL). Hoogte: srtm30m via OpenTopoData, ruw.</desc>
+  </metadata>
+  <trk>
+    <name>Keutenberg (Schin op Geul)</name>
+    <trkseg>
+      <trkpt lat="50.848577" lon="5.874245"><ele>77.0</ele></trkpt>
+      <trkpt lat="50.848420" lon="5.874386"><ele>78.0</ele></trkpt>
+      <trkpt lat="50.848258" lon="5.874507"><ele>78.0</ele></trkpt>
+      <trkpt lat="50.848086" lon="5.874591"><ele>78.0</ele></trkpt>
+      <trkpt lat="50.847913" lon="5.874667"><ele>78.0</ele></trkpt>
+      <trkpt lat="50.847739" lon="5.874739"><ele>78.0</ele></trkpt>
+      <trkpt lat="50.847560" lon="5.874765"><ele>79.0</ele></trkpt>
+      <trkpt lat="50.847382" lon="5.874731"><ele>81.0</ele></trkpt>
+      <trkpt lat="50.847299" lon="5.874523"><ele>82.0</ele></trkpt>
+      <trkpt lat="50.847243" lon="5.874259"><ele>85.0</ele></trkpt>
+      <trkpt lat="50.847088" lon="5.874125"><ele>87.0</ele></trkpt>
+      <trkpt lat="50.846915" lon="5.874153"><ele>88.0</ele></trkpt>
+      <trkpt lat="50.846742" lon="5.874219"><ele>91.0</ele></trkpt>
+      <trkpt lat="50.846588" lon="5.874080"><ele>93.0</ele></trkpt>
+      <trkpt lat="50.846429" lon="5.873953"><ele>94.0</ele></trkpt>
+      <trkpt lat="50.846255" lon="5.873886"><ele>98.0</ele></trkpt>
+      <trkpt lat="50.846077" lon="5.873839"><ele>102.0</ele></trkpt>
+      <trkpt lat="50.845899" lon="5.873798"><ele>105.0</ele></trkpt>
+      <trkpt lat="50.845721" lon="5.873764"><ele>107.0</ele></trkpt>
+      <trkpt lat="50.845541" lon="5.873740"><ele>109.0</ele></trkpt>
+      <trkpt lat="50.845362" lon="5.873719"><ele>112.0</ele></trkpt>
+      <trkpt lat="50.845183" lon="5.873700"><ele>114.0</ele></trkpt>
+      <trkpt lat="50.845003" lon="5.873682"><ele>116.0</ele></trkpt>
+      <trkpt lat="50.844824" lon="5.873659"><ele>119.0</ele></trkpt>
+      <trkpt lat="50.844645" lon="5.873635"><ele>122.0</ele></trkpt>
+      <trkpt lat="50.844465" lon="5.873611"><ele>125.0</ele></trkpt>
+      <trkpt lat="50.844286" lon="5.873613"><ele>127.0</ele></trkpt>
+      <trkpt lat="50.844106" lon="5.873621"><ele>129.0</ele></trkpt>
+      <trkpt lat="50.843927" lon="5.873651"><ele>131.0</ele></trkpt>
+      <trkpt lat="50.843748" lon="5.873679"><ele>134.0</ele></trkpt>
+      <trkpt lat="50.843570" lon="5.873668"><ele>136.0</ele></trkpt>
+      <trkpt lat="50.843400" lon="5.873575"><ele>139.0</ele></trkpt>
+      <trkpt lat="50.843236" lon="5.873458"><ele>141.0</ele></trkpt>
+      <trkpt lat="50.843069" lon="5.873351"><ele>141.0</ele></trkpt>
+      <trkpt lat="50.842900" lon="5.873254"><ele>141.0</ele></trkpt>
+      <trkpt lat="50.842729" lon="5.873170"><ele>141.0</ele></trkpt>
+      <trkpt lat="50.842553" lon="5.873106"><ele>141.0</ele></trkpt>
+      <trkpt lat="50.842377" lon="5.873054"><ele>142.0</ele></trkpt>
+      <trkpt lat="50.842199" lon="5.873007"><ele>143.0</ele></trkpt>
+      <trkpt lat="50.842025" lon="5.872936"><ele>144.0</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>

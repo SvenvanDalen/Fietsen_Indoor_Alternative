@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: Giau
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Passo Giau (Selva di Cadore)
+  gpx: {fileID: 6176564803743436627, guid: 4accca7a1ab74b94db56601986a92d53, type: 3}
+  terrain: {fileID: 4900000, guid: f2d75d90323e08a4fb77f302c92f0c03, type: 3}
+  region: Dolomieten
+  lengthMeters: 9643.767
+  averageGradePercent: 9.499022
+  elevationGain: 916.0635
+  treeLine: 2100
+  forestFrom: 1000
+  aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
+  gravelVergeAboveTreeLine: 1
+  unpavedFrom: 0
+  unpavedTo: 0
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

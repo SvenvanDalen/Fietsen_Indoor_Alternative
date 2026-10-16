@@ -17,6 +17,8 @@ import argparse
 import math
 import re
 import struct
+import time
+import urllib.error
 import urllib.request
 import zlib
 
@@ -80,8 +82,15 @@ class Tiles:
         if key not in self.cache:
             url = TILE_URL.format(z=self.zoom, x=tx, y=ty)
             request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-            with urllib.request.urlopen(request, timeout=60) as response:
-                width, rows = read_png_rgb(response.read())
+            for attempt in range(1, 5):  # netwerk of S3 even weg: opnieuw proberen
+                try:
+                    with urllib.request.urlopen(request, timeout=60) as response:
+                        width, rows = read_png_rgb(response.read())
+                    break
+                except (urllib.error.URLError, TimeoutError, ConnectionError):
+                    if attempt == 4:
+                        raise
+                    time.sleep(30 * attempt)
             self.cache[key] = [[r[3 * x] * 256 + r[3 * x + 1] + r[3 * x + 2] / 256.0 - 32768.0 for x in range(width)]
                                for r in rows]
             print(f"  tile {self.zoom}/{tx}/{ty}")
@@ -102,30 +111,23 @@ class Tiles:
         return a * (1 - ty) + b * ty
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--gpx", required=True, help="klim waarvoor het landschap nodig is")
-    parser.add_argument("--out", required=True)
-    parser.add_argument("--margin", type=float, default=900.0, help="meter rond de route")
-    parser.add_argument("--spacing", type=float, default=25.0, help="meter tussen roosterpunten")
-    parser.add_argument("--zoom", type=int, default=13, help="tile-zoom; 13 is ~15 m per pixel hier")
-    args = parser.parse_args()
-
-    text = open(args.gpx, encoding="utf-8").read()
+def build_terrain(gpx, out, margin=900.0, spacing=25.0, zoom=13):
+    """Schrijft het hoogtebestand voor de klim in gpx naar out; geeft (laagste, hoogste) hoogte terug."""
+    text = open(gpx, encoding="utf-8").read()
     points = [(float(a), float(b)) for a, b in re.findall(r'lat="([-\d.]+)" lon="([-\d.]+)"', text)]
     lats, lons = [p[0] for p in points], [p[1] for p in points]
     mid_lat = (min(lats) + max(lats)) / 2
-    margin_lat = args.margin / METERS_PER_DEGREE
-    margin_lon = args.margin / (METERS_PER_DEGREE * math.cos(math.radians(mid_lat)))
+    margin_lat = margin / METERS_PER_DEGREE
+    margin_lon = margin / (METERS_PER_DEGREE * math.cos(math.radians(mid_lat)))
     south, north = min(lats) - margin_lat, max(lats) + margin_lat
     west, east = min(lons) - margin_lon, max(lons) + margin_lon
-    dlat = args.spacing / METERS_PER_DEGREE
-    dlon = args.spacing / (METERS_PER_DEGREE * math.cos(math.radians(mid_lat)))
+    dlat = spacing / METERS_PER_DEGREE
+    dlon = spacing / (METERS_PER_DEGREE * math.cos(math.radians(mid_lat)))
     rows = int(math.ceil((north - south) / dlat)) + 1
     cols = int(math.ceil((east - west) / dlon)) + 1
-    print(f"rooster {rows} × {cols} punten om de {args.spacing:.0f} m; tiles ophalen...")
+    print(f"rooster {rows} × {cols} punten om de {spacing:.0f} m; tiles ophalen...")
 
-    tiles = Tiles(args.zoom)
+    tiles = Tiles(zoom)
     heights = []
     lowest, highest = math.inf, -math.inf
     for r in range(rows):
@@ -134,11 +136,23 @@ def main():
             lowest, highest = min(lowest, h), max(highest, h)
             heights.append(int(round(h)))
 
-    with open(args.out, "wb") as f:
+    with open(out, "wb") as f:
         f.write(b"FDEM")
         f.write(struct.pack("<i4d2i", 1, south, west, dlat, dlon, rows, cols))
         f.write(struct.pack(f"<{len(heights)}h", *heights))
-    print(f"hoogte {lowest:.0f} tot {highest:.0f} m; {len(tiles.cache)} tiles; geschreven naar {args.out}")
+    print(f"hoogte {lowest:.0f} tot {highest:.0f} m; {len(tiles.cache)} tiles; geschreven naar {out}")
+    return lowest, highest
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--gpx", required=True, help="klim waarvoor het landschap nodig is")
+    parser.add_argument("--out", required=True)
+    parser.add_argument("--margin", type=float, default=900.0, help="meter rond de route")
+    parser.add_argument("--spacing", type=float, default=25.0, help="meter tussen roosterpunten")
+    parser.add_argument("--zoom", type=int, default=13, help="tile-zoom; 13 is ~15 m per pixel hier")
+    args = parser.parse_args()
+    build_terrain(args.gpx, args.out, args.margin, args.spacing, args.zoom)
 
 
 if __name__ == "__main__":
