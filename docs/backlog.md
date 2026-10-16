@@ -313,6 +313,8 @@ Als rijder wil ik klimcategorieën.
 
 - [ ] Categorie volgens lengte × gemiddelde helling
 
+**Stand (2026-10-16):** gebouwd (`ClimbCategories`, grenzen in `docs/decisions.md`); de categorie staat in het hoogteprofiel. Mont Ventoux vanaf Bédoin is HC.
+
 #### 4.4 Vijf startklimmen, waaronder vier echte iconen
 
 Epic: E4 · Fase: MVP · Prio: Must · Punten: 8
