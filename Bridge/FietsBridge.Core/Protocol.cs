@@ -16,6 +16,9 @@ public sealed record ConnectCommand(string Id) : Command;
 
 public sealed record DisconnectCommand(string Id) : Command;
 
+/// <summary>Helling die de trainer moet nabootsen (story 1.2), in procent.</summary>
+public sealed record GradeCommand(string Id, float Grade) : Command;
+
 /// <summary>
 /// JSON-berichten tussen brug en Unity, één bericht per WebSocket-tekstframe.
 /// Veldnamen in camelCase en enums als tekst, zodat Unity's JsonUtility ze direct leest.
@@ -62,6 +65,7 @@ public static class Protocol
                     root.TryGetProperty("all", out var all) && all.GetBoolean()),
                 "connect" => new ConnectCommand(root.GetProperty("id").GetString()!),
                 "disconnect" => new DisconnectCommand(root.GetProperty("id").GetString()!),
+                "grade" => new GradeCommand(root.GetProperty("id").GetString()!, root.GetProperty("grade").GetSingle()),
                 _ => null,
             };
         }
