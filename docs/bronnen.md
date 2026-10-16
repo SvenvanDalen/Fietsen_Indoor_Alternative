@@ -8,6 +8,7 @@ Herkomst en licentie van alle route-, hoogte- en terreindata (story 13.5). Voeg 
 |---|---|---|---|---|---|
 | Mont Ventoux vanaf Bédoin | `FietsApp/Assets/FietsApp/Routes/MontVentoux_Bedoin.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 974` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-15 |
 | Alpe d'Huez | `FietsApp/Assets/FietsApp/Routes/AlpeDHuez.gpx`, `.terrain.bytes` | OpenStreetMap, weg `D 211` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
+| Colle delle Finestre vanaf Susa | `FietsApp/Assets/FietsApp/Routes/Finestre_Susa.gpx`, `.terrain.bytes` | OpenStreetMap, wegen "Via Meana", "Via Colle delle Finestre", "Strada Provinciale del Colle delle Finestre" en naamloos verbindingsstuk way 330898189 (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
 | Passo dello Stelvio vanaf Prato | `FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.gpx`, `.terrain.bytes` | OpenStreetMap, weg `SS38` (ODbL) | SRTM 30 m via OpenTopoData (publiek domein) | Terrain Tiles, AWS Open Data (Terrarium, zoom 13) | `tools/route_from_osm.py`, `tools/terrain_from_tiles.py` op 2026-10-16 |
 
 Opnieuw maken:
@@ -21,9 +22,14 @@ python tools/terrain_from_tiles.py --gpx FietsApp/Assets/FietsApp/Routes/AlpeDHu
 
 python tools/route_from_osm.py --ref "SS38" --bbox 46.52,10.44,46.65,10.62 --start 46.6195,10.5925 --end 46.5287,10.4530 --name "Passo dello Stelvio (Prato)" --out FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.gpx
 python tools/terrain_from_tiles.py --gpx FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.gpx --out FietsApp/Assets/FietsApp/Routes/Stelvio_Prato.terrain.bytes
+
+python tools/route_from_osm.py --filter '["name"~"Colle delle Finestre|^Via Meana$"]' --way 330898189 --bbox 45.06,7.00,45.15,7.10 --start 45.1341,7.0607 --end 45.0726,7.0537 --name "Colle delle Finestre (Susa)" --out FietsApp/Assets/FietsApp/Routes/Finestre_Susa.gpx
+python tools/terrain_from_tiles.py --gpx FietsApp/Assets/FietsApp/Routes/Finestre_Susa.gpx --out FietsApp/Assets/FietsApp/Routes/Finestre_Susa.terrain.bytes
 ```
 
 Alpe d'Huez loopt hier van het begin van de D 211 tot het dorp (12,9 km, 723 → 1791 m). De bekende 13,8 km eindigt bij de Tour-finish, via straten van het skidorp die geen D 211 heten.
+
+De Colle delle Finestre heeft geen doorlopend wegnummer in OSM (alleen het stuk bij de top heet SP172); daarom selecteert `--filter` op straatnaam en voegt `--way` het naamloze verbindingsstuk toe. Het onverharde stuk (in OSM `surface=compacted`) begint 10,48 km na de start, op 1457 m; dat staat als `unpavedFrom` in `Finestre_Susa.asset`.
 
 ## Licenties en naamsvermelding
 

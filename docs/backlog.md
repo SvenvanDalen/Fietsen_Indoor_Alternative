@@ -330,6 +330,8 @@ Als rijder wil ik 5 startklimmen, waaronder vier echte iconen.
 
 **Stand (2026-10-16, later):** Passo dello Stelvio vanaf Prato erbij (SS38, 24,6 km, 911 → 2759 m, gemiddeld 7,5%, steilste km 9,6%, HC, 45 van de 48 haarspelden herkend). Nog te doen: Colle delle Finestre, een fantasieklim.
 
+**Stand (2026-10-16, Finestre):** Colle delle Finestre vanaf Susa erbij (17,9 km, 485 → 2158 m, gemiddeld 9,3%, HC), met de laatste 7,4 km als grindweg in beeld (extra rolweerstand volgt bij 4.13). De vier iconen staan er daarmee; nog te doen: een fantasieklim.
+
 #### 4.5 Bibliotheek met 50+ klimmen
 
 Epic: E4 · Fase: V1 · Prio: Should · Punten: 13 (eerst splitsen)

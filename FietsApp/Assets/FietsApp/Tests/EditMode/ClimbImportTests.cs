@@ -230,6 +230,61 @@ namespace FietsApp.Tests
         }
     }
 
+    public class FinestreTests
+    {
+        const string GpxPath = "Assets/FietsApp/Routes/Finestre_Susa.gpx";
+
+        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+
+        [Test]
+        public void MatchesTheKnownClimbFromSusa()
+        {
+            var stats = ClimbStats.Of(Load());
+
+            // Susa (±500 m) tot de col (2178 m): ±18,5 km aan gemiddeld ±9,2%, heel gelijkmatig.
+            Assert.That(stats.LengthMeters / 1000f, Is.EqualTo(17.9f).Within(0.4f));
+            Assert.That(stats.StartElevation, Is.EqualTo(490f).Within(25f));
+            Assert.That(stats.EndElevation, Is.EqualTo(2165f).Within(25f));
+            Assert.That(stats.AverageGradePercent, Is.EqualTo(9.3f).Within(0.3f));
+            Assert.That(stats.MaxGradePercent, Is.InRange(10f, 15f));
+            Assert.That(stats.MinGradePercent, Is.GreaterThan(-1f));
+            Assert.That(ClimbCategories.Of(stats), Is.EqualTo(ClimbCategory.HC));
+        }
+
+        [Test]
+        public void HasManyHairpins()
+        {
+            // 55 bochten, veel kort op elkaar in het bos; de teller vindt alleen bochten die 120 m uit elkaar liggen.
+            Assert.That(Hairpins.Count(Load()), Is.GreaterThanOrEqualTo(30));
+        }
+    }
+
+    public class ClimbAssetTests
+    {
+        [Test]
+        public void UnpavedSection()
+        {
+            var climb = UnityEngine.ScriptableObject.CreateInstance<Climb>();
+            climb.unpavedFrom = 10480f;
+            climb.unpavedTo = 100000f;
+
+            Assert.That(climb.IsUnpaved(10000f), Is.False);
+            Assert.That(climb.IsUnpaved(10480f), Is.True);
+            Assert.That(climb.IsUnpaved(17000f), Is.True);
+            UnityEngine.Object.DestroyImmediate(climb);
+        }
+
+        [Test]
+        public void NoUnpavedSection_ByDefault()
+        {
+            var climb = UnityEngine.ScriptableObject.CreateInstance<Climb>();
+
+            Assert.That(climb.IsUnpaved(0f), Is.False);
+            Assert.That(climb.IsUnpaved(5000f), Is.False);
+            UnityEngine.Object.DestroyImmediate(climb);
+        }
+    }
+
     static class Hairpins
     {
         /// <summary>Plekken waar de weg binnen 60 m bijna omkeert, minstens 120 m uit elkaar.</summary>
