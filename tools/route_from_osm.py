@@ -171,17 +171,22 @@ def resample(points, spacing):
     return result
 
 
-def fetch_elevations(points, dataset):
-    """OpenTopoData: maximaal 100 punten per verzoek en 1 verzoek per seconde."""
-    elevations = []
-    for i in range(0, len(points), 100):
-        batch = points[i:i + 100]
+def fetch_elevations(points, dataset, cache=None):
+    """OpenTopoData: maximaal 100 punten per verzoek, 1 verzoek per seconde en 1000 per dag. Met een cache
+    (dict van "lat,lon" naar hoogte) worden al bekende punten niet opnieuw gevraagd."""
+    cache = {} if cache is None else cache
+    key = lambda p: f"{dataset}:{p[0]:.6f},{p[1]:.6f}"
+    missing = [p for p in points if key(p) not in cache]
+    for i in range(0, len(missing), 100):
+        batch = missing[i:i + 100]
         locations = "|".join(f"{lat:.6f},{lon:.6f}" for lat, lon in batch)
         answer = http_json(OPENTOPODATA.format(dataset=dataset), {"locations": locations})
         if answer.get("status") != "OK":
             raise SystemExit(f"OpenTopoData gaf een fout: {answer}")
-        elevations.extend(r["elevation"] for r in answer["results"])
+        for p, r in zip(batch, answer["results"]):
+            cache[key(p)] = r["elevation"]
         time.sleep(1.1)
+    elevations = [cache[key(p)] for p in points]
     if any(e is None for e in elevations):
         raise SystemExit("Hoogtemodel heeft gaten op deze route; probeer een andere --dataset.")
     return elevations
@@ -206,6 +211,20 @@ def write_gpx(path, name, points, elevations, dataset):
         f.write("\n".join(lines))
 
 
+def route_path(bbox, start, end, via=(), ref=None, tag_filter=None, extra_ids=(), join=20.0):
+    """De weg van start via de tussenpunten naar de finish als lijst (lat, lon), plus per stop hoe ver
+    (m) het opgegeven punt van de weg lag; groot betekent meestal een verkeerd punt of de verkeerde weg."""
+    ways = fetch_ways(bbox, ref=ref, tag_filter=tag_filter, extra_ids=extra_ids)
+    coords, edges = build_graph(ways)
+    join_gaps(coords, edges, join)
+    stops = [start] + list(via) + [end]
+    nodes = [nearest_node(coords, p) for p in stops]
+    route = [nodes[0]]
+    for a, b in zip(nodes, nodes[1:]):
+        route += shortest_path(edges, a, b)[1:]
+    return [coords[n] for n in route], [distance_m(coords[n], p) for n, p in zip(nodes, stops)]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     which = parser.add_mutually_exclusive_group(required=True)
@@ -225,20 +244,11 @@ def main():
 
     start = tuple(map(float, args.start.split(",")))
     end = tuple(map(float, args.end.split(",")))
+    via = [tuple(map(float, v.split(","))) for v in args.via]
 
-    ways = fetch_ways(args.bbox, ref=args.ref, tag_filter=args.filter, extra_ids=args.way)
-    coords, edges = build_graph(ways)
-    joined = join_gaps(coords, edges, args.join)
-    stops = [start] + [tuple(map(float, v.split(","))) for v in args.via] + [end]
-    nodes = [nearest_node(coords, p) for p in stops]
-    offsets = ", ".join(f"{distance_m(coords[n], p):.0f}" for n, p in zip(nodes, stops))
-    print(f"{len(ways)} wegen, {len(coords)} knooppunten, {joined} verbindingen over gaten; "
-          f"afstand van start, tussenpunten en finish tot de weg: {offsets} m")
-
-    route = [nodes[0]]
-    for a, b in zip(nodes, nodes[1:]):
-        route += shortest_path(edges, a, b)[1:]
-    path = [coords[n] for n in route]
+    path, offsets = route_path(args.bbox, start, end, via, ref=args.ref, tag_filter=args.filter,
+                               extra_ids=args.way, join=args.join)
+    print("afstand van start, tussenpunten en finish tot de weg: " + ", ".join(f"{o:.0f}" for o in offsets) + " m")
     length = sum(distance_m(a, b) for a, b in zip(path, path[1:]))
     points = resample(path, args.spacing)
     print(f"route {length / 1000:.2f} km, {len(points)} punten; hoogtes ophalen ({args.dataset})...")
