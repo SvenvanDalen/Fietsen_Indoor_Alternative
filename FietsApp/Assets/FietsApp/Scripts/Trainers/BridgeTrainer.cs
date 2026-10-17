@@ -31,6 +31,11 @@ namespace FietsApp.Trainers
         /// <summary>De (begrensde) helling is veranderd en moet naar de trainer (story 1.2).</summary>
         public event Action<float> GradeChanged;
 
+        /// <summary>Het ERG-doel is veranderd (hele watts, 0 = uit) en moet naar de trainer (story 8.2).</summary>
+        public event Action<int> ErgChanged;
+
+        public float ErgWatts { get; private set; }
+
         public BridgeTrainer(float maxGradePercent = 20f)
         {
             MaxGradePercent = maxGradePercent;
@@ -43,6 +48,14 @@ namespace FietsApp.Trainers
             if (clamped == _gradePercent) return;
             _gradePercent = clamped;
             GradeChanged?.Invoke(clamped);
+        }
+
+        public void SetErgWatts(float watts)
+        {
+            int rounded = watts > 0f ? (int)Math.Round(watts) : 0;
+            if (rounded == (int)ErgWatts) return;
+            ErgWatts = rounded;
+            ErgChanged?.Invoke(rounded);
         }
 
         /// <summary>

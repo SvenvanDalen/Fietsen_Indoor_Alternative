@@ -70,6 +70,15 @@ public class ProtocolTests
             Protocol.Parse("""{"type":"grade","id":"AA:BB:CC:DD:EE:FF","grade":8.5}"""));
     }
 
+    [Fact]
+    public void Parse_PowerCommand()
+    {
+        Assert.Equal(new PowerCommand("AA:BB:CC:DD:EE:FF", 250),
+            Protocol.Parse("""{"type":"power","id":"AA:BB:CC:DD:EE:FF","watts":250}"""));
+        Assert.Equal(new PowerCommand("AA:BB:CC:DD:EE:FF", 0),
+            Protocol.Parse("""{"type":"power","id":"AA:BB:CC:DD:EE:FF","watts":0}"""));
+    }
+
     [Theory]
     [InlineData("""{"type":"onbekend"}""")]
     [InlineData("""{"type":"connect"}""")]

@@ -33,6 +33,9 @@ sealed class SensorConnection : IDisposable
     /// <summary>Helling voor de trainer (story 1.2); apparaten zonder FTMS-besturing negeren dit.</summary>
     public void SetGrade(float gradePercent) => _control?.SetGrade(gradePercent);
 
+    /// <summary>ERG-vermogen voor de trainer (story 8.2); null of 0 = terug naar de helling.</summary>
+    public void SetTargetPower(int? watts) => _control?.SetTargetPower(watts);
+
     SensorConnection(string id, BluetoothLEDevice device, Action<Measurement> onData)
     {
         Id = id;

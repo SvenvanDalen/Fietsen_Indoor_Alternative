@@ -16,6 +16,7 @@ namespace FietsApp
 
         RiderPhysics _physics;
         float _gradePercent;
+        float _gradeScale = 1f;
 
         public ITrainer Trainer { get; private set; }
         public SimulatorTrainer Simulator { get; private set; }
@@ -27,14 +28,31 @@ namespace FietsApp
         /// <summary>Remmen, van 0 (los) tot 1 (vol); bijvoorbeeld de spatiebalk. Werkt met elke trainer.</summary>
         public float Brake { get; set; }
 
-        /// <summary>Helling van de route. De trainer krijgt dezelfde waarde, begrensd op zijn maximum.</summary>
+        /// <summary>
+        /// Helling van de route; de fysica rekent hiermee. De trainer krijgt hem maal <see cref="GradeScale"/>,
+        /// begrensd op zijn maximum.
+        /// </summary>
         public float GradePercent
         {
             get => _gradePercent;
             set
             {
                 _gradePercent = value;
-                Trainer?.SetGrade(value);
+                Trainer?.SetGrade(value * _gradeScale);
+            }
+        }
+
+        /// <summary>
+        /// Weerstandsgevoeligheid (story 2.3): welk deel van de helling de trainer laat voelen, 0,5-1,5. Snelheid
+        /// en klimtijd blijven op de echte helling, zodat tijden vergelijkbaar blijven.
+        /// </summary>
+        public float GradeScale
+        {
+            get => _gradeScale;
+            set
+            {
+                _gradeScale = Mathf.Clamp(value, 0.5f, 1.5f);
+                Trainer?.SetGrade(_gradePercent * _gradeScale);
             }
         }
 
@@ -53,8 +71,11 @@ namespace FietsApp
         /// <summary>Wissel van vermogensbron, bijvoorbeeld van simulator naar Bluetooth.</summary>
         public void UseTrainer(ITrainer trainer)
         {
+            float erg = Trainer?.ErgWatts ?? 0f; // een lopende workout gaat door op de nieuwe trainer
+            Trainer?.SetErgWatts(0f);
             Trainer = trainer;
-            Trainer.SetGrade(_gradePercent);
+            Trainer.SetGrade(_gradePercent * _gradeScale);
+            Trainer.SetErgWatts(erg);
         }
 
         /// <summary>Een nieuwe rit begint (na <see cref="StartAt"/>); de vorige is dan voorbij.</summary>

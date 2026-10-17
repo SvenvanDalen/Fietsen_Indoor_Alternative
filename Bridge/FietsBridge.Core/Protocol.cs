@@ -19,6 +19,9 @@ public sealed record DisconnectCommand(string Id) : Command;
 /// <summary>Helling die de trainer moet nabootsen (story 1.2), in procent.</summary>
 public sealed record GradeCommand(string Id, float Grade) : Command;
 
+/// <summary>ERG-modus (story 8.2): vast vermogen in watt; 0 of minder zet de trainer terug op de helling.</summary>
+public sealed record PowerCommand(string Id, int Watts) : Command;
+
 /// <summary>
 /// JSON-berichten tussen brug en Unity, één bericht per WebSocket-tekstframe.
 /// Veldnamen in camelCase en enums als tekst, zodat Unity's JsonUtility ze direct leest.
@@ -66,6 +69,7 @@ public static class Protocol
                 "connect" => new ConnectCommand(root.GetProperty("id").GetString()!),
                 "disconnect" => new DisconnectCommand(root.GetProperty("id").GetString()!),
                 "grade" => new GradeCommand(root.GetProperty("id").GetString()!, root.GetProperty("grade").GetSingle()),
+                "power" => new PowerCommand(root.GetProperty("id").GetString()!, root.GetProperty("watts").GetInt32()),
                 _ => null,
             };
         }

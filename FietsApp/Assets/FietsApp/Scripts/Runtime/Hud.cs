@@ -48,7 +48,9 @@ namespace FietsApp
             int seconds = (int)ride.ElapsedSeconds;
             _status.text =
                 $"{t.Name}{(t.IsConnected ? "" : " (niet verbonden)")}   " +
-                $"helling {ride.GradePercent:0.0}% (trainer {t.GradePercent:0.0}%)   " +
+                (t.ErgWatts > 0f
+                    ? $"helling {ride.GradePercent:0.0}%   <color=#ffd060>ERG {t.ErgWatts:0} W</color>   "
+                    : $"helling {ride.GradePercent:0.0}% (trainer {t.GradePercent:0.0}%)   ") +
                 $"{ride.DistanceM / 1000f:0.00} km   {seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}" +
                 (ride.Brake > 0f ? "   <color=#ff6060>remmen</color>" : "") +
                 (recorder != null && recorder.Status.Length > 0 ? $"   <color=#ff9090>●</color> {recorder.Status}" : "");

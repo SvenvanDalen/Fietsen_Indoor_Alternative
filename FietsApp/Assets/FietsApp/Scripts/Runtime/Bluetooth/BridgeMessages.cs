@@ -84,6 +84,10 @@ namespace FietsApp.Bluetooth
         public static string Grade(string id, float gradePercent) =>
             $"{{\"type\":\"grade\",\"id\":\"{id}\",\"grade\":{gradePercent.ToString("0.##", CultureInfo.InvariantCulture)}}}";
 
+        /// <summary>ERG-vermogen voor de trainer in hele watts; 0 = terug naar de helling (story 8.2).</summary>
+        public static string Power(string id, int watts) =>
+            $"{{\"type\":\"power\",\"id\":\"{id}\",\"watts\":{(watts > 0 ? watts : 0)}}}";
+
         public static string Disconnect(string id) => $"{{\"type\":\"disconnect\",\"id\":\"{id}\"}}";
 
         /// <summary>Signaalsterkte in woorden; grenzen zijn vuistregels voor Bluetooth LE binnenshuis.</summary>

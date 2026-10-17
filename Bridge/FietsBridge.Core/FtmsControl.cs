@@ -19,15 +19,24 @@ public readonly record struct FtmsResponse(byte RequestOpCode, FtmsResult Result
 public static class FtmsControl
 {
     public const byte OpRequestControl = 0x00;
+    public const byte OpSetTargetPower = 0x05;
     public const byte OpStartOrResume = 0x07;
     public const byte OpSetSimulation = 0x11;
     public const byte OpResponse = 0x80;
 
+    const int PowerTargetBit = 3;
     const int SimulationTargetBit = 13;
 
     public static byte[] RequestControl() => [OpRequestControl];
 
     public static byte[] StartOrResume() => [OpStartOrResume];
+
+    /// <summary>ERG-modus (story 8.2): de trainer houdt zelf dit vermogen vast, ongeacht cadans (sint16, 1 W).</summary>
+    public static byte[] SetTargetPower(int watts)
+    {
+        short w = (short)Math.Clamp(watts, 0, 4000);
+        return [OpSetTargetPower, (byte)w, (byte)(w >> 8)];
+    }
 
     /// <summary>
     /// Indoor bike simulation: windsnelheid (sint16, 0,001 m/s), helling (sint16, 0,01 %),
@@ -47,11 +56,17 @@ public static class FtmsControl
         data.Length >= 3 && data[0] == OpResponse ? new FtmsResponse(data[1], (FtmsResult)data[2]) : null;
 
     /// <summary>Uit de Feature-characteristic: kan de trainer een helling nabootsen?</summary>
-    public static bool SupportsSimulation(ReadOnlySpan<byte> features)
+    public static bool SupportsSimulation(ReadOnlySpan<byte> features) => HasTarget(features, SimulationTargetBit);
+
+    /// <summary>Uit de Feature-characteristic: kan de trainer een vast vermogen vasthouden (ERG)?</summary>
+    public static bool SupportsPower(ReadOnlySpan<byte> features) => HasTarget(features, PowerTargetBit);
+
+    /// <summary>4 bytes machine-features, dan 4 bytes target-settings met per bit een instelbare doelwaarde.</summary>
+    static bool HasTarget(ReadOnlySpan<byte> features, int bit)
     {
         if (features.Length < 8) return false;
         uint targets = (uint)(features[4] | features[5] << 8 | features[6] << 16 | features[7] << 24);
-        return (targets & (1u << SimulationTargetBit)) != 0;
+        return (targets & (1u << bit)) != 0;
     }
 }
 
@@ -91,4 +106,30 @@ public sealed class GradeSender
         _lastTime = now;
         return grade;
     }
+}
+
+/// <summary>
+/// Bepaalt wanneer een nieuw ERG-vermogen naar de trainer gaat (story 8.2): een nieuw doel meteen, maar
+/// hoogstens elke <see cref="MinInterval"/>; hetzelfde doel niet opnieuw. Geen geleidelijke overgang: een
+/// workout wil een stap, en de trainer regelt zelf hoe snel hij die haalt.
+/// </summary>
+public sealed class PowerSender
+{
+    public static readonly TimeSpan MinInterval = TimeSpan.FromMilliseconds(500);
+
+    int? _lastSent;
+    DateTimeOffset _lastTime;
+
+    /// <summary>Het vermogen om nu te versturen, of null als er niets verstuurd hoeft te worden.</summary>
+    public int? Next(int desired, DateTimeOffset now)
+    {
+        if (_lastSent == desired) return null;
+        if (_lastSent is not null && now - _lastTime < MinInterval) return null;
+        _lastSent = desired;
+        _lastTime = now;
+        return desired;
+    }
+
+    /// <summary>Opnieuw beginnen, bijvoorbeeld na een mislukte opdracht of na de helling.</summary>
+    public void Reset() => _lastSent = null;
 }

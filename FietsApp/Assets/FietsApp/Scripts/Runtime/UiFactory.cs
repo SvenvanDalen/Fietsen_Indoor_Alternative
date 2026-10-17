@@ -51,6 +51,18 @@ namespace FietsApp
             return text;
         }
 
+        /// <summary>Half doorzichtig zwart paneel; <paramref name="anchor"/> is ook het draaipunt.</summary>
+        public static RectTransform Panel(Transform canvas, string name, Vector2 anchor, Vector2 position, Vector2 size)
+        {
+            var rt = new GameObject(name, typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
+            rt.SetParent(canvas, false);
+            rt.anchorMin = rt.anchorMax = rt.pivot = anchor;
+            rt.anchoredPosition = position;
+            rt.sizeDelta = size;
+            rt.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);
+            return rt;
+        }
+
         /// <summary>Blauwe knop met een label, linksboven op <paramref name="topLeft"/>.</summary>
         public static (Button button, Text label) Button(RectTransform parent, string name, Vector2 topLeft, float width,
             float height, UnityEngine.Events.UnityAction onClick)

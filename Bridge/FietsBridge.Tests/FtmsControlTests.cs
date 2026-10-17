@@ -62,6 +62,55 @@ public class FtmsControlTests
         Assert.False(FtmsControl.SupportsSimulation([0, 0, 0, 0, 0x08, 0x00, 0, 0])); // alleen vermogen
         Assert.False(FtmsControl.SupportsSimulation([0, 0, 0]));
     }
+
+    [Fact]
+    public void SupportsPower_ReadsTargetSettingBit3()
+    {
+        Assert.True(FtmsControl.SupportsPower([0, 0, 0, 0, 0x08, 0x00, 0, 0]));
+        Assert.True(FtmsControl.SupportsPower([0, 0, 0, 0, 0x08, 0x20, 0, 0])); // vermogen én simulatie
+        Assert.False(FtmsControl.SupportsPower([0, 0, 0, 0, 0x00, 0x20, 0, 0])); // alleen simulatie
+        Assert.False(FtmsControl.SupportsPower([0, 0, 0]));
+    }
+
+    [Fact]
+    public void SetTargetPower_EncodesWattsAsSint16()
+    {
+        // 250 W = 0x00FA (little-endian FA 00); 1200 W = 0x04B0.
+        Assert.Equal([0x05, 0xFA, 0x00], FtmsControl.SetTargetPower(250));
+        Assert.Equal([0x05, 0xB0, 0x04], FtmsControl.SetTargetPower(1200));
+        Assert.Equal([0x05, 0x00, 0x00], FtmsControl.SetTargetPower(-10));
+    }
+}
+
+public class PowerSenderTests
+{
+    static readonly DateTimeOffset T0 = new(2026, 10, 16, 8, 0, 0, TimeSpan.Zero);
+
+    [Fact]
+    public void SendsNewTargetOnceAndImmediately()
+    {
+        var sender = new PowerSender();
+        Assert.Equal(200, sender.Next(200, T0));
+        Assert.Null(sender.Next(200, T0.AddSeconds(5)));
+    }
+
+    [Fact]
+    public void StepWaitsForMinimumInterval()
+    {
+        var sender = new PowerSender();
+        sender.Next(200, T0);
+        Assert.Null(sender.Next(300, T0.AddMilliseconds(250)));
+        Assert.Equal(300, sender.Next(300, T0.AddMilliseconds(500)));
+    }
+
+    [Fact]
+    public void ResetSendsAgain()
+    {
+        var sender = new PowerSender();
+        sender.Next(200, T0);
+        sender.Reset();
+        Assert.Equal(200, sender.Next(200, T0.AddMilliseconds(10)));
+    }
 }
 
 public class GradeSenderTests
