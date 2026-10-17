@@ -503,8 +503,8 @@ Epic: E6 · Fase: MVP · Prio: Should · Punten: 2
 
 Als rijder wil ik pauzeren zonder dat de rit stopt met tellen.
 
-- [ ] Pauzeknop
-- [ ] Tijd en afstand blijven kloppen
+- [x] Pauzeknop
+- [x] Tijd en afstand blijven kloppen
 
 ### E7 Accounts en profiel (V1)
 
