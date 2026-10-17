@@ -1,3 +1,4 @@
+using FietsApp.Training;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,6 +6,7 @@ namespace FietsApp
 {
     /// <summary>
     /// HUD (story 6.1): vermogen, cadans, snelheid en hartslag, altijd zichtbaar en schaalbaar.
+    /// De vermogenstegel kleurt mee met de zone van het 3-secondenvermogen (story 8.5).
     /// Bouwt zijn eigen canvas op, zodat de scène alleen dit component nodig heeft.
     /// </summary>
     public sealed class Hud : MonoBehaviour
@@ -15,9 +17,13 @@ namespace FietsApp
 
         const float TileWidth = 220f;
         const float TileHeight = 120f;
+        const float ZoneSeconds = 3f;
+        static readonly Color TileColor = new Color(0f, 0f, 0f, 0.55f);
 
         RectTransform _root;
-        Text _power, _cadence, _speed, _heartRate, _status;
+        Text _power, _cadence, _speed, _heartRate, _status, _powerCaption;
+        Image _powerTile, _zoneBar;
+        readonly RollingAverage _zonePower = new RollingAverage(ZoneSeconds);
 
         void Awake()
         {
@@ -34,6 +40,7 @@ namespace FietsApp
             var t = ride.Trainer;
 
             _power.text = $"{t.PowerWatts:0}";
+            ShowZone(t.PowerWatts);
             _cadence.text = $"{t.CadenceRpm:0}";
             _speed.text = $"{ride.SpeedMs * 3.6f:0.0}";
             _heartRate.text = t.HeartRateBpm > 0f ? $"{t.HeartRateBpm:0}" : "--";
@@ -46,6 +53,29 @@ namespace FietsApp
                 (ride.Brake > 0f ? "   <color=#ff6060>remmen</color>" : "") +
                 (recorder != null && recorder.Status.Length > 0 ? $"   <color=#ff9090>●</color> {recorder.Status}" : "");
         }
+
+        /// <summary>Kleur en naam van de zone; stilstaan (0 W) laat de tegel neutraal.</summary>
+        void ShowZone(float watts)
+        {
+            _zonePower.Add(watts, Time.deltaTime);
+            int ftp = ProfileStore.Current.ftpWatts;
+            if (_zonePower.Value < 1.0)
+            {
+                _powerTile.color = TileColor;
+                _zoneBar.enabled = false;
+                _powerCaption.text = $"VERMOGEN (W)  <color=#bbb>FTP {ftp}</color>";
+                return;
+            }
+            var zone = PowerZones.Of(_zonePower.Value, ftp);
+            var color = ZoneColor(zone);
+            _powerTile.color = new Color(color.r * 0.45f, color.g * 0.45f, color.b * 0.45f, 0.8f);
+            _zoneBar.enabled = true;
+            _zoneBar.color = color;
+            _powerCaption.text = $"<b>{zone.Label.ToUpperInvariant()}</b> (W)";
+        }
+
+        public static Color ZoneColor(PowerZone zone) => new Color(
+            ((zone.Rgb >> 16) & 0xFF) / 255f, ((zone.Rgb >> 8) & 0xFF) / 255f, (zone.Rgb & 0xFF) / 255f, 1f);
 
         void ApplyScale()
         {
@@ -70,6 +100,18 @@ namespace FietsApp
             ApplyScale();
 
             _power = AddTile("VERMOGEN", "W", 0);
+            _powerTile = _power.transform.parent.GetComponent<Image>();
+            _powerCaption = _powerTile.transform.Find("Label").GetComponent<Text>();
+            _powerCaption.supportRichText = true;
+            _zoneBar = new GameObject("Zone", typeof(RectTransform), typeof(Image)).GetComponent<Image>();
+            _zoneBar.transform.SetParent(_powerTile.transform, false);
+            var bar = _zoneBar.rectTransform;
+            bar.anchorMin = Vector2.zero;
+            bar.anchorMax = new Vector2(1f, 0f);
+            bar.pivot = new Vector2(0.5f, 0f);
+            bar.sizeDelta = new Vector2(0f, 8f);
+            _zoneBar.raycastTarget = false;
+            _zoneBar.enabled = false;
             _cadence = AddTile("CADANS", "rpm", 1);
             _speed = AddTile("SNELHEID", "km/u", 2);
             _heartRate = AddTile("HARTSLAG", "bpm", 3);
@@ -89,7 +131,7 @@ namespace FietsApp
             tile.anchorMin = tile.anchorMax = tile.pivot = new Vector2(0.5f, 1f);
             tile.sizeDelta = new Vector2(TileWidth, TileHeight);
             tile.anchoredPosition = new Vector2((index - 1.5f) * (TileWidth + 20f), 0f);
-            tile.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.55f);
+            tile.GetComponent<Image>().color = TileColor;
 
             var caption = AddText(tile, "Label", 18, TextAnchor.UpperCenter);
             caption.text = $"{label} ({unit})";
