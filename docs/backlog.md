@@ -402,14 +402,14 @@ Epic: E4 · Fase: MVP · Prio: Must · Punten: 13 (eerst splitsen)
 
 Als rijder wil ik één doorlopende wereld waarin alle klimmen liggen, in een verzonnen landschap met nagebouwde klimmen.
 
-- [ ] Eén kaart met alle klimmen als aansluitende routes
-- [ ] Kiezen via wereldkaart
-- [ ] Overgang zonder laadscherm of met korte fade
+- [x] Eén kaart met alle klimmen als aansluitende routes
+- [x] Kiezen via wereldkaart
+- [x] Overgang zonder laadscherm of met korte fade
 
 **Gesplitst (2026-10-17):** zie het besluit "Doorlopende wereld" in `docs/decisions.md`.
-- 4.11a Wereldmodel (engine-vrij): gebieden met een dal en een knooppunt, dalwegen naar de voet van elke klim, ligging en hoogteverschuiving per klim, routes aan elkaar knopen
-- 4.11b Rijden door de wereld: één doorlopende route knooppunt → dalweg → klim → terug, met landschap eromheen
-- 4.11c Wereldkaart met het netwerk; kiezen met een korte fade
+- [x] 4.11a Wereldmodel (engine-vrij): gebieden met een dal en een knooppunt, dalwegen naar de voet van elke klim, ligging en hoogteverschuiving per klim, routes aan elkaar knopen
+- [x] 4.11b Rijden door de wereld: één doorlopende route knooppunt → dalweg → klim → terug, met landschap eromheen
+- [x] 4.11c Wereldkaart met het netwerk; kiezen met een korte fade
 
 #### 4.12 Afdalingen zelf rijden op elke klim
 
