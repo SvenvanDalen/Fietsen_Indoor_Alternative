@@ -64,13 +64,13 @@ namespace FietsApp
             var current = routeView.Climb != null ? _world.Find(routeView.Climb.name) : null;
             Select(current != null ? _world.RegionOf(current) : _world.Regions[0]);
             _panel.SetActive(true);
-            ride.enabled = false;
+            ride.Hold(this);
         }
 
         public void Close()
         {
             _panel.SetActive(false);
-            ride.enabled = true;
+            ride.Release(this);
         }
 
         /// <summary>Rit op deze klim, achter een korte fade naar zwart en terug.</summary>
@@ -88,7 +88,7 @@ namespace FietsApp
             _panel.SetActive(false);
             yield return null; // zwart beeld eerst tonen, dan pas de wereld opbouwen
             rideMenu.Ride(asset);
-            ride.enabled = true;
+            ride.Release(this);
             yield return null;
             yield return Fade(1f, 0f);
             _fade.gameObject.SetActive(false);

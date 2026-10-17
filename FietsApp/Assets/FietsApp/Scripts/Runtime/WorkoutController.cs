@@ -53,7 +53,7 @@ namespace FietsApp
                 Stop($"Workout klaar: {_player.Workout.Name}");
                 return;
             }
-            ride.Trainer.SetErgWatts(_player.TargetWatts(ProfileStore.Current.ftpWatts));
+            ride.Trainer.SetErgWatts(ride.enabled ? _player.TargetWatts(ProfileStore.Current.ftpWatts) : 0f); // stil: geen weerstand
             Refresh();
         }
 

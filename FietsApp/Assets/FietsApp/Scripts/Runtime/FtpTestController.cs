@@ -45,7 +45,7 @@ namespace FietsApp
                 Finish();
                 return;
             }
-            ride.Trainer.SetErgWatts(_test.ErgWatts);
+            ride.Trainer.SetErgWatts(ride.enabled ? _test.ErgWatts : 0f); // stil: geen weerstand
             int s = (int)System.Math.Ceiling(_test.PhaseRemaining);
             string erg = _test.ErgWatts > 0 ? $"<b>{_test.ErgWatts} W</b>" : "<b>vrij</b>";
             _phase.text = $"{_test.PhaseName}  {erg}   nog {s / 60}:{s % 60:00}";

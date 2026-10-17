@@ -7,7 +7,7 @@ namespace FietsApp
     /// <summary>
     /// Hoogteprofiel van de hele route met de positie van de rijder (story 6.2):
     /// stukken van 100 m gekleurd naar helling, een stip op de huidige plek, en de helling,
-    /// hoogte, afstand tot de top en klimcategorie (story 4.3) als tekst. Toets P toont of verbergt het paneel.
+    /// hoogte, afstand tot de top en klimcategorie (story 4.3) als tekst. Toets H toont of verbergt het paneel (P is pauze, story 6.4).
     /// </summary>
     public sealed class ElevationProfileHud : MonoBehaviour
     {
@@ -55,7 +55,7 @@ namespace FietsApp
         void Update()
         {
             var kb = UnityEngine.InputSystem.Keyboard.current;
-            if (kb != null && kb.pKey.wasPressedThisFrame) _panel.SetActive(!_panel.activeSelf);
+            if (kb != null && kb.hKey.wasPressedThisFrame) _panel.SetActive(!_panel.activeSelf);
             if (_profile == null || !_panel.activeSelf) return;
 
             var route = routeView.Route;

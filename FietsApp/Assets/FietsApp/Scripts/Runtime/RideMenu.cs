@@ -87,7 +87,7 @@ namespace FietsApp
         public void Open()
         {
             _panel.SetActive(true);
-            ride.enabled = false; // rit staat stil zolang je kiest
+            ride.Hold(this); // rit staat stil zolang je kiest
             _gradeScale = routeView.Climb != null
                 ? ProfileStore.Current.GradeScale(routeView.Climb.displayName)
                 : RiderProfile.DefaultGradeScale;
@@ -97,7 +97,7 @@ namespace FietsApp
         public void Close()
         {
             _panel.SetActive(false);
-            ride.enabled = true;
+            ride.Release(this);
         }
 
         /// <summary>Start een rit op klim <paramref name="index"/> uit de lijst, aan de voet.</summary>
