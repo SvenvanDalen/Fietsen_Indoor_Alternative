@@ -114,6 +114,21 @@ namespace FietsApp
             Close();
         }
 
+        /// <summary>
+        /// Start een rit op <paramref name="climb"/> met zijn eigen opgeslagen weerstand, bijvoorbeeld vanaf de
+        /// wereldkaart (story 4.11c). In de doorlopende wereld begin je bij het knooppunt in het dal.
+        /// </summary>
+        public void Ride(Climb climb)
+        {
+            if (climb != routeView.Climb) routeView.SetClimb(climb);
+            ride.GradeScale = ProfileStore.Current.GradeScale(climb.displayName) / 100f;
+            ride.StartAt(0f);
+            if (IsOpen) Close();
+        }
+
+        /// <summary>De klimmen in het menu, voor de wereldkaart.</summary>
+        public IReadOnlyList<Climb> Climbs => climbs;
+
         void Page(int step)
         {
             int pages = Mathf.Max(1, (_shown.Count + PageSize - 1) / PageSize);
