@@ -32,6 +32,7 @@ namespace FietsApp
         Journey _journey;
         bool _journeyResolved;
         IHeightSource _naturalHeights;
+        CornerSpeeds _corners;
 
         static ClimbLibrary _worldFor;
         static WorldMap _world;
@@ -73,6 +74,9 @@ namespace FietsApp
         // Lui aangemaakt, zodat andere componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
         /// <summary>Wat er gereden wordt: de rit door de wereld, of anders de klim zelf.</summary>
         public Route Route => _route ?? (_route = Journey?.Route ?? OwnRoute);
+
+        /// <summary>Bochten van <see cref="Route"/> en hoe hard je erdoor kunt (afdalingen, story 4.12).</summary>
+        public CornerSpeeds Corners => _corners ?? (_corners = new CornerSpeeds(Route));
 
         /// <summary>De klim op zijn plek in de wereld (zelfde punten als in <see cref="Route"/>); afstanden vanaf de voet.</summary>
         public Route ClimbRoute => _climbRoute ?? (_climbRoute = Journey != null ? Journey.Climb.WorldRoute() : OwnRoute);
@@ -148,6 +152,7 @@ namespace FietsApp
             _journey = null;
             _journeyResolved = false;
             _naturalHeights = null;
+            _corners = null;
             Build();
         }
 

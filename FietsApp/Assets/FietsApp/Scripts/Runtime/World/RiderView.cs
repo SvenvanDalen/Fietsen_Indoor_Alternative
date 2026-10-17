@@ -20,6 +20,10 @@ namespace FietsApp
         const float SnapDistance = 20f;
         float _lastDistance;
 
+        [Tooltip("Hoe ver de rijder in een bocht hooguit schuin hangt (graden).")]
+        [SerializeField, Range(0f, 45f)] float maxLean = 35f;
+        float _lean;
+
         void Awake()
         {
             if (ride == null) ride = FindAnyObjectByType<RideController>();
@@ -48,9 +52,17 @@ namespace FietsApp
             float grade = ride.DistanceM >= route.Length ? 0f : here.GradePercent;
             if (!Mathf.Approximately(ride.GradePercent, grade)) ride.GradePercent = grade;
 
+            // Voor bochten remt de rijder vanzelf af (afdalingen, story 4.12) en hangt hij schuin in de bocht.
+            var corners = routeView.Corners;
+            ride.SpeedLimit = corners.SpeedLimitAt(distance);
+            float curvature = corners.CurvatureAt(distance);
+            float targetLean = Mathf.Clamp(Mathf.Atan(ride.SpeedMs * ride.SpeedMs * curvature / 9.81f) * Mathf.Rad2Deg, -maxLean, maxLean);
+            _lean = Mathf.Lerp(_lean, targetLean, 1f - Mathf.Exp(-6f * Time.deltaTime));
+
             Vector3 position = new Vector3(here.X, here.Elevation, here.Z);
             Vector3 forward = new Vector3(here.HeadingX, here.GradePercent / 100f, here.HeadingZ).normalized;
-            rider.SetPositionAndRotation(position, Quaternion.LookRotation(forward, Vector3.up));
+            // Positieve kromming is een bocht naar links: rol om de rijrichting naar links (positieve z-rotatie).
+            rider.SetPositionAndRotation(position, Quaternion.LookRotation(forward, Vector3.up) * Quaternion.Euler(0f, 0f, _lean));
 
             bool jumped = Mathf.Abs(distance - _lastDistance) > SnapDistance;
             _lastDistance = distance;
