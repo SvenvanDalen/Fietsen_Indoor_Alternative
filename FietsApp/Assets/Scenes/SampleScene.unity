@@ -1206,6 +1206,7 @@ MonoBehaviour:
   cameraOffset: {x: 0, y: 2.6, z: -7}
   lookAhead: 12
   cameraSmoothing: 4
+  maxLean: 35
 --- !u!114 &1293722328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1312,6 +1313,52 @@ MonoBehaviour:
   routeView: {fileID: 1397060718}
   wallMaterial: {fileID: 2100000, guid: 675d2d4fc23569148a546f6d2df45d2b, type: 2}
   redMaterial: {fileID: 2100000, guid: 1c5aafda52283cb4d9551ea87dcb4810, type: 2}
+--- !u!1 &1513543189
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1513543191}
+  - component: {fileID: 1513543190}
+  m_Layer: 0
+  m_Name: Pauze
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1513543190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1513543189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7163c2f695628a4797914701fbfb2ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.PauseController
+  ride: {fileID: 1293722325}
+  rideMenu: {fileID: 884605691}
+--- !u!4 &1513543191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1513543189}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1609879895
 GameObject:
   m_ObjectHideFlags: 0
@@ -1684,3 +1731,4 @@ SceneRoots:
   - {fileID: 315344538}
   - {fileID: 862297249}
   - {fileID: 665469798}
+  - {fileID: 1513543191}

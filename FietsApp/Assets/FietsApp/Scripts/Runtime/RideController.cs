@@ -47,7 +47,7 @@ namespace FietsApp
             set
             {
                 _gradePercent = value;
-                Trainer?.SetGrade(value * _gradeScale);
+                PushGrade();
             }
         }
 
@@ -61,7 +61,7 @@ namespace FietsApp
             set
             {
                 _gradeScale = Mathf.Clamp(value, 0.5f, 1.5f);
-                Trainer?.SetGrade(_gradePercent * _gradeScale);
+                PushGrade();
             }
         }
 
@@ -71,6 +71,36 @@ namespace FietsApp
             Simulator = new SimulatorTrainer();
             UseTrainer(Simulator);
         }
+
+        /// <summary>
+        /// Zet de rit stil namens <paramref name="owner"/> (pauze, ritmenu, wereldkaart; story 6.4). De rit loopt pas
+        /// weer als iedereen die hem stilzette hem ook weer vrijgeeft, zodat het sluiten van een menu een pauze niet opheft.
+        /// Stil telt er geen tijd of afstand, en de trainer krijgt een vlakke weg zodat je makkelijk weer wegrijdt.
+        /// </summary>
+        public void Hold(object owner)
+        {
+            _holds.Add(owner);
+            enabled = false;
+        }
+
+        /// <summary>Geeft de rit vrij namens <paramref name="owner"/>; zie <see cref="Hold"/>.</summary>
+        public void Release(object owner)
+        {
+            _holds.Remove(owner);
+            enabled = _holds.Count == 0;
+        }
+
+        /// <summary>Of <paramref name="owner"/> de rit stilhoudt.</summary>
+        public bool IsHeldBy(object owner) => _holds.Contains(owner);
+
+        readonly System.Collections.Generic.HashSet<object> _holds = new System.Collections.Generic.HashSet<object>();
+
+        void OnEnable() => PushGrade();
+
+        void OnDisable() => PushGrade();
+
+        /// <summary>Helling naar de trainer: die van de route maal de gevoeligheid, of vlak als de rit stilstaat.</summary>
+        void PushGrade() => Trainer?.SetGrade(isActiveAndEnabled ? _gradePercent * _gradeScale : 0f);
 
         void OnValidate()
         {
@@ -83,7 +113,7 @@ namespace FietsApp
             float erg = Trainer?.ErgWatts ?? 0f; // een lopende workout gaat door op de nieuwe trainer
             Trainer?.SetErgWatts(0f);
             Trainer = trainer;
-            Trainer.SetGrade(_gradePercent * _gradeScale);
+            PushGrade();
             Trainer.SetErgWatts(erg);
         }
 
