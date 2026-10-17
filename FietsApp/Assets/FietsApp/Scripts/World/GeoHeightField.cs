@@ -34,6 +34,15 @@ namespace FietsApp.World
     }
 
     /// <summary>
+    /// Een hoogtebron die maar een deel van de wereld kent (story 4.11b): 1 waar hij geldt, 0 erbuiten, met een
+    /// zachte overgang. <see cref="TerrainHeights"/> vult de rest aan met verzonnen heuvels.
+    /// </summary>
+    public interface IHeightCoverage
+    {
+        float Coverage(float x, float z);
+    }
+
+    /// <summary>
     /// Echt landschap: een rooster van hoogtes in breedte- en lengtegraden, gemaakt met
     /// tools/terrain_from_tiles.py (formaat "FDEM", zie daar).
     /// </summary>
@@ -85,6 +94,17 @@ namespace FietsApp.World
             return (float)(a + (b - a) * tr);
         }
 
+        /// <summary>Afstand in meters tot de rand van het rooster; negatief erbuiten.</summary>
+        public double EdgeDistance(double latitude, double longitude)
+        {
+            const double metersPerDegree = 6371000.0 * Math.PI / 180.0;
+            double north = _south + (_rows - 1) * _dLat, east = _west + (_cols - 1) * _dLon;
+            double cosLat = Math.Cos(latitude * Math.PI / 180.0);
+            double toSouth = (latitude - _south) * metersPerDegree, toNorth = (north - latitude) * metersPerDegree;
+            double toWest = (longitude - _west) * metersPerDegree * cosLat, toEast = (east - longitude) * metersPerDegree * cosLat;
+            return Math.Min(Math.Min(toSouth, toNorth), Math.Min(toWest, toEast));
+        }
+
         static double Clamp(double v, double min, double max) => v < min ? min : v > max ? max : v;
     }
 
@@ -105,6 +125,53 @@ namespace FietsApp.World
         {
             var (lat, lon) = _projection.ToGeo(x, z);
             return _field.HeightAt(lat, lon);
+        }
+    }
+}
+
+namespace FietsApp.World
+{
+    /// <summary>
+    /// Echt landschap van een klim op zijn plek in de doorlopende wereld (story 4.11b): wereldmeters terug naar de
+    /// eigen meters van de klim, dan naar breedte- en lengtegraad, plus de hoogteverschuiving van de klim. Geldt
+    /// alleen binnen het hoogtebestand; de laatste <see cref="Fade"/> meter naar de rand loopt de dekking af.
+    /// </summary>
+    public sealed class WorldHeights : IHeightSource, IHeightCoverage
+    {
+        readonly GeoHeightField _field;
+        readonly GeoProjection _projection;
+        readonly ClimbPlacement _placement;
+
+        public WorldHeights(GeoHeightField field, GeoProjection projection, ClimbPlacement placement, float fade = 300f)
+        {
+            _field = field;
+            _projection = projection ?? throw new System.ArgumentNullException(nameof(projection));
+            _placement = placement;
+            Fade = fade;
+        }
+
+        public float Fade { get; }
+
+        public float HeightAt(float x, float z)
+        {
+            var (lat, lon) = Geo(x, z);
+            return _field.HeightAt(lat, lon) + _placement.ElevationOffset;
+        }
+
+        public float Coverage(float x, float z)
+        {
+            var (lat, lon) = Geo(x, z);
+            double edge = _field.EdgeDistance(lat, lon);
+            if (edge <= 0) return 0f;
+            if (edge >= Fade) return 1f;
+            float t = (float)(edge / Fade);
+            return t * t * (3f - 2f * t);
+        }
+
+        (double lat, double lon) Geo(float x, float z)
+        {
+            var (lx, lz) = _placement.ToLocal(x, z);
+            return _projection.ToGeo(lx, lz);
         }
     }
 }

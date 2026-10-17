@@ -43,7 +43,7 @@ namespace FietsApp
         void Build()
         {
             if (routeView == null) return;
-            var route = routeView.Route;
+            var route = routeView.ClimbRoute; // borden alleen op de klim, ook in de doorlopende wereld
             _font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             var root = _generated.NewObject("Borden", transform).transform;
 

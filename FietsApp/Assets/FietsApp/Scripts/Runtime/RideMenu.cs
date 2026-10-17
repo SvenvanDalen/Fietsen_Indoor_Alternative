@@ -65,7 +65,7 @@ namespace FietsApp
         {
             if (c.lengthMeters > 0f)
                 return ClimbSummary.Of(c.displayName, c.lengthMeters, c.averageGradePercent, c.elevationGain, c.region);
-            var route = c == routeView.Climb ? routeView.Route : ClimbImport.FromGpx(Gpx.Parse(c.gpx.text));
+            var route = c == routeView.Climb ? routeView.OwnRoute : ClimbImport.FromGpx(Gpx.Parse(c.gpx.text));
             return ClimbSummary.Of(c.displayName, ClimbStats.Of(route), c.region);
         }
 

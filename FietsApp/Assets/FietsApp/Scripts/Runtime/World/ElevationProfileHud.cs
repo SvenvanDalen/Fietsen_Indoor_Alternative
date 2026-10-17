@@ -47,7 +47,8 @@ namespace FietsApp
         {
             _profile = ElevationProfile.Build(routeView.Route);
             _graph.Profile = _profile;
-            string label = ClimbCategories.Label(ClimbCategories.Of(ClimbStats.Of(routeView.Route)));
+            // Categorie van de klim zelf, niet van de hele rit met dalweg en afdaling (doorlopende wereld, 4.11b).
+            string label = ClimbCategories.Label(ClimbCategories.Of(ClimbStats.Of(routeView.ClimbRoute)));
             _category = label.Length > 0 ? $"<b>{label}</b>   " : "";
         }
 
@@ -77,9 +78,12 @@ namespace FietsApp
             }
             else
             {
-                toSummit = $"nog {(route.Length - distance) / 1000f:0.0} km tot de finish";
+                toSummit = routeView.Journey != null
+                    ? $"afdaling, nog {(route.Length - distance) / 1000f:0.0} km tot het dal"
+                    : $"nog {(route.Length - distance) / 1000f:0.0} km tot de finish";
             }
-            _details.text = $"{_category}hoogte {here.Elevation:0} m   {toSummit}";
+            // Echte hoogte boven zeeniveau, ook als de klim in de wereld verschoven ligt.
+            _details.text = $"{_category}hoogte {routeView.RealElevation(here.Elevation):0} m   {toSummit}";
         }
 
         void Build()

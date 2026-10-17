@@ -31,12 +31,13 @@ namespace FietsApp
 
         void Build()
         {
-            var route = routeView != null ? routeView.Route : null;
             var heights = routeView != null ? routeView.NaturalHeights : null;
             var climb = routeView != null ? routeView.Climb : null;
-            if (climb == null || !climb.summitTower || route?.Projection == null || heights == null) return;
-
-            var (x, z) = route.Projection.ToLocal(climb.summitLatitude, climb.summitLongitude);
+            if (climb == null || !climb.summitTower || heights == null) return;
+            // Echte coördinaten naar de plek in de wereld (ook als de klim daar gedraaid en verschoven ligt).
+            var place = routeView.FromGeo(climb.summitLatitude, climb.summitLongitude);
+            if (!place.HasValue) return;
+            var (x, z) = place.Value;
             var root = _generated.NewObject("Zendmast", transform).transform;
             root.position = new Vector3(x, heights.HeightAt(x, z) - 1f, z);
 

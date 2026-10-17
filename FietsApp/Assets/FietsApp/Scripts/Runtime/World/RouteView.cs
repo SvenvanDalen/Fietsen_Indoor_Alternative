@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FietsApp.World;
 using UnityEngine;
 
@@ -23,15 +24,100 @@ namespace FietsApp
 
         [Tooltip("De klim (Assets/FietsApp/Routes). Leeg = de oefenklim.")]
         [SerializeField] Climb climb;
+        [Tooltip("Alle klimmen; samen vormen ze de doorlopende wereld (story 4.11). Leeg = alleen de klim zelf.")]
+        [SerializeField] ClimbLibrary library;
 
         readonly GeneratedContent _generated = new GeneratedContent();
-        Route _route;
+        Route _route, _climbRoute, _ownRoute;
+        Journey _journey;
+        bool _journeyResolved;
         IHeightSource _naturalHeights;
 
-        // Lui aangemaakt, zodat andere componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
-        public Route Route => _route ?? (_route = climb != null && climb.gpx != null
+        static ClimbLibrary _worldFor;
+        static WorldMap _world;
+
+        /// <summary>De doorlopende wereld van alle klimmen in de bibliotheek, eenmalig opgebouwd.</summary>
+        public WorldMap World
+        {
+            get
+            {
+                if (library == null || library.climbs == null || library.climbs.Length == 0) return null;
+                if (_worldFor != library || _world == null)
+                {
+                    _world = WorldMap.Build(library.climbs.Where(c => c != null && c.gpx != null)
+                        .Select(c => new WorldClimb(c.name, c.displayName, c.region, ClimbImport.FromGpx(Gpx.Parse(c.gpx.text)))));
+                    _worldFor = library;
+                }
+                return _world;
+            }
+        }
+
+        /// <summary>De rit door de wereld voor de gekozen klim, of null buiten de wereld (oefenklim, geen bibliotheek).</summary>
+        public Journey Journey
+        {
+            get
+            {
+                if (_journeyResolved) return _journey;
+                _journeyResolved = true;
+                var placed = climb != null ? World?.Find(climb.name) : null;
+                _journey = placed != null ? World.Journey(placed) : null;
+                return _journey;
+            }
+        }
+
+        /// <summary>De klim zelf in eigen meters en echte hoogte (voor geografie en statistiek).</summary>
+        public Route OwnRoute => _ownRoute ?? (_ownRoute = climb != null && climb.gpx != null
             ? ClimbImport.FromGpx(Gpx.Parse(climb.gpx.text))
             : TestRoutes.Testklim());
+
+        // Lui aangemaakt, zodat andere componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
+        /// <summary>Wat er gereden wordt: de rit door de wereld, of anders de klim zelf.</summary>
+        public Route Route => _route ?? (_route = Journey?.Route ?? OwnRoute);
+
+        /// <summary>De klim op zijn plek in de wereld (zelfde punten als in <see cref="Route"/>); afstanden vanaf de voet.</summary>
+        public Route ClimbRoute => _climbRoute ?? (_climbRoute = Journey != null ? Journey.Climb.WorldRoute() : OwnRoute);
+
+        /// <summary>Afstand langs <see cref="Route"/> waar de klim begint (de voet) en eindigt (de top).</summary>
+        public float ClimbStart => Journey != null ? Journey[JourneyPart.Climb].Start : 0f;
+        public float ClimbEnd => Journey != null ? Journey[JourneyPart.Climb].End : Route.Length;
+
+        /// <summary>Wereldhoogte = echte hoogte + deze verschuiving (0 buiten de wereld).</summary>
+        public float ElevationOffset => Journey != null ? Journey.Climb.Placement.ElevationOffset : 0f;
+
+        public float RealElevation(float worldElevation) => worldElevation - ElevationOffset;
+
+        /// <summary>
+        /// Waar je op de klim bent, in meters vanaf de voet, ook tijdens de afdaling over dezelfde weg; null op de
+        /// dalweg. Voor alles wat per plek op de klim hoort (onverhard stuk, borden).
+        /// </summary>
+        public float? ClimbDistanceAt(float distance)
+        {
+            if (Journey == null) return distance;
+            var up = Journey[JourneyPart.Climb];
+            var down = Journey[JourneyPart.Descent];
+            if (distance >= up.Start && distance <= up.End) return distance - up.Start;
+            if (distance > down.Start && distance <= down.End) return up.End - up.Start - (distance - down.Start);
+            return null;
+        }
+
+        /// <summary>Breedte- en lengtegraad van een plek in de wereld (via de echte ligging van de klim), of null zonder GPX.</summary>
+        public (double latitude, double longitude)? ToGeo(float x, float z)
+        {
+            var projection = OwnRoute.Projection;
+            if (projection == null) return null;
+            if (Journey == null) return projection.ToGeo(x, z);
+            var (lx, lz) = Journey.Climb.Placement.ToLocal(x, z);
+            return projection.ToGeo(lx, lz);
+        }
+
+        /// <summary>Plek in de wereld van een echte coördinaat (bijv. de top van de Ventoux), of null zonder GPX.</summary>
+        public (float x, float z)? FromGeo(double latitude, double longitude)
+        {
+            var projection = OwnRoute.Projection;
+            if (projection == null) return null;
+            var (lx, lz) = projection.ToLocal(latitude, longitude);
+            return Journey == null ? (lx, lz) : Journey.Climb.Placement.ToWorld(lx, lz);
+        }
 
         /// <summary>De gekozen klim, of null voor de oefenklim.</summary>
         public Climb Climb => climb;
@@ -50,14 +136,17 @@ namespace FietsApp
 
         /// <summary>Echt landschap in de lokale meters van de route, of null als er geen is.</summary>
         public IHeightSource NaturalHeights =>
-            _naturalHeights ?? (_naturalHeights = climb != null && climb.terrain != null && Route.Projection != null
-                ? new LocalHeights(GeoHeightField.Parse(climb.terrain.bytes), Route.Projection)
-                : null);
+            _naturalHeights ?? (_naturalHeights = climb == null || climb.terrain == null || OwnRoute.Projection == null ? null
+                : Journey != null
+                    ? new WorldHeights(GeoHeightField.Parse(climb.terrain.bytes), OwnRoute.Projection, Journey.Climb.Placement)
+                    : (IHeightSource)new LocalHeights(GeoHeightField.Parse(climb.terrain.bytes), OwnRoute.Projection));
 
         void OnEnable()
         {
             // Opnieuw inlezen, voor als de GPX of het landschap in de inspector is gewisseld.
-            _route = null;
+            _route = _climbRoute = _ownRoute = null;
+            _journey = null;
+            _journeyResolved = false;
             _naturalHeights = null;
             Build();
         }
@@ -78,10 +167,10 @@ namespace FietsApp
             };
 
             AddStrip("Weg", road, new[] { roadMaterial, unpavedRoadMaterial ?? roadMaterial }, pts,
-                i => climb != null && climb.IsUnpaved(pts[i].Distance) ? 1 : 0);
+                i => climb != null && ClimbDistanceAt(pts[i].Distance) is float d && climb.IsUnpaved(d) ? 1 : 0);
             float gravelFrom = climb != null && climb.gravelVergeAboveTreeLine ? climb.treeLine : float.MaxValue;
             AddStrip("Berm", verges, new[] { vergeMaterial, bareVergeMaterial ?? vergeMaterial }, pts,
-                i => pts[i].Elevation > gravelFrom ? 1 : 0);
+                i => RealElevation(pts[i].Elevation) > gravelFrom ? 1 : 0);
         }
 
         /// <summary>

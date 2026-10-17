@@ -153,7 +153,9 @@ namespace FietsApp.World
 
             // Stap 3: de vloeiende routehoogte is van zichzelf glad (straal ~120 m), dus die rekenen we op een
             // grof rooster uit en interpoleren we daartussen. Scheelt een factor 16 aan rekenwerk.
-            var smooth = natural != null ? null : CoarseField(countX, countZ, SmoothStride,
+            // Een bron die maar een deel kent (doorlopende wereld) wordt buiten dat deel aangevuld met verzonnen heuvels.
+            var coverage = natural as IHeightCoverage;
+            var smooth = natural != null && coverage == null ? null : CoarseField(countX, countZ, SmoothStride,
                 (ix, iz) => SmoothElevation(anchors, minX + ix * s.CellSize, minZ + iz * s.CellSize, s.SmoothingRadius));
 
             for (int iz = 0; iz < countZ; iz++)
@@ -166,18 +168,16 @@ namespace FietsApp.World
                 float height = roadElevation[iz * countX + ix] - s.RoadDepth;
                 if (t > 0f)
                 {
-                    float landscape;
-                    if (natural != null)
-                    {
-                        landscape = natural.HeightAt(x, z);
-                    }
-                    else
+                    float real = natural == null ? 0f : coverage == null ? 1f : coverage.Coverage(x, z);
+                    float landscape = real > 0f ? natural.HeightAt(x, z) : 0f;
+                    if (real < 1f)
                     {
                         float amplitude = Math.Min(distance * s.AmplitudePerMeter, s.MaxAmplitude);
                         float rise = Math.Min(distance * s.RisePerMeter, s.MaxRise);
-                        landscape = smooth[iz * countX + ix]
-                                    + noise.Fbm(x / s.NoiseScale, z / s.NoiseScale) * amplitude
-                                    + rise;
+                        float invented = smooth[iz * countX + ix]
+                                         + noise.Fbm(x / s.NoiseScale, z / s.NoiseScale) * amplitude
+                                         + rise;
+                        landscape = invented + (landscape - invented) * real;
                     }
                     height += (landscape - height) * t;
                 }
