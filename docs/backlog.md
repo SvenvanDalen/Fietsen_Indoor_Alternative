@@ -201,8 +201,8 @@ Epic: E2 · Fase: MVP · Prio: Must · Punten: 2
 
 Als rijder wil ik instelbare weerstandsgevoeligheid.
 
-- [ ] Schaal 50-150% van de echte helling
-- [ ] Per klim instelbaar in het menu, niet tijdens de rit
+- [x] Schaal 50-150% van de echte helling
+- [x] Per klim instelbaar in het menu, niet tijdens de rit
 
 #### 2.4 Afdalingen voelen realistisch
 
@@ -273,8 +273,8 @@ Epic: E3 · Fase: MVP · Prio: Must · Punten: 3
 
 Als rijder wil ik kilometerborden en bochtnummers.
 
-- [ ] Bordjes met afstand tot de top
-- [ ] Hellingspercentage zichtbaar
+- [x] Bordjes met afstand tot de top
+- [x] Hellingspercentage zichtbaar
 
 #### 3.5 Dorpjes en publiek in de klim
 
@@ -536,7 +536,7 @@ Epic: E8 · Fase: MVP · Prio: Must · Punten: 5
 
 Als rijder wil ik een FTP-test doen (20 min of ramp).
 
-- [ ] Resultaat wordt opgeslagen in het profiel
+- [x] Resultaat wordt opgeslagen in het profiel
 
 #### 8.2 Gestructureerde workouts (ERG-modus)
 
@@ -544,8 +544,8 @@ Epic: E8 · Fase: MVP · Prio: Must · Punten: 8
 
 Als rijder wil ik gestructureerde workouts.
 
-- [ ] Intervallen met doelvermogen
-- [ ] De trainer regelt het vermogen
+- [x] Intervallen met doelvermogen
+- [x] De trainer regelt het vermogen
 
 #### 8.3 Workout-editor
 
@@ -571,7 +571,7 @@ Epic: E8 · Fase: MVP · Prio: Must · Punten: 2
 
 Als rijder wil ik vermogenszones tijdens het rijden.
 
-- [ ] Zonekleuren in de HUD
+- [x] Zonekleuren in de HUD
 
 ### E9 Voortgang en uitdagingen (V1)
 
