@@ -63,8 +63,10 @@ namespace FietsApp
             _settings.Seed = seed;
             // Boomgrens en bos komen van de klim; de oefenklim heeft overal gras.
             var climb = routeView.Climb;
-            _settings.TreeLine = climb != null ? climb.treeLine : float.MaxValue;
-            _settings.ForestFrom = climb != null ? climb.forestFrom : float.MaxValue;
+            // In de doorlopende wereld ligt alles in hoogte verschoven; de boomgrens schuift mee (besluit "Doorlopende wereld").
+            float offset = routeView.ElevationOffset;
+            _settings.TreeLine = climb != null ? climb.treeLine + offset : float.MaxValue;
+            _settings.ForestFrom = climb != null ? climb.forestFrom + offset : float.MaxValue;
             _aboveTreeLine = climb != null && climb.aboveTreeLine != null ? climb.aboveTreeLine : bareMaterial;
             _biome = new Biome(_settings);
 

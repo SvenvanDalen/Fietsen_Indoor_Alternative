@@ -1211,6 +1211,7 @@ MonoBehaviour:
   roadWidth: 6
   vergeWidth: 2.5
   climb: {fileID: 11400000, guid: 983c6b2dde51fd343bef26a790dca975, type: 2}
+  library: {fileID: 11400000, guid: 69d7db2d21a48034484e354262f60158, type: 2}
 --- !u!4 &1397060719
 Transform:
   m_ObjectHideFlags: 0

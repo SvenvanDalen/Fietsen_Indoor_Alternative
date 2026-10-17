@@ -60,13 +60,15 @@ namespace FietsApp
             float distance = Mathf.Min(ride.DistanceM, route.Length);
             var here = route.Sample(distance);
             double lat = double.NaN, lon = double.NaN;
-            if (route.Projection != null) (lat, lon) = route.Projection.ToGeo(here.X, here.Z);
+            var geo = routeView.ToGeo(here.X, here.Z);
+            if (geo.HasValue) (lat, lon) = geo.Value;
             var t = ride.Trainer;
             if (_log.Count == 0) _climbName = routeView.Climb != null ? routeView.Climb.displayName : "Oefenklim";
+            // Echte hoogte en echte ligging, ook als de klim in de doorlopende wereld verschoven ligt.
             _log.Add(new RideSample(DateTime.UtcNow, t.PowerWatts, t.CadenceRpm, t.HeartRateBpm, ride.SpeedMs,
-                distance, here.Elevation, lat, lon));
+                distance, routeView.RealElevation(here.Elevation), lat, lon));
 
-            // Op de top is de klim klaar: bewaren, ook als je daarna nog even doortrapt.
+            // Aan het eind van de route (de top, of in de wereld terug in het dal) is de rit klaar: bewaren.
             if (ride.DistanceM >= route.Length)
             {
                 Save();
