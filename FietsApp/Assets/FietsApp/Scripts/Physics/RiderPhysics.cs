@@ -81,12 +81,24 @@ namespace FietsApp.Physics
         /// houdt je ook op een steile afdaling stil zonder achteruit te duwen (story 2.4).
         /// </summary>
         /// <param name="brake">0 = niet remmen, 1 = vol remmen (<see cref="MaxBrakeDeceleration"/>).</param>
-        public float Step(float speed, float powerWatts, float gradePercent, float dt, float brake = 0f)
+        /// <param name="speedLimit">
+        /// Snelheid die je hier niet voorbij wilt, zoals voor een bocht (story 4.12). Kom je erboven, dan remt de rijder
+        /// vanzelf bij, hooguit met <see cref="MaxBrakeDeceleration"/>; daaronder gebeurt niets.
+        /// </param>
+        public float Step(float speed, float powerWatts, float gradePercent, float dt, float brake = 0f,
+            float speedLimit = float.PositiveInfinity)
         {
             float propulsion = powerWatts / Math.Max(speed, MinPropulsionSpeed);
             float accel = (propulsion - ResistanceForce(speed, gradePercent)) / Parameters.TotalMassKg;
-            accel -= Math.Clamp(brake, 0f, 1f) * MaxBrakeDeceleration;
-            return Math.Max(0f, speed + accel * dt);
+            float manual = Math.Clamp(brake, 0f, 1f) * MaxBrakeDeceleration;
+            float next = speed + (accel - manual) * dt;
+            if (next > speedLimit)
+            {
+                // Bijremmen tot de grens, maar niet harder dan de rem kan (handrem telt mee).
+                float extra = Math.Max(0f, MaxBrakeDeceleration - manual) * dt;
+                next = Math.Max(speedLimit, next - extra);
+            }
+            return Math.Max(0f, next);
         }
     }
 }

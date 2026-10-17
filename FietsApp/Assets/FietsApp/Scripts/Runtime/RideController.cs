@@ -29,6 +29,15 @@ namespace FietsApp
         public float Brake { get; set; }
 
         /// <summary>
+        /// Hoogste veilige snelheid hier (m/s), zoals voor een bocht in de afdaling (story 4.12); de rijder remt vanzelf
+        /// bij als hij erboven komt. Oneindig = geen grens.
+        /// </summary>
+        public float SpeedLimit { get; set; } = float.PositiveInfinity;
+
+        /// <summary>Of de rijder deze frame vanzelf bijremde voor een bocht.</summary>
+        public bool CornerBraking { get; private set; }
+
+        /// <summary>
         /// Helling van de route; de fysica rekent hiermee. De trainer krijgt hem maal <see cref="GradeScale"/>,
         /// begrensd op zijn maximum.
         /// </summary>
@@ -95,7 +104,9 @@ namespace FietsApp
             float dt = Time.deltaTime;
             if (Trainer == Simulator) Simulator.Tick(dt);
 
-            SpeedMs = _physics.Step(SpeedMs, Trainer.PowerWatts, _gradePercent, dt, Brake);
+            float free = _physics.Step(SpeedMs, Trainer.PowerWatts, _gradePercent, dt, Brake);
+            SpeedMs = _physics.Step(SpeedMs, Trainer.PowerWatts, _gradePercent, dt, Brake, SpeedLimit);
+            CornerBraking = SpeedMs < free - 1e-4f;
             DistanceM += SpeedMs * dt;
             ElapsedSeconds += dt;
         }
