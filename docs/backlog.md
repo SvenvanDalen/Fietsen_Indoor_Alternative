@@ -417,8 +417,8 @@ Epic: E4 · Fase: MVP · Prio: Must · Punten: 5
 
 Als rijder wil ik afdalingen die ik zelf rijd op elke klim.
 
-- [ ] Elke klim heeft een afdaling met vrijloop en bochten
-- [ ] Geen automatische overgang
+- [x] Elke klim heeft een afdaling met vrijloop en bochten
+- [x] Geen automatische overgang
 
 #### 4.13 Ondergronden (kassei, grind, sneeuw)
 
