@@ -16,6 +16,9 @@ namespace FietsApp.Training
         public double WindowSeconds { get; }
         public double Value => _time > 0 ? _sum / _time : 0;
 
+        /// <summary>Hoeveel seconden er in het venster zitten; gelijk aan het venster zodra het vol is.</summary>
+        public double Duration => _time;
+
         /// <summary>Voeg een meting toe die <paramref name="dt"/> seconden gold.</summary>
         public void Add(double value, double dt)
         {

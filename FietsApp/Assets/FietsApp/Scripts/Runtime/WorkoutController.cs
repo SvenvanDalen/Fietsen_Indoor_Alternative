@@ -16,6 +16,7 @@ namespace FietsApp
     {
         [SerializeField] RideController ride;
         [SerializeField] RideMenu rideMenu;
+        [SerializeField] FtpTestController ftpTest;
 
         const float PanelWidth = 420f, ChartHeight = 70f;
         const float FinishedMessageSeconds = 8f;
@@ -34,6 +35,7 @@ namespace FietsApp
         {
             if (ride == null) ride = FindAnyObjectByType<RideController>();
             if (rideMenu == null) rideMenu = FindAnyObjectByType<RideMenu>();
+            if (ftpTest == null) ftpTest = FindAnyObjectByType<FtpTestController>();
             UiFactory.EnsureEventSystem();
             BuildUi();
         }
@@ -61,7 +63,7 @@ namespace FietsApp
             if (kb == null) return;
             if (rideMenu != null && rideMenu.IsOpen) return;
 
-            if (kb.wKey.wasPressedThisFrame) ShowList(!IsListOpen);
+            if (kb.wKey.wasPressedThisFrame && (ftpTest == null || !ftpTest.IsRunning)) ShowList(!IsListOpen);
             if (IsListOpen)
             {
                 if (kb.escapeKey.wasPressedThisFrame) ShowList(false);
@@ -133,7 +135,7 @@ namespace FietsApp
             var canvas = UiFactory.Canvas(transform, "Workout Canvas", 15);
 
             // Lijst met workouts, midden in beeld.
-            var list = Panel(canvas, "Workoutlijst", new Vector2(0.5f, 0.5f), Vector2.zero,
+            var list = UiFactory.Panel(canvas, "Workoutlijst", new Vector2(0.5f, 0.5f), Vector2.zero,
                 new Vector2(760f, 90f + WorkoutLibrary.All.Length * 40f));
             _list = list.gameObject;
             _listTitle = UiFactory.Text(list, "Titel", 28, -14f, 40f);
@@ -153,7 +155,7 @@ namespace FietsApp
             _list.SetActive(false);
 
             // Paneel tijdens de workout, linksboven.
-            var panel = Panel(canvas, "Workout", new Vector2(0f, 1f), new Vector2(24f, -24f),
+            var panel = UiFactory.Panel(canvas, "Workout", new Vector2(0f, 1f), new Vector2(24f, -24f),
                 new Vector2(PanelWidth, 110f + ChartHeight));
             _panel = panel.gameObject;
             _title = UiFactory.Text(panel, "Naam", 18, -8f, 26f);
@@ -174,7 +176,7 @@ namespace FietsApp
             _panel.SetActive(false);
 
             // Melding na afloop, op dezelfde plek.
-            var done = Panel(canvas, "Klaar", new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(PanelWidth, 44f));
+            var done = UiFactory.Panel(canvas, "Klaar", new Vector2(0f, 1f), new Vector2(24f, -24f), new Vector2(PanelWidth, 44f));
             _donePanel = done.gameObject;
             _done = UiFactory.Text(done, "Tekst", 20, -6f, 32f);
             _donePanel.SetActive(false);
@@ -210,15 +212,5 @@ namespace FietsApp
             _marker.SetAsLastSibling();
         }
 
-        static RectTransform Panel(Transform canvas, string name, Vector2 anchor, Vector2 position, Vector2 size)
-        {
-            var rt = new GameObject(name, typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
-            rt.SetParent(canvas, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = anchor;
-            rt.anchoredPosition = position;
-            rt.sizeDelta = size;
-            rt.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);
-            return rt;
-        }
     }
 }
