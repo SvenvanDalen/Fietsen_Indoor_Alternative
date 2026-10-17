@@ -340,12 +340,12 @@ Epic: E4 · Fase: V1 · Prio: Should · Punten: 13 (eerst splitsen)
 
 Als rijder wil ik 50+ klimmen in de bibliotheek.
 
-- [ ] Gevarieerd: Alpen, Pyreneeën, Dolomieten, lokale heuvels
+- [x] Gevarieerd: Alpen, Pyreneeën, Dolomieten, lokale heuvels
 
 **Gesplitst (2026-10-16):**
 - 4.5a Gereedschap: catalogus `tools/climbs.json` en `tools/build_climbs.py` (weg controleren tegen bekende lengte, dan hoogte en landschap) — gebouwd
 - 4.5b Unity: `ClimbLibrary`, FietsApp > Klimmen bijwerken, ritmenu met gebiedsfilter en pagina's — gebouwd
-- 4.5c Inhoud: de klimmen uit de catalogus bouwen en nalopen — bezig
+- 4.5c Inhoud: de klimmen uit de catalogus bouwen en nalopen — gebouwd (55 klimmen)
 
 **Stand 4.5c (2026-10-16, avond):** alle 55 klimmen uit de catalogus gebouwd en in de bibliotheek. Omdat Overpass vaak overbelast was, komt de weg nu standaard uit de OSRM-routeplanner (OSM-data; fietsprofiel voor kasseienhellingen), met start en finish uit de catalogus; de wegcontrole vergelijkt de lengte met de bekende lengte. In het hoogteprofiel worden tunnels en bruggen uit OSM rechtgetrokken (de Grimsel had een bult van 200 m door een tunnel) en steil op-en-af binnen 800 m weggewerkt; elke klim begint op het laagste punt en eindigt op het hoogste. `ClimbLibraryTests` staat nu echte steilte toe (tot 25%: Angliru, Mortirolo, Zoncolan) en echte afdalingen tot 10% (Lagos de Covadonga, Tre Cime, Croix de Fer), en controleert dat elke klim aan de voet begint en op de top eindigt. Korte heuvels (Kapelmuur, Mur de Huy, Paterberg) komen 1 à 2 procentpunt minder steil uit dan bekend: het hoogtemodel van 30 m vlakt korte steile stukken af.
 
