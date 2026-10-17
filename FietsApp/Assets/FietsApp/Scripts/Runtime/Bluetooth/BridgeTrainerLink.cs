@@ -40,6 +40,7 @@ namespace FietsApp.Bluetooth
         void OnEnable()
         {
             Trainer.GradeChanged += SendGrade;
+            Trainer.ErgChanged += SendErg;
             bridge.ConnectionChanged += OnBridgeConnectionChanged;
             bridge.ConnectionReceived += OnConnection;
             bridge.DataReceived += OnData;
@@ -48,6 +49,7 @@ namespace FietsApp.Bluetooth
         void OnDisable()
         {
             Trainer.GradeChanged -= SendGrade;
+            Trainer.ErgChanged -= SendErg;
             bridge.ConnectionChanged -= OnBridgeConnectionChanged;
             bridge.ConnectionReceived -= OnConnection;
             bridge.DataReceived -= OnData;
@@ -98,8 +100,12 @@ namespace FietsApp.Bluetooth
                     State = message.state,
                     Message = message.message,
                 };
-                // Een net verbonden trainer krijgt meteen de huidige helling.
-                if (newlyConnected) bridge.SetGrade(message.id, Trainer.GradePercent);
+                // Een net verbonden trainer krijgt meteen de huidige helling, en het ERG-doel als er een workout loopt.
+                if (newlyConnected)
+                {
+                    bridge.SetGrade(message.id, Trainer.GradePercent);
+                    if (Trainer.ErgWatts > 0f) bridge.SetTargetPower(message.id, (int)Trainer.ErgWatts);
+                }
             }
             Apply();
         }
@@ -112,6 +118,13 @@ namespace FietsApp.Bluetooth
         {
             foreach (var c in _connections.Values)
                 if (c.State == "connected") bridge.SetGrade(c.Id, gradePercent);
+        }
+
+        /// <summary>ERG-vermogen naar alle verbonden apparaten; alleen trainers met FTMS-vermogensdoel doen er iets mee.</summary>
+        void SendErg(int watts)
+        {
+            foreach (var c in _connections.Values)
+                if (c.State == "connected") bridge.SetTargetPower(c.Id, watts);
         }
 
         void OnData(DataMessage data) => Trainer.Apply(data.power, data.cadence, data.heartRate, Now);

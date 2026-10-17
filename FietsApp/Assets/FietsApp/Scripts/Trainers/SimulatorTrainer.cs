@@ -4,7 +4,8 @@ namespace FietsApp.Trainers
 {
     /// <summary>
     /// Trainer zonder hardware (story 1.6). Het doelvermogen wordt van buitenaf gezet
-    /// (toetsenbord of test); cadans en hartslag volgen er geleidelijk uit.
+    /// (toetsenbord of test); cadans en hartslag volgen er geleidelijk uit. In ERG-modus (story 8.2)
+    /// levert de gesimuleerde rijder precies het ERG-vermogen, zodat workouts zonder trainer te testen zijn.
     /// </summary>
     public sealed class SimulatorTrainer : ITrainer
     {
@@ -42,13 +43,17 @@ namespace FietsApp.Trainers
         public void SetGrade(float gradePercent) =>
             _gradePercent = Clamp(gradePercent, -MaxGradePercent, MaxGradePercent);
 
+        public float ErgWatts { get; private set; }
+
+        public void SetErgWatts(float watts) => ErgWatts = Clamp(watts, 0f, MaxPowerWatts);
+
         /// <summary>Werkt de gesimuleerde metingen bij; aanroepen per frame.</summary>
         public void Tick(float dt)
         {
-            PowerWatts = _targetPower;
-            CadenceRpm = _targetPower > 0f ? 85f : 0f;
+            PowerWatts = ErgWatts > 0f ? ErgWatts : _targetPower;
+            CadenceRpm = PowerWatts > 0f ? 85f : 0f;
 
-            float targetHr = RestingHeartRate + HeartRatePerWatt * _targetPower;
+            float targetHr = RestingHeartRate + HeartRatePerWatt * PowerWatts;
             float alpha = 1f - (float)Math.Exp(-dt / HeartRateTimeConstant);
             HeartRateBpm += (targetHr - HeartRateBpm) * alpha;
         }

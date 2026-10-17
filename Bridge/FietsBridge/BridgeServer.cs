@@ -102,6 +102,9 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
             case GradeCommand grade:
                 if (_sensors.TryGetValue(grade.Id, out var sensor)) sensor.SetGrade(grade.Grade);
                 break;
+            case PowerCommand power:
+                if (_sensors.TryGetValue(power.Id, out var trainer)) trainer.SetTargetPower(power.Watts > 0 ? power.Watts : null);
+                break;
             case DisconnectCommand disconnect:
                 if (Disconnect(disconnect.Id) is { } name)
                     await BroadcastAsync(Protocol.Connection(disconnect.Id, name, ConnectionState.Disconnected), ct);

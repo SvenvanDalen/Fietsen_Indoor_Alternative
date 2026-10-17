@@ -21,5 +21,11 @@ namespace FietsApp.Trainers
 
         /// <summary>Vraag de trainer om een helling na te bootsen; wordt begrensd op het bereik van de trainer.</summary>
         void SetGrade(float gradePercent);
+
+        /// <summary>ERG-doel in watt (story 8.2), of 0 als de trainer de helling volgt.</summary>
+        float ErgWatts { get; }
+
+        /// <summary>Laat de trainer dit vermogen vasthouden, ongeacht helling en cadans; 0 zet ERG uit.</summary>
+        void SetErgWatts(float watts);
     }
 }

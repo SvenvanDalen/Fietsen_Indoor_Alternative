@@ -53,8 +53,11 @@ namespace FietsApp
         /// <summary>Wissel van vermogensbron, bijvoorbeeld van simulator naar Bluetooth.</summary>
         public void UseTrainer(ITrainer trainer)
         {
+            float erg = Trainer?.ErgWatts ?? 0f; // een lopende workout gaat door op de nieuwe trainer
+            Trainer?.SetErgWatts(0f);
             Trainer = trainer;
             Trainer.SetGrade(_gradePercent);
+            Trainer.SetErgWatts(erg);
         }
 
         /// <summary>Een nieuwe rit begint (na <see cref="StartAt"/>); de vorige is dan voorbij.</summary>

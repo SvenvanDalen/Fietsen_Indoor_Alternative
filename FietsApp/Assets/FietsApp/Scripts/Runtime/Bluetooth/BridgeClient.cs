@@ -84,6 +84,8 @@ namespace FietsApp.Bluetooth
 
         public void SetGrade(string id, float gradePercent) => _ = SendAsync(BridgeMessages.Grade(id, gradePercent));
 
+        public void SetTargetPower(string id, int watts) => _ = SendAsync(BridgeMessages.Power(id, watts));
+
         async Task SendAsync(string text)
         {
             var socket = _socket;
