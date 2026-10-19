@@ -5,7 +5,8 @@ namespace FietsBridge.Core;
 
 public enum BluetoothState { On, Off, Unavailable }
 
-public enum ConnectionState { Connecting, Connected, Disconnected, Failed }
+/// <summary>Toestand van een apparaat; Reconnecting = onverwacht weggevallen, de brug probeert het opnieuw (story 1.5).</summary>
+public enum ConnectionState { Connecting, Connected, Disconnected, Failed, Reconnecting }
 
 public abstract record Command;
 
