@@ -176,7 +176,8 @@ namespace FietsApp
                 label.text = $"{i + 1}.  <b>{climb.Name}</b>{(current ? "  <color=#9fd>(nu)</color>" : "")}" +
                              $"   <color=#ddd>{climb.Details(Dutch)}</color>" +
                              (climb.Region.Length > 0 ? $"   <color=#9ab>{climb.Region}</color>" : "") +
-                             ScaleNote(climbs[index].displayName);
+                             ScaleNote(climbs[index].displayName) +
+                             RecordNote(climbs[index].displayName);
             }
             _empty.gameObject.SetActive(_shown.Count == 0);
             _pageLabel.text = $"{_shown.Count} klimmen   pagina {_page + 1}/{pages}   <color=#bbb>(← →)</color>";
@@ -244,6 +245,10 @@ namespace FietsApp
             _pageLabel.alignment = TextAnchor.MiddleCenter;
             UiFactory.Button(_footer, "Volgende", new Vector2(Width - 136f, -6f), 120f, 40f, () => Page(+1)).label.text = "volgende →";
         }
+
+        /// <summary>Je beste tijd op een klim (story 9.2), als je hem al eens hebt uitgereden.</summary>
+        static string RecordNote(string climb) =>
+            ProfileStore.Current.Record(climb) is { } r ? $"   <color=#ffd060>PR {ClimbResult.Clock(r.bestSeconds)}</color>" : "";
 
         /// <summary>Opgeslagen weerstand van een klim, als die afwijkt van 100%.</summary>
         static string ScaleNote(string climb)

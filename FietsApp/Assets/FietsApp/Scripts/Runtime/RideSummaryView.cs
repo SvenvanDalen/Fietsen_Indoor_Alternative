@@ -23,6 +23,7 @@ namespace FietsApp
         Text _toastText;
         float _toastUntil;
         bool _summitShown;
+        string _recordLine; // uitkomst van de klimtijd tegen het record (9.2), voor de samenvatting
 
         public bool IsOpen => _panel != null && _panel.activeSelf;
 
@@ -50,6 +51,7 @@ namespace FietsApp
         void OnRideStarting()
         {
             _summitShown = false;
+            _recordLine = null;
             _toast.SetActive(false);
             Close();
         }
@@ -61,7 +63,9 @@ namespace FietsApp
             {
                 _summitShown = true;
                 float watts = recorder.Log.AveragePowerBetween(routeView.ClimbStart, routeView.ClimbEnd);
-                _toastText.text = $"<b>Top bereikt!</b>   klimtijd {Clock(climb)}   gemiddeld {watts:0} W";
+                _recordLine = RegisterClimbTime(climb);
+                _toastText.text = $"<b>Top bereikt!</b>   klimtijd {Clock(climb)}   gemiddeld {watts:0} W" +
+                                  (_recordLine != null ? $"\n<size=22>{_recordLine}</size>" : "");
                 _toast.SetActive(true);
                 _toastUntil = Time.unscaledTime + summitSeconds;
             }
@@ -79,7 +83,8 @@ namespace FietsApp
             string name = recorder.ClimbName ?? "Rit";
             var climb = log.SecondsBetween(routeView.ClimbStart, routeView.ClimbEnd);
             _title.text = $"<b>{name}</b>  <color=#bbb>ritsamenvatting</color>";
-            _body.text = RideSummaryText.Of(log, climb, log.AveragePowerBetween(routeView.ClimbStart, routeView.ClimbEnd));
+            _body.text = RideSummaryText.Of(log, climb, log.AveragePowerBetween(routeView.ClimbStart, routeView.ClimbEnd)) +
+                         (_recordLine != null ? $"\n<color=#bbb>Record:</color>  <b>{_recordLine}</b>" : "");
             _panel.SetActive(true);
         }
 
@@ -90,13 +95,23 @@ namespace FietsApp
 
         static string Clock(double seconds) => RideSummaryText.Clock(seconds);
 
+        /// <summary>Legt de klimtijd vast in het profiel (alleen voor een echte klim) en beschrijft hoe hij zich tot het record verhoudt.</summary>
+        string RegisterClimbTime(double seconds)
+        {
+            var climb = routeView.Climb;
+            if (climb == null) return null; // oefenklim
+            var result = ProfileStore.Current.AddClimbTime(climb.displayName, seconds, System.DateTime.Now.ToString("yyyy-MM-dd"));
+            ProfileStore.Save();
+            return result.IsRecord ? $"<color=#ffd060>{result.Describe()}</color>" : result.Describe();
+        }
+
         void BuildUi()
         {
             var canvas = UiFactory.Canvas(transform, "Ritsamenvatting", 35);
 
-            var toast = UiFactory.Panel(canvas, "Top", new Vector2(0.5f, 1f), new Vector2(0f, -200f), new Vector2(760f, 60f));
+            var toast = UiFactory.Panel(canvas, "Top", new Vector2(0.5f, 1f), new Vector2(0f, -200f), new Vector2(860f, 92f));
             _toast = toast.gameObject;
-            _toastText = UiFactory.Text(toast, "Tekst", 28, -4f, 52f);
+            _toastText = UiFactory.Text(toast, "Tekst", 28, -4f, 84f);
             _toastText.alignment = TextAnchor.MiddleCenter;
             _toastText.color = new Color(1f, 0.85f, 0.4f);
             _toast.SetActive(false);
@@ -104,7 +119,7 @@ namespace FietsApp
             var panel = UiFactory.Panel(canvas, "Samenvatting", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(640f, 420f));
             _panel = panel.gameObject;
             _title = UiFactory.Text(panel, "Titel", 32, -16f, 50f);
-            _body = UiFactory.Text(panel, "Cijfers", 26, -76f, 260f);
+            _body = UiFactory.Text(panel, "Cijfers", 26, -76f, 270f);
             _body.alignment = TextAnchor.UpperLeft;
             _body.lineSpacing = 1.25f;
             UiFactory.Button(panel, "Sluiten", new Vector2(240f, -350f), 160f, 48f, Close).label.text = "Sluiten (Enter)";
