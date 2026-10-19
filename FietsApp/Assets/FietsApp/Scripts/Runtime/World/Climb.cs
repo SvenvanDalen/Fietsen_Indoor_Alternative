@@ -37,14 +37,12 @@ namespace FietsApp
         [Tooltip("Grindberm boven de boomgrens, zoals op de kale top van de Ventoux.")]
         public bool gravelVergeAboveTreeLine = true;
 
-        [Header("Onverhard")]
-        [Tooltip("Begin van een onverhard stuk in meter langs de route, zoals het grind op de Colle delle Finestre.")]
-        public float unpavedFrom;
-        [Tooltip("Eind van het onverharde stuk; niet groter dan het begin = geen onverhard stuk.")]
-        public float unpavedTo;
+        [Header("Ondergrond (story 4.13)")]
+        [Tooltip("Stukken met grind, kasseien of sneeuw, in meter vanaf de voet (FietsApp > Klimmen bijwerken, uit tools/climbs.json). De rest is asfalt.")]
+        public FietsApp.World.SurfaceSection[] surfaces = new FietsApp.World.SurfaceSection[0];
 
-        /// <summary>Ligt dit punt op het onverharde stuk? Alleen beeld; extra rolweerstand volgt in story 4.13.</summary>
-        public bool IsUnpaved(float distance) => unpavedTo > unpavedFrom && distance >= unpavedFrom && distance <= unpavedTo;
+        /// <summary>De ondergrond op <paramref name="distance"/> m van de voet.</summary>
+        public FietsApp.World.Surface SurfaceAt(float distance) => FietsApp.World.Surfaces.At(surfaces, distance);
 
         [Header("Herkenningspunt")]
         [Tooltip("Zendmast op de top, zoals op de Mont Ventoux.")]

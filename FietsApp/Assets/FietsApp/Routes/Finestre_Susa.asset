@@ -24,8 +24,10 @@ MonoBehaviour:
   forestFrom: 700
   aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
   gravelVergeAboveTreeLine: 1
-  unpavedFrom: 10480
-  unpavedTo: 100000
+  surfaces:
+  - from: 10480
+    to: 100000
+    surface: 1
   summitTower: 0
   summitLatitude: 0
   summitLongitude: 0
