@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 35e23afeaaed1f240ad0c8f7ba3a467c, type: 3}
   terrain: {fileID: 4900000, guid: aef93f3e9aa5d4a4cabee0aeedfd0523, type: 3}
   region: "Pyrenee\xEBn"
+  country: Frankrijk
   lengthMeters: 12556.261
   averageGradePercent: 6.2599435
   elevationGain: 786.01483

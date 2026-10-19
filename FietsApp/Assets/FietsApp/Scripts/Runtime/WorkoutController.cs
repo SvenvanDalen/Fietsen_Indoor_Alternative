@@ -59,7 +59,7 @@ namespace FietsApp
 
         void HandleKeys()
         {
-            var kb = Keyboard.current;
+            var kb = UiFactory.IsTyping ? null : Keyboard.current; // niet tijdens typen in een tekstveld
             if (kb == null) return;
             if (rideMenu != null && rideMenu.IsOpen) return;
 

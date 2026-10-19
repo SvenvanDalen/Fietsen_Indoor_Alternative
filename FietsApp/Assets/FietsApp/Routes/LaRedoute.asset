@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 27f7cc5a026d3124c9a64ed663a02381, type: 3}
   terrain: {fileID: 4900000, guid: 3aabe8e7b0260604b95da27ca195fdf3, type: 3}
   region: Ardennen
+  country: "Belgi\xEB"
   lengthMeters: 1584.2222
   averageGradePercent: 10.060956
   elevationGain: 159.3879

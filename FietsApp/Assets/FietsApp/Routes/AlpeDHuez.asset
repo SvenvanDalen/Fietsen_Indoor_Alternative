@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 035aaea132a4af24bbcb9c653c4d040e, type: 3}
   terrain: {fileID: 4900000, guid: 0c30e39b5146c1b4999362315f6005a2, type: 3}
   region: Alpen
+  country: Frankrijk
   lengthMeters: 12897.095
   averageGradePercent: 8.280831
   elevationGain: 1071.6891

@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 1f30d522b36827e4e8075af953c12cc3, type: 3}
   terrain: {fileID: 4900000, guid: b4a1343fdbfb62c49bee80fd7498b970, type: 3}
   region: Alpen
+  country: "Itali\xEB"
   lengthMeters: 21170
   averageGradePercent: 7.368633
   elevationGain: 1559.9396

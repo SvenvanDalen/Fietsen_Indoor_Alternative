@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: c5d7b1c4ffbf302408e43d395f9c0468, type: 3}
   terrain: {fileID: 4900000, guid: 02a591a614e912a48901cd0085a82c41, type: 3}
   region: Vlaanderen
+  country: "Belgi\xEB"
   lengthMeters: 479.8908
   averageGradePercent: 12.6996565
   elevationGain: 60.94448

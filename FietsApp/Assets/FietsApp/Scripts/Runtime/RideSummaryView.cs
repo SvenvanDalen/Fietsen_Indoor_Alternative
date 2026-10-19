@@ -67,7 +67,7 @@ namespace FietsApp
             }
             if (_toast.activeSelf && Time.unscaledTime > _toastUntil) _toast.SetActive(false);
 
-            var kb = Keyboard.current;
+            var kb = UiFactory.IsTyping ? null : Keyboard.current; // niet tijdens typen in een tekstveld
             if (IsOpen && kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame))
                 Close();
         }

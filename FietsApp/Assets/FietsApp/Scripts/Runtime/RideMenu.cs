@@ -11,7 +11,7 @@ namespace FietsApp
 {
     /// <summary>
     /// Ritmenu (story 6.3): kies een klim uit de bibliotheek (story 4.5), gefilterd op lengte, gemiddelde helling,
-    /// categorie en gebied, per pagina van negen. Opent bij de start en met M; zolang het open is staat de rit stil.
+    /// categorie, gebied en land of gezocht op naam (story 4.6), per pagina van negen. Enter in het zoekveld kiest de eerste. Opent bij de start en met M; zolang het open is staat de rit stil.
     /// Een klim kiezen zet je aan de voet. Cijfertoetsen 1-9 kiezen, pijl links/rechts bladert. De knop Weerstand
     /// (of G) stelt in hoeveel van de helling de trainer laat voelen (story 2.3); dat wordt per klim onthouden.
     /// </summary>
@@ -25,14 +25,15 @@ namespace FietsApp
         [SerializeField] bool openAtStart = true;
 
         const int PageSize = 9;
-        const float Width = 900f, RowHeight = 44f, HeaderHeight = 124f, FooterHeight = 56f;
+        const float Width = 900f, RowHeight = 44f, HeaderHeight = 176f, FooterHeight = 56f;
         static readonly CultureInfo Dutch = CultureInfo.GetCultureInfo("nl-NL");
 
         readonly ClimbFilter _filter = new ClimbFilter();
         ClimbSummary[] _summaries;
         GameObject _panel;
         RectTransform _panelRect, _footer;
-        Text _lengthLabel, _gradeLabel, _categoryLabel, _regionLabel, _empty, _pageLabel, _scaleLabel;
+        Text _lengthLabel, _gradeLabel, _categoryLabel, _regionLabel, _countryLabel, _empty, _pageLabel, _scaleLabel;
+        InputField _search;
         int _gradeScale = RiderProfile.DefaultGradeScale;
         readonly List<(Button button, Text label)> _rows = new List<(Button, Text)>();
         readonly List<int> _shown = new List<int>();
@@ -55,6 +56,7 @@ namespace FietsApp
         {
             _summaries = climbs.Select(Summarize).ToArray();
             _filter.SetRegions(_summaries.Select(s => s.Region));
+            _filter.SetCountries(_summaries.Select(s => s.Country));
             if (routeView.Climb != null)
                 ride.GradeScale = ProfileStore.Current.GradeScale(routeView.Climb.displayName) / 100f;
             if (openAtStart) Open();
@@ -64,15 +66,15 @@ namespace FietsApp
         ClimbSummary Summarize(Climb c)
         {
             if (c.lengthMeters > 0f)
-                return ClimbSummary.Of(c.displayName, c.lengthMeters, c.averageGradePercent, c.elevationGain, c.region);
+                return ClimbSummary.Of(c.displayName, c.lengthMeters, c.averageGradePercent, c.elevationGain, c.region, c.country);
             var route = c == routeView.Climb ? routeView.OwnRoute : ClimbImport.FromGpx(Gpx.Parse(c.gpx.text));
-            return ClimbSummary.Of(c.displayName, ClimbStats.Of(route), c.region);
+            return ClimbSummary.Of(c.displayName, ClimbStats.Of(route), c.region, c.country);
         }
 
         void Update()
         {
             var kb = Keyboard.current;
-            if (kb == null) return;
+            if (kb == null || UiFactory.IsTyping) return;
             if (kb.mKey.wasPressedThisFrame) { if (IsOpen) Close(); else Open(); }
             if (!IsOpen) return;
             if (kb.escapeKey.wasPressedThisFrame) Close();
@@ -96,6 +98,8 @@ namespace FietsApp
 
         public void Close()
         {
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null); // zoekveld los, sneltoetsen weer aan
             _panel.SetActive(false);
             ride.Release(this);
         }
@@ -155,6 +159,7 @@ namespace FietsApp
             _gradeLabel.text = _filter.GradeLabel;
             _categoryLabel.text = _filter.CategoryLabel;
             _regionLabel.text = _filter.RegionLabel;
+            _countryLabel.text = _filter.CountryLabel;
             _scaleLabel.text = $"Weerstand {_gradeScale}%";
 
             _shown.Clear();
@@ -175,7 +180,7 @@ namespace FietsApp
                 bool current = climbs[index] == routeView.Climb;
                 label.text = $"{i + 1}.  <b>{climb.Name}</b>{(current ? "  <color=#9fd>(nu)</color>" : "")}" +
                              $"   <color=#ddd>{climb.Details(Dutch)}</color>" +
-                             (climb.Region.Length > 0 ? $"   <color=#9ab>{climb.Region}</color>" : "") +
+                             Place(climb) +
                              ScaleNote(climbs[index].displayName);
             }
             _empty.gameObject.SetActive(_shown.Count == 0);
@@ -208,12 +213,19 @@ namespace FietsApp
             _scaleLabel = scaleLabel;
             y -= 52f;
 
-            float w = (Width - 32f - 3 * 10f) / 4f;
+            float w = (Width - 32f - 4 * 10f) / 5f;
             _lengthLabel = FilterButton(panel, "Lengte", 0, y, w, () => { _filter.NextLength(); FilterChanged(); });
             _gradeLabel = FilterButton(panel, "Helling", 1, y, w, () => { _filter.NextGrade(); FilterChanged(); });
             _categoryLabel = FilterButton(panel, "Categorie", 2, y, w, () => { _filter.NextCategory(); FilterChanged(); });
             _regionLabel = FilterButton(panel, "Gebied", 3, y, w, () => { _filter.NextRegion(); FilterChanged(); });
-            y -= 58f;
+            _countryLabel = FilterButton(panel, "Land", 4, y, w, () => { _filter.NextCountry(); FilterChanged(); });
+            y -= 54f;
+
+            _search = UiFactory.TextInput(panel, "Zoeken", new Vector2(16f, y), Width - 32f, 42f,
+                "Zoek op naam, gebied of land (Enter kiest de eerste)");
+            _search.onValueChanged.AddListener(text => { _filter.Query = text; FilterChanged(); });
+            _search.onSubmit.AddListener(_ => { if (_shown.Count > 0) Choose(_shown[0]); });
+            y -= 52f;
 
             _empty = UiFactory.Text(panel, "Leeg", 20, y, RowHeight);
             _empty.text = "<color=#bbb>Geen klim past bij dit filter.</color>";
@@ -243,6 +255,15 @@ namespace FietsApp
             _pageLabel = UiFactory.Text(_footer, "Pagina", 18, -6f, 40f);
             _pageLabel.alignment = TextAnchor.MiddleCenter;
             UiFactory.Button(_footer, "Volgende", new Vector2(Width - 136f, -6f), 120f, 40f, () => Page(+1)).label.text = "volgende →";
+        }
+
+        /// <summary>Gebied en land, bijv. "Alpen · Italië"; het land valt weg als het gebied al zo heet.</summary>
+        static string Place(ClimbSummary climb)
+        {
+            string place = climb.Country.Length > 0 && climb.Country != climb.Region
+                ? (climb.Region.Length > 0 ? $"{climb.Region} · {climb.Country}" : climb.Country)
+                : climb.Region;
+            return place.Length > 0 ? $"   <color=#9ab>{place}</color>" : "";
         }
 
         /// <summary>Opgeslagen weerstand van een klim, als die afwijkt van 100%.</summary>
