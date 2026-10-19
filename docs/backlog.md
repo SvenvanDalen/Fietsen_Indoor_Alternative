@@ -148,7 +148,7 @@ Epic: E1 · Fase: MVP · Prio: Should · Punten: 3
 
 Als rijder wil ik dat de verbinding automatisch herstelt.
 
-- [ ] Herverbinden binnen 10 seconden na wegvallen
+- [x] Herverbinden binnen 10 seconden na wegvallen
 
 #### 1.6 Vermogen simuleren zonder trainer
 
