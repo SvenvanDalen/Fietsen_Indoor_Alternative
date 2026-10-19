@@ -28,6 +28,15 @@ namespace FietsApp
         /// <summary>Waar de ritten staan.</summary>
         public static string Folder => Path.Combine(Application.persistentDataPath, "Ritten");
 
+        /// <summary>De metingen van de rit die nu loopt (of net klaar is).</summary>
+        public RideLog Log => _log;
+
+        /// <summary>De naam van de klim van deze rit.</summary>
+        public string ClimbName => _climbName;
+
+        /// <summary>Aan het eind van de route: de rit is klaar en bewaard (ritsamenvatting, story 5.3).</summary>
+        public event Action<RideLog> Finished;
+
         /// <summary>Het laatst opgeslagen bestand, of null.</summary>
         public string LastSavedPath { get; private set; }
 
@@ -73,6 +82,7 @@ namespace FietsApp
             {
                 Save();
                 _finished = true;
+                Finished?.Invoke(_log);
             }
         }
 

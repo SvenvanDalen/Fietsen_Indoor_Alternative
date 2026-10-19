@@ -66,6 +66,52 @@ namespace FietsApp.Recording
             }
         }
 
+        /// <summary>
+        /// Gereden tijd (s, zonder pauzes) waarop de rit afstand <paramref name="distance"/> passeerde, tussen twee metingen
+        /// in geïnterpoleerd; 0 als de rit daar al voorbij begon, null als hij er (nog) niet kwam.
+        /// </summary>
+        public double? TimerAtDistance(float distance)
+        {
+            if (_samples.Count == 0) return null;
+            if (_samples[0].DistanceM >= distance) return 0.0;
+            for (int i = 1; i < _samples.Count; i++)
+            {
+                float a = _samples[i - 1].DistanceM, b = _samples[i].DistanceM;
+                if (b < distance) continue;
+                return i - 1 + (b > a ? (distance - a) / (double)(b - a) : 1.0);
+            }
+            return null;
+        }
+
+        /// <summary>Hoe ver na de voet de eerste meting mag liggen om nog als hele klim te tellen (de eerste meting komt na een seconde).</summary>
+        public const float StartTolerance = 25f;
+
+        /// <summary>
+        /// Klimtijd (s) van de voet op <paramref name="start"/> tot de top op <paramref name="end"/>; null zolang de top
+        /// niet gehaald is, of als de rit pas halverwege de klim begon.
+        /// </summary>
+        public double? SecondsBetween(float start, float end)
+        {
+            if (_samples.Count == 0 || _samples[0].DistanceM > start + StartTolerance) return null;
+            var from = TimerAtDistance(start);
+            var to = TimerAtDistance(end);
+            return from.HasValue && to.HasValue ? to.Value - from.Value : (double?)null;
+        }
+
+        /// <summary>Gemiddeld vermogen over de metingen tussen twee afstanden (bijvoorbeeld op de klim).</summary>
+        public float AveragePowerBetween(float start, float end)
+        {
+            double sum = 0;
+            int n = 0;
+            foreach (var s in _samples)
+            {
+                if (s.DistanceM < start || s.DistanceM > end) continue;
+                sum += s.PowerWatts;
+                n++;
+            }
+            return n > 0 ? (float)(sum / n) : 0f;
+        }
+
         float Average(Func<RideSample, float> value, bool skipZero = false)
         {
             double sum = 0;
