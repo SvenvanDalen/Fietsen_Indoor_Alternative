@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: a1594ea00c3c19b479097cf3d83883ed, type: 3}
   terrain: {fileID: 4900000, guid: 9f58135680b2f864abc4103ca679e634, type: 3}
   region: Zwitserland
+  country: Zwitserland
   lengthMeters: 12209.598
   averageGradePercent: 7.3219914
   elevationGain: 893.9857

@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 2012c8cd11e49b447993bed7a6cca4e3, type: 3}
   terrain: {fileID: 4900000, guid: 1c18683004f115f47b164ef46c08b070, type: 3}
   region: Dolomieten
+  country: "Itali\xEB"
   lengthMeters: 13789.67
   averageGradePercent: 7.657713
   elevationGain: 1061.3546

@@ -54,7 +54,7 @@ namespace FietsApp
 
         void Update()
         {
-            var kb = UnityEngine.InputSystem.Keyboard.current;
+            var kb = UiFactory.IsTyping ? null : UnityEngine.InputSystem.Keyboard.current; // niet tijdens typen in een tekstveld
             if (kb != null && kb.hKey.wasPressedThisFrame) _panel.SetActive(!_panel.activeSelf);
             if (_profile == null || !_panel.activeSelf) return;
 

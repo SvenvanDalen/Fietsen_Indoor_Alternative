@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 6e911f7ec4be5f44fa5f0aab8a366b07, type: 3}
   terrain: {fileID: 4900000, guid: a5ccddf10ceb2b446a99f5a0c74959bb, type: 3}
   region: Limburg
+  country: Nederland
   lengthMeters: 1059.1041
   averageGradePercent: 5.5688095
   elevationGain: 58.979492

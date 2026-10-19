@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 1b35741e3e3bdd8419e0927eeb12c87a, type: 3}
   terrain: {fileID: 4900000, guid: a50606e2b0efefb40a26495832420437, type: 3}
   region: Vogezen
+  country: Frankrijk
   lengthMeters: 15734.566
   averageGradePercent: 6.0261936
   elevationGain: 948.1955

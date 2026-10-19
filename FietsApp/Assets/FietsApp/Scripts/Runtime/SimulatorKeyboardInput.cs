@@ -18,7 +18,7 @@ namespace FietsApp
 
         void Update()
         {
-            var kb = Keyboard.current;
+            var kb = UiFactory.IsTyping ? null : Keyboard.current; // niet tijdens typen in een tekstveld
             if (kb == null) return;
             _ride.Brake = kb.spaceKey.isPressed ? 1f : 0f;
             if (_ride.Trainer != _ride.Simulator) return;

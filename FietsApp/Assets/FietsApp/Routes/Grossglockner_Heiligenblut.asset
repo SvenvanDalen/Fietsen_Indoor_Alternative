@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: cc2e1048d2c1b3547bf7322c46b7f8b2, type: 3}
   terrain: {fileID: 4900000, guid: f8144adbe2a046b45995fb53fe0c93d7, type: 3}
   region: Oostenrijk
+  country: Oostenrijk
   lengthMeters: 15397.144
   averageGradePercent: 8.280568
   elevationGain: 1316.2034

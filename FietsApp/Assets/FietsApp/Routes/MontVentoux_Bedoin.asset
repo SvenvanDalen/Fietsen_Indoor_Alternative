@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: cd82b5d85d2880745b29e020fb5b7e05, type: 3}
   terrain: {fileID: 4900000, guid: 67553304cd8360c489d6567d2361941c, type: 3}
   region: Provence
+  country: Frankrijk
   lengthMeters: 21360
   averageGradePercent: 7.368884
   elevationGain: 1574.8259

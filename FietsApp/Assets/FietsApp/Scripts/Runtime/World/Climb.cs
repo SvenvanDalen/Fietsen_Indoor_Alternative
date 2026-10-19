@@ -18,6 +18,8 @@ namespace FietsApp
         public TextAsset terrain;
         [Tooltip("Gebied voor het filter in het ritmenu, bijv. \"Alpen\" of \"Pyreneeën\".")]
         public string region;
+        [Tooltip("Land van de voet, voor zoeken in het ritmenu (story 4.6).")]
+        public string country;
 
         [Header("Kerncijfers (FietsApp > Klimmen bijwerken)")]
         [Tooltip("Uit de GPX berekend en hier bewaard, zodat het ritmenu niet elke klim hoeft in te lezen.")]

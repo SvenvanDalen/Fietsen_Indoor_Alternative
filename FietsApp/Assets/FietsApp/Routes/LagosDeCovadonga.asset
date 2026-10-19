@@ -16,6 +16,7 @@ MonoBehaviour:
   gpx: {fileID: 6176564803743436627, guid: 1412bd42ebad2854f9cc9348391a0c72, type: 3}
   terrain: {fileID: 4900000, guid: 6405a33a66ad9564d931e2152b4a4c54, type: 3}
   region: Spanje
+  country: Spanje
   lengthMeters: 10796.901
   averageGradePercent: 8.25229
   elevationGain: 890.9916

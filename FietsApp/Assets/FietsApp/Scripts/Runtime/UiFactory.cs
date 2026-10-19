@@ -63,6 +63,53 @@ namespace FietsApp
             return rt;
         }
 
+        /// <summary>Of de rijder nu in een tekstveld typt; sneltoetsen (M, G, P, ...) doen dan niets.</summary>
+        public static bool IsTyping
+        {
+            get
+            {
+                var selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+                var field = selected != null ? selected.GetComponent<InputField>() : null;
+                return field != null && field.isFocused;
+            }
+        }
+
+        /// <summary>Tekstveld met een grijze hint, linksboven op <paramref name="topLeft"/>.</summary>
+        public static InputField TextInput(RectTransform parent, string name, Vector2 topLeft, float width, float height, string hint)
+        {
+            var rt = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(InputField)).GetComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0f, 1f);
+            rt.anchoredPosition = topLeft;
+            rt.sizeDelta = new Vector2(width, height);
+            rt.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.12f);
+
+            Text Child(string childName, Color color, FontStyle style)
+            {
+                var text = new GameObject(childName, typeof(RectTransform), typeof(Text)).GetComponent<Text>();
+                text.rectTransform.SetParent(rt, false);
+                text.rectTransform.anchorMin = Vector2.zero;
+                text.rectTransform.anchorMax = Vector2.one;
+                text.rectTransform.offsetMin = new Vector2(12f, 0f);
+                text.rectTransform.offsetMax = new Vector2(-12f, 0f);
+                text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                text.fontSize = 20;
+                text.fontStyle = style;
+                text.color = color;
+                text.alignment = TextAnchor.MiddleLeft;
+                text.supportRichText = false;
+                return text;
+            }
+
+            var field = rt.GetComponent<InputField>();
+            var placeholder = Child("Hint", new Color(1f, 1f, 1f, 0.45f), FontStyle.Italic);
+            placeholder.text = hint;
+            field.placeholder = placeholder;
+            field.textComponent = Child("Tekst", Color.white, FontStyle.Normal);
+            field.lineType = UnityEngine.UI.InputField.LineType.SingleLine;
+            return field;
+        }
+
         /// <summary>Blauwe knop met een label, linksboven op <paramref name="topLeft"/>.</summary>
         public static (Button button, Text label) Button(RectTransform parent, string name, Vector2 topLeft, float width,
             float height, UnityEngine.Events.UnityAction onClick)

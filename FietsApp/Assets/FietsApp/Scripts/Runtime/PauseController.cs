@@ -42,7 +42,7 @@ namespace FietsApp
 
         void Update()
         {
-            var kb = Keyboard.current;
+            var kb = UiFactory.IsTyping ? null : Keyboard.current; // niet tijdens typen in een tekstveld
             if (kb != null && (kb.pKey.wasPressedThisFrame || kb.pauseKey.wasPressedThisFrame)) Toggle();
             if (IsPaused) Refresh();
         }
