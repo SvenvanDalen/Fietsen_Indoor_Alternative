@@ -129,6 +129,7 @@ namespace FietsApp.Bluetooth
                     c.State == "connected" ? "<color=#7d7>verbonden</color>" +
                         (string.IsNullOrEmpty(c.Message) ? "" : $"  <color=#bbb>{c.Message}</color>") :
                     c.State == "connecting" ? "<color=#fd6>verbinden...</color>" :
+                    c.State == "reconnecting" ? "<color=#fd6>verbinding weg, herstellen...</color>" :
                     $"<color=#f77>mislukt: {c.Message}</color>";
                 lines.Add((c.Id, c.Name, $"{DisplayName(c.Name, c.Id)}  {state}", new Color(0.15f, 0.3f, 0.15f, 0.9f)));
             }

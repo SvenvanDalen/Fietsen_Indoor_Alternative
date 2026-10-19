@@ -55,6 +55,17 @@ namespace FietsApp.Tests
         }
 
         [Test]
+        public void Parse_ReconnectingMessage()
+        {
+            // Zelfde voorbeeld als ReconnectScheduleTests.ReconnectingState_Serializes in de brug.
+            var connection = BridgeMessages.Parse(
+                "{\"type\":\"connection\",\"id\":\"AA:BB:CC:DD:EE:FF\",\"name\":\"Smart Drive\",\"state\":\"reconnecting\",\"message\":\"\"}") as ConnectionMessage;
+
+            Assert.That(connection, Is.Not.Null);
+            Assert.That(connection.state, Is.EqualTo("reconnecting"));
+        }
+
+        [Test]
         public void ConnectCommands_MatchBridgeFormat()
         {
             Assert.That(BridgeMessages.Connect("AA:BB:CC:DD:EE:FF"),

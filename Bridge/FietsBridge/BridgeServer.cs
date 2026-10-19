@@ -14,6 +14,8 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
 {
     readonly ConcurrentDictionary<WebSocket, byte> _clients = new();
     readonly ConcurrentDictionary<string, SensorConnection> _sensors = new();
+    // Onverwacht weggevallen apparaten waarvoor de brug opnieuw probeert te verbinden (story 1.5).
+    readonly ConcurrentDictionary<string, CancellationTokenSource> _reconnecting = new();
     readonly SemaphoreSlim _sendLock = new(1, 1);
     volatile bool _includeUnknown;
 
@@ -79,6 +81,7 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
             {
                 // Unity is weg: apparaten vrijgeven zodat andere apps ze kunnen gebruiken.
                 scanner.Stop();
+                foreach (var id in _reconnecting.Keys) StopReconnecting(id);
                 foreach (var id in _sensors.Keys) Disconnect(id);
             }
         }
@@ -106,7 +109,7 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
                 if (_sensors.TryGetValue(power.Id, out var trainer)) trainer.SetTargetPower(power.Watts > 0 ? power.Watts : null);
                 break;
             case DisconnectCommand disconnect:
-                if (Disconnect(disconnect.Id) is { } name)
+                if ((StopReconnecting(disconnect.Id) ?? Disconnect(disconnect.Id)) is { } name)
                     await BroadcastAsync(Protocol.Connection(disconnect.Id, name, ConnectionState.Disconnected), ct);
                 break;
             default:
@@ -117,34 +120,89 @@ sealed class BridgeServer(int port, DeviceRegistry registry, BleScanner scanner)
 
     async Task ConnectAsync(string id, CancellationToken ct)
     {
-        if (_sensors.ContainsKey(id)) return;
+        if (_sensors.ContainsKey(id) || _reconnecting.ContainsKey(id)) return;
         string name = registry.Snapshot(DateTimeOffset.Now, includeUnknown: true).FirstOrDefault(d => d.Id == id)?.Name ?? "";
         Console.WriteLine($"Verbinden met {id} {name}");
         await BroadcastAsync(Protocol.Connection(id, name, ConnectionState.Connecting), ct);
 
         try
         {
-            var sensor = await SensorConnection.ConnectAsync(id, m => _ = BroadcastAsync(Protocol.Data(id, m), ct));
-            sensor.Disconnected += () =>
-            {
-                if (Disconnect(id) is not { } lostName) return; // al bewust ontkoppeld
-                Console.WriteLine($"Verbinding met {id} verbroken");
-                _ = BroadcastAsync(Protocol.Connection(id, lostName, ConnectionState.Disconnected), ct);
-            };
-            sensor.ControlStatus += message =>
-            {
-                Console.WriteLine($"{id}: {message}");
-                _ = BroadcastAsync(Protocol.Connection(id, sensor.Name, ConnectionState.Connected, message), ct);
-            };
-            _sensors[id] = sensor;
-            Console.WriteLine($"Verbonden met {id} {sensor.Name}");
-            await BroadcastAsync(Protocol.Connection(id, sensor.Name, ConnectionState.Connected), ct);
+            await AttachAsync(id, await OpenAsync(id, ct), ct);
         }
         catch (Exception e) when (e is InvalidOperationException or System.Runtime.InteropServices.COMException)
         {
             Console.WriteLine($"Verbinden met {id} mislukt: {e.Message}");
             await BroadcastAsync(Protocol.Connection(id, name, ConnectionState.Failed, e.Message), ct);
         }
+    }
+
+    Task<SensorConnection> OpenAsync(string id, CancellationToken ct) =>
+        SensorConnection.ConnectAsync(id, m => _ = BroadcastAsync(Protocol.Data(id, m), ct));
+
+    /// <summary>Neemt een verbonden apparaat op en meldt het aan Unity, die dan meteen helling en ERG-doel stuurt.</summary>
+    async Task AttachAsync(string id, SensorConnection sensor, CancellationToken ct)
+    {
+        sensor.Disconnected += () => OnLost(id, ct);
+        sensor.ControlStatus += message =>
+        {
+            Console.WriteLine($"{id}: {message}");
+            _ = BroadcastAsync(Protocol.Connection(id, sensor.Name, ConnectionState.Connected, message), ct);
+        };
+        _sensors[id] = sensor;
+        Console.WriteLine($"Verbonden met {id} {sensor.Name}");
+        await BroadcastAsync(Protocol.Connection(id, sensor.Name, ConnectionState.Connected), ct);
+    }
+
+    /// <summary>Apparaat viel onverwacht weg (buiten bereik, trainer even zonder stroom): opnieuw proberen.</summary>
+    void OnLost(string id, CancellationToken ct)
+    {
+        if (Disconnect(id) is not { } name) return; // al bewust ontkoppeld of al aan het herstellen
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        if (!_reconnecting.TryAdd(id, cts)) { cts.Dispose(); return; }
+        Console.WriteLine($"Verbinding met {id} verbroken; opnieuw verbinden");
+        _ = ReconnectAsync(id, name, cts.Token, ct);
+    }
+
+    /// <param name="stop">Stopt het proberen (bewust ontkoppeld, Unity weg).</param>
+    /// <param name="server">Levensduur van de brug, voor de herstelde verbinding.</param>
+    async Task ReconnectAsync(string id, string name, CancellationToken stop, CancellationToken server)
+    {
+        var ct = stop;
+        var started = DateTimeOffset.Now;
+        try
+        {
+            await BroadcastAsync(Protocol.Connection(id, name, ConnectionState.Reconnecting), ct);
+            for (int attempt = 0; ReconnectSchedule.Delay(attempt, DateTimeOffset.Now - started) is { } delay; attempt++)
+            {
+                await Task.Delay(delay, ct);
+                try
+                {
+                    var sensor = await OpenAsync(id, server);
+                    if (ct.IsCancellationRequested || !_reconnecting.TryRemove(id, out var cts)) { sensor.Dispose(); return; }
+                    cts.Dispose();
+                    Console.WriteLine($"Verbinding met {id} hersteld na {(DateTimeOffset.Now - started).TotalSeconds:0.0} s");
+                    await AttachAsync(id, sensor, server);
+                    return;
+                }
+                catch (Exception e) when (e is InvalidOperationException or System.Runtime.InteropServices.COMException)
+                {
+                    // Nog niet terug; volgende poging.
+                }
+            }
+            if (StopReconnecting(id) is null) return;
+            Console.WriteLine($"Verbinding met {id} niet hersteld");
+            await BroadcastAsync(Protocol.Connection(id, name, ConnectionState.Failed, "verbinding niet hersteld"), CancellationToken.None);
+        }
+        catch (OperationCanceledException) { /* bewust ontkoppeld of Unity weg */ }
+    }
+
+    /// <summary>Stopt het opnieuw verbinden; geeft het id terug (de naam kent Unity al), of null als er niets liep.</summary>
+    string? StopReconnecting(string id)
+    {
+        if (!_reconnecting.TryRemove(id, out var cts)) return null;
+        cts.Cancel();
+        cts.Dispose();
+        return id;
     }
 
     /// <summary>Verbreekt de verbinding; geeft de naam terug, of null als er geen verbinding was.</summary>

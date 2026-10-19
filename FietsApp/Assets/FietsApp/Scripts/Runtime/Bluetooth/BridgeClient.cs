@@ -22,7 +22,9 @@ namespace FietsApp.Bluetooth
         CancellationTokenSource _cts;
         ClientWebSocket _socket;
         volatile bool _connected;
+        volatile int _session; // telt elke geslaagde verbinding, ook als wegvallen en terugkomen binnen één frame gebeuren
         bool _wasConnected;
+        int _seenSession;
 
         public bool IsConnected => _connected;
         public StatusMessage LastStatus { get; private set; }
@@ -48,12 +50,22 @@ namespace FietsApp.Bluetooth
 
         void Update()
         {
-            if (_wasConnected != _connected)
+            bool connected = _connected;
+            int session = _session;
+            if (connected && _wasConnected && session != _seenSession)
             {
-                _wasConnected = _connected;
-                if (!_connected) LastStatus = null;
-                ConnectionChanged?.Invoke(_connected);
+                // Tussen twee frames weggevallen en terug: luisteraars moeten het wegvallen toch zien.
+                _wasConnected = false;
+                LastStatus = null;
+                ConnectionChanged?.Invoke(false);
             }
+            if (_wasConnected != connected)
+            {
+                _wasConnected = connected;
+                if (!connected) LastStatus = null;
+                ConnectionChanged?.Invoke(connected);
+            }
+            _seenSession = session;
 
             while (_inbox.TryDequeue(out var message))
             {
@@ -112,6 +124,7 @@ namespace FietsApp.Bluetooth
                     try
                     {
                         await socket.ConnectAsync(new Uri(url), ct);
+                        _session++;
                         _connected = true;
                         while (socket.State == WebSocketState.Open)
                         {
