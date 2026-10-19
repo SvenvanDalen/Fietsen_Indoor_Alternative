@@ -359,7 +359,7 @@ Epic: E4 · Fase: V1 · Prio: Should · Punten: 3
 
 Als rijder wil ik klimmen op naam kunnen vinden.
 
-- [ ] Zoeken en filteren op land, gemiddelde helling en lengte
+- [x] Zoeken en filteren op land, gemiddelde helling en lengte
 
 #### 4.7 Etappe van meerdere klimmen
 
@@ -595,8 +595,8 @@ Epic: E9 · Fase: V1 · Prio: Should · Punten: 3
 
 Als rijder wil ik mijn beste tijd per klim bijhouden.
 
-- [ ] Persoonlijk record per klim
-- [ ] Vergelijking met vorige poging
+- [x] Persoonlijk record per klim
+- [x] Vergelijking met vorige poging
 
 #### 9.3 Everesting-uitdaging
 
@@ -613,7 +613,7 @@ Epic: E9 · Fase: V1 · Prio: Should · Punten: 5
 
 Als rijder wil ik een ghost van mijn beste poging.
 
-- [ ] Doorzichtige renner op het parcours
+- [x] Doorzichtige renner op het parcours
 
 ### E10 Multiplayer (V2, uitgesteld: je rijdt voorlopig solo)
 
