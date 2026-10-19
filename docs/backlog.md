@@ -456,7 +456,7 @@ Epic: E5 · Fase: MVP · Prio: Should · Punten: 3
 
 Als rijder wil ik een ritsamenvatting zien.
 
-- [ ] Tijd, gemiddeld vermogen, klimtijd en hoogtemeters
+- [x] Tijd, gemiddeld vermogen, klimtijd en hoogtemeters
 
 #### 5.4 Uploaden naar Garmin Connect en Intervals.icu
 
