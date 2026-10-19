@@ -11,7 +11,8 @@ namespace FietsApp.Tests
             var profile = new RiderProfile();
             var result = profile.AddClimbTime("Alpe d'Huez", 3725, "2026-10-19");
             Assert.That(result.IsFirst, Is.True);
-            Assert.That(result.Describe(), Is.EqualTo("eerste keer: je record"));
+            Assert.That(result.Describe(), Is.EqualTo("badge verdiend! eerste keer boven, dus meteen je record"));
+            Assert.That(profile.Record("Alpe d'Huez").firstOn, Is.EqualTo("2026-10-19"));
             Assert.That(profile.Record("Alpe d'Huez").bestSeconds, Is.EqualTo(3725));
             Assert.That(profile.Record("Mont Ventoux"), Is.Null);
         }
@@ -43,6 +44,19 @@ namespace FietsApp.Tests
             Assert.That(result.Describe(), Is.EqualTo("+2:00 op je record (1:30:00), 1:20 sneller dan vorige keer"));
             Assert.That(profile.Record("Stelvio").bestSeconds, Is.EqualTo(5400));
             Assert.That(profile.Record("Stelvio").lastSeconds, Is.EqualTo(5520));
+        }
+
+        [Test]
+        public void BadgesForClimbsYouFinished()
+        {
+            var profile = new RiderProfile();
+            profile.AddClimbTime("Alpe d'Huez", 3725, "2026-10-19");
+            profile.AddClimbTime("Alpe d'Huez", 3600, "2026-10-20");
+            profile.AddClimbTime("Koppenberg", 95, "2026-10-21");
+            Assert.That(profile.HasBadge("Alpe d'Huez"), Is.True);
+            Assert.That(profile.HasBadge("Mont Ventoux"), Is.False);
+            Assert.That(profile.BadgeCount(new[] { "Alpe d'Huez", "Mont Ventoux", "Koppenberg", "Stelvio" }), Is.EqualTo(2));
+            Assert.That(profile.Record("Alpe d'Huez").firstOn, Is.EqualTo("2026-10-19"), "badge-datum blijft de eerste keer");
         }
 
         [Test]

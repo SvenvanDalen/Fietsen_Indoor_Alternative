@@ -2,11 +2,15 @@ using System;
 
 namespace FietsApp.Training
 {
-    /// <summary>Beste en laatste klimtijd van één klim (story 9.2), in het profiel bewaard.</summary>
+    /// <summary>
+    /// Beste en laatste klimtijd van één klim (story 9.2), in het profiel bewaard. Een record betekent ook dat je de
+    /// klim hebt uitgereden: dat is je badge (story 9.1).
+    /// </summary>
     [Serializable]
     public sealed class ClimbRecord
     {
         public string climb = "";
+        public string firstOn = "";  // jjjj-mm-dd: de dag van de badge
         public double bestSeconds;
         public string bestOn = "";   // jjjj-mm-dd
         public double lastSeconds;
@@ -33,7 +37,7 @@ namespace FietsApp.Training
         /// <summary>Bijv. "nieuw record, 0:32 sneller" of "+1:05 op je record (58:10), 0:12 sneller dan vorige keer".</summary>
         public string Describe()
         {
-            if (IsFirst) return "eerste keer: je record";
+            if (IsFirst) return "badge verdiend! eerste keer boven, dus meteen je record";
             string text = IsRecord
                 ? $"nieuw record, {Delta(PreviousBest.Value - Seconds)} sneller"
                 : Seconds == PreviousBest.Value
