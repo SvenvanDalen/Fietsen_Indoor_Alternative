@@ -83,6 +83,17 @@ namespace FietsApp.Recording
             return null;
         }
 
+        /// <summary>Afstand op gereden tijd <paramref name="timer"/> (s), tussen twee metingen in geïnterpoleerd en begrensd op de opname.</summary>
+        public float DistanceAtTimer(double timer)
+        {
+            if (_samples.Count == 0) return 0f;
+            if (timer <= 0) return _samples[0].DistanceM;
+            int i = (int)timer;
+            if (i >= _samples.Count - 1) return _samples[_samples.Count - 1].DistanceM;
+            double t = timer - i;
+            return (float)(_samples[i].DistanceM + (_samples[i + 1].DistanceM - _samples[i].DistanceM) * t);
+        }
+
         /// <summary>Hoe ver na de voet de eerste meting mag liggen om nog als hele klim te tellen (de eerste meting komt na een seconde).</summary>
         public const float StartTolerance = 25f;
 
