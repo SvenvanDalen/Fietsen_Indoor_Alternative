@@ -4,7 +4,7 @@ namespace FietsApp.Training
 {
     /// <summary>
     /// Ingebouwde workouts (story 8.2), van rustig tot zwaar. Doelen als deel van de FTP, zodat ze voor iedereen
-    /// passen; een eigen editor volgt bij 8.3.
+    /// passen; eigen workouts maak je in de workout-editor (8.3).
     /// </summary>
     public static class WorkoutLibrary
     {
