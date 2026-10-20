@@ -259,7 +259,7 @@ namespace FietsApp
             UiFactory.Button(_footer, "Vorige", new Vector2(16f, -6f), 120f, 40f, () => Page(-1)).label.text = "← vorige";
             _pageLabel = UiFactory.Text(_footer, "Pagina", 18, -6f, 40f);
             _pageLabel.alignment = TextAnchor.MiddleCenter;
-            // Everesting-uitdaging (9.3) aan of uit; de voortgang staat linksonder in beeld.
+            // Everesting-uitdaging (9.3) aan of uit; de voortgang staat rechtsonder in beeld.
             var (everestingButton, everestingLabel) = UiFactory.Button(_footer, "Everesting", new Vector2(150f, -6f), 210f, 40f,
                 () => { _everesting.Toggle(); Refresh(); });
             everestingButton.GetComponent<Image>().color = new Color(0.45f, 0.36f, 0.1f, 1f);

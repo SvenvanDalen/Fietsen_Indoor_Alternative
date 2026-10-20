@@ -105,7 +105,7 @@ namespace FietsApp
             try
             {
                 Directory.CreateDirectory(Folder);
-                string safe = new string(_climbName.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray()).Trim('_');
+                string safe = new string((_climbName ?? "Rit").Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray()).Trim('_');
                 string path = Path.Combine(Folder, $"{_log.StartUtc.ToLocalTime():yyyy-MM-dd_HHmm}_{safe}.fit");
                 File.WriteAllBytes(path, FitWriter.Write(_log));
                 LastSavedPath = path;

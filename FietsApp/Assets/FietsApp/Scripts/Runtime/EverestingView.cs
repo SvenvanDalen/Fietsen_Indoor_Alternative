@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace FietsApp
 {
     /// <summary>
-    /// Everesting-uitdaging (story 9.3): linksonder een voortgangsbalk naar 8848 m zolang de uitdaging loopt, met de
+    /// Everesting-uitdaging (story 9.3): rechtsonder, boven het hoogteprofiel, een voortgangsbalk naar 8848 m zolang de uitdaging loopt, met de
     /// hoogtemeters van de huidige rit erbij. Elke afgesloten rit telt mee in het profiel. Starten en stoppen gaat via het
     /// ritmenu (<see cref="Toggle"/>).
     /// </summary>
@@ -16,7 +16,8 @@ namespace FietsApp
         [Tooltip("Hoe lang de melding blijft staan als de 8848 m gehaald is (seconden).")]
         [SerializeField, Min(1f)] float doneSeconds = 15f;
 
-        const float Width = 560f;
+        // Even breed als het hoogteprofiel (ElevationProfileHud, 640 × 230) en er 10 px boven.
+        const float Width = 640f, Above = 24f + 230f + 10f;
 
         GameObject _bar, _toast;
         RectTransform _fill;
@@ -66,6 +67,7 @@ namespace FietsApp
 
         void OnRideClosed(RideLog log)
         {
+            if (log == _counted) return; // al meegeteld
             float ascent = AscentSinceStart(log);
             _counted = log;
             if (!Challenge.active) return;
@@ -73,7 +75,7 @@ namespace FietsApp
             ProfileStore.Save();
             Refresh();
             if (!done) return;
-            _toastText.text = $"<b>Everest gehaald!</b>   {Challenge.Describe()}";
+            _toastText.text = $"<b>{Challenge.Describe()}</b>";
             _toast.SetActive(true);
             _toastUntil = Time.unscaledTime + doneSeconds;
         }
@@ -98,7 +100,7 @@ namespace FietsApp
         {
             var canvas = UiFactory.Canvas(transform, "Everesting Canvas", 12);
 
-            var bar = UiFactory.Panel(canvas, "Everesting", new Vector2(0f, 0f), new Vector2(24f, 24f), new Vector2(Width, 64f));
+            var bar = UiFactory.Panel(canvas, "Everesting", new Vector2(1f, 0f), new Vector2(-24f, Above), new Vector2(Width, 64f));
             _bar = bar.gameObject;
             _label = UiFactory.Text(bar, "Tekst", 20, -4f, 28f);
             _label.alignment = TextAnchor.MiddleCenter;
