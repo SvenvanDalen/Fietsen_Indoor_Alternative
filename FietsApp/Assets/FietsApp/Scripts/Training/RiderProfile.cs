@@ -72,6 +72,9 @@ namespace FietsApp.Training
             return result;
         }
 
+        /// <summary>De Everesting-uitdaging over meerdere ritten (9.3).</summary>
+        public EverestingChallenge everesting = new EverestingChallenge();
+
         /// <summary>Badge van een klim (9.1): je hebt hem van voet tot top gereden.</summary>
         public bool HasBadge(string climb) => Record(climb) != null;
 
