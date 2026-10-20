@@ -32,7 +32,8 @@ namespace FietsApp
         ClimbSummary[] _summaries;
         GameObject _panel;
         RectTransform _panelRect, _footer;
-        Text _lengthLabel, _gradeLabel, _categoryLabel, _regionLabel, _countryLabel, _empty, _pageLabel, _scaleLabel;
+        Text _lengthLabel, _gradeLabel, _categoryLabel, _regionLabel, _countryLabel, _empty, _pageLabel, _scaleLabel, _everestingLabel;
+        EverestingView _everesting;
         InputField _search;
         int _gradeScale = RiderProfile.DefaultGradeScale;
         readonly List<(Button button, Text label)> _rows = new List<(Button, Text)>();
@@ -45,6 +46,7 @@ namespace FietsApp
         {
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             if (ride == null) ride = FindAnyObjectByType<RideController>();
+            _everesting = FindAnyObjectByType<EverestingView>();
             var source = library != null && library.climbs.Length > 0 ? library.climbs : climbs ?? new Climb[0];
             climbs = source.Where(c => c != null && c.gpx != null).ToArray();
             UiFactory.EnsureEventSystem();
@@ -161,6 +163,8 @@ namespace FietsApp
             _regionLabel.text = _filter.RegionLabel;
             _countryLabel.text = _filter.CountryLabel;
             _scaleLabel.text = $"Weerstand {_gradeScale}%";
+            if (_everesting != null)
+                _everestingLabel.text = _everesting.IsActive ? "Everesting stoppen" : "Everesting starten";
 
             _shown.Clear();
             if (_summaries != null) _shown.AddRange(_filter.Apply(_summaries));
@@ -255,6 +259,12 @@ namespace FietsApp
             UiFactory.Button(_footer, "Vorige", new Vector2(16f, -6f), 120f, 40f, () => Page(-1)).label.text = "← vorige";
             _pageLabel = UiFactory.Text(_footer, "Pagina", 18, -6f, 40f);
             _pageLabel.alignment = TextAnchor.MiddleCenter;
+            // Everesting-uitdaging (9.3) aan of uit; de voortgang staat linksonder in beeld.
+            var (everestingButton, everestingLabel) = UiFactory.Button(_footer, "Everesting", new Vector2(150f, -6f), 210f, 40f,
+                () => { _everesting.Toggle(); Refresh(); });
+            everestingButton.GetComponent<Image>().color = new Color(0.45f, 0.36f, 0.1f, 1f);
+            everestingButton.gameObject.SetActive(_everesting != null);
+            _everestingLabel = everestingLabel;
             UiFactory.Button(_footer, "Volgende", new Vector2(Width - 136f, -6f), 120f, 40f, () => Page(+1)).label.text = "volgende →";
         }
 

@@ -69,6 +69,9 @@ namespace FietsApp.Training
             return result;
         }
 
+        /// <summary>De Everesting-uitdaging over meerdere ritten (9.3).</summary>
+        public EverestingChallenge everesting = new EverestingChallenge();
+
         static int Clamp(int p) => p < MinGradeScale ? MinGradeScale : p > MaxGradeScale ? MaxGradeScale : p;
     }
 

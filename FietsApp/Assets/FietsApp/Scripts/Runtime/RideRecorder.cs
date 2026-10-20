@@ -37,6 +37,9 @@ namespace FietsApp
         /// <summary>Aan het eind van de route: de rit is klaar en bewaard (ritsamenvatting, story 5.3).</summary>
         public event Action<RideLog> Finished;
 
+        /// <summary>Een rit is afgesloten en telt mee (lang genoeg); precies één keer per rit, ook als het schrijven mislukt (Everesting, story 9.3).</summary>
+        public event Action<RideLog> Closed;
+
         /// <summary>Het laatst opgeslagen bestand, of null.</summary>
         public string LastSavedPath { get; private set; }
 
@@ -98,6 +101,7 @@ namespace FietsApp
         public void Save()
         {
             if (_finished || _log.Count < minimumSeconds) return;
+            Closed?.Invoke(_log);
             try
             {
                 Directory.CreateDirectory(Folder);
