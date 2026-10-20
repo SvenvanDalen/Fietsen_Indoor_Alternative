@@ -262,25 +262,24 @@ namespace FietsApp.Tests
     public class ClimbAssetTests
     {
         [Test]
-        public void UnpavedSection()
+        public void GravelSection()
         {
             var climb = UnityEngine.ScriptableObject.CreateInstance<Climb>();
-            climb.unpavedFrom = 10480f;
-            climb.unpavedTo = 100000f;
+            climb.surfaces = new[] { new SurfaceSection { from = 10480f, to = 100000f, surface = Surface.Gravel } };
 
-            Assert.That(climb.IsUnpaved(10000f), Is.False);
-            Assert.That(climb.IsUnpaved(10480f), Is.True);
-            Assert.That(climb.IsUnpaved(17000f), Is.True);
+            Assert.That(climb.SurfaceAt(10000f), Is.EqualTo(Surface.Asphalt));
+            Assert.That(climb.SurfaceAt(10480f), Is.EqualTo(Surface.Gravel));
+            Assert.That(climb.SurfaceAt(17000f), Is.EqualTo(Surface.Gravel));
             UnityEngine.Object.DestroyImmediate(climb);
         }
 
         [Test]
-        public void NoUnpavedSection_ByDefault()
+        public void Asphalt_ByDefault()
         {
             var climb = UnityEngine.ScriptableObject.CreateInstance<Climb>();
 
-            Assert.That(climb.IsUnpaved(0f), Is.False);
-            Assert.That(climb.IsUnpaved(5000f), Is.False);
+            Assert.That(climb.SurfaceAt(0f), Is.EqualTo(Surface.Asphalt));
+            Assert.That(climb.SurfaceAt(5000f), Is.EqualTo(Surface.Asphalt));
             UnityEngine.Object.DestroyImmediate(climb);
         }
     }

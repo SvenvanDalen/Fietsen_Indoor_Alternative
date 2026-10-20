@@ -18,7 +18,8 @@ namespace FietsApp.Editor
         const string Materials = "Assets/FietsApp/Materials/";
 
         [System.Serializable] sealed class Catalog { public Entry[] climbs; }
-        [System.Serializable] sealed class Entry { public string id, name, region, country, biome; }
+        [System.Serializable] sealed class Entry { public string id, name, region, country, biome; public SurfaceEntry[] surfaces; }
+        [System.Serializable] sealed class SurfaceEntry { public float from, to; public string surface; }
 
         [MenuItem("FietsApp/Klimmen bijwerken")]
         public static void Run() => Debug.Log(Build());
@@ -48,6 +49,8 @@ namespace FietsApp.Editor
                 climb.displayName = entry.name;
                 climb.region = entry.region;
                 climb.country = entry.country;
+                climb.surfaces = (entry.surfaces ?? new SurfaceEntry[0])
+                    .Select(s => new SurfaceSection { from = s.from, to = s.to, surface = Surfaces.Parse(s.surface) }).ToArray();
                 climb.gpx = gpx;
                 climb.terrain = AssetDatabase.LoadAssetAtPath<TextAsset>(Routes + entry.id + ".terrain.bytes");
                 var stats = ClimbStats.Of(ClimbImport.FromGpx(Gpx.Parse(gpx.text)));

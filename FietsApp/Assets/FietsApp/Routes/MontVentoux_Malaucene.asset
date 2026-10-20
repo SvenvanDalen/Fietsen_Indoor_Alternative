@@ -24,8 +24,7 @@ MonoBehaviour:
   forestFrom: 550
   aboveTreeLine: {fileID: 0}
   gravelVergeAboveTreeLine: 1
-  unpavedFrom: 0
-  unpavedTo: 0
+  surfaces: []
   summitTower: 1
   summitLatitude: 44.1739
   summitLongitude: 5.27843

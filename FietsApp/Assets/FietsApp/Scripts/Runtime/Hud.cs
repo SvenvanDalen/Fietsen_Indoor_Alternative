@@ -52,6 +52,8 @@ namespace FietsApp
                     ? $"helling {ride.GradePercent:0.0}%   <color=#ffd060>ERG {t.ErgWatts:0} W</color>   "
                     : $"helling {ride.GradePercent:0.0}% (trainer {t.GradePercent:0.0}%)   ") +
                 $"{ride.DistanceM / 1000f:0.00} km   {seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}" +
+                (ride.Surface != FietsApp.World.Surface.Asphalt
+                    ? $"   <color=#e0c890>{FietsApp.World.Surfaces.Label(ride.Surface)}</color>" : "") +
                 (ride.Brake > 0f ? "   <color=#ff6060>remmen</color>"
                     : ride.CornerBraking ? "   <color=#ffb060>remt voor bocht</color>" : "") +
                 (recorder != null && recorder.Status.Length > 0 ? $"   <color=#ff9090>●</color> {recorder.Status}" : "");
