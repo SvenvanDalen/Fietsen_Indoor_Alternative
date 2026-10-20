@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using FietsApp.Training;
 using FietsApp.World;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,6 +15,8 @@ namespace FietsApp
     /// midden het gekozen dal met elke klim als spaak in zijn echte richting en lengte (kleur naar categorie);
     /// rechts de klimmen van dat gebied. Een klim kiezen start de rit bij het knooppunt van dat dal, achter een
     /// korte fade zodat je de wereld niet ziet opbouwen. Zolang de kaart open is staat de rit stil.
+    /// Het is ook het overzicht van je badges (story 9.1): uitgereden klimmen krijgen een gouden ruit, per gebied en
+    /// in de titel staat hoeveel je er hebt.
     /// </summary>
     public sealed class WorldMapView : MonoBehaviour
     {
@@ -108,11 +111,21 @@ namespace FietsApp
         void Select(WorldRegion region)
         {
             _selected = region;
+            var profile = ProfileStore.Current;
             foreach (var (button, r) in _regionButtons)
+            {
                 button.GetComponent<Image>().color = r == region ? new Color(0.85f, 0.55f, 0.15f) : new Color(0.16f, 0.3f, 0.5f);
+                // Badges per gebied (9.1): uitgereden van het totaal.
+                int earned = profile.BadgeCount(r.Climbs.Select(c => c.Name));
+                button.GetComponentInChildren<Text>().text = earned > 0
+                    ? $"{r.Name} <color=#ffd060>{earned}/{r.Climbs.Count}</color>"
+                    : $"{r.Name} ({r.Climbs.Count})";
+            }
             DrawDetail(region);
             DrawList(region);
-            _title.text = $"Wereldkaart  <size=16><color=#bbb>(K of Esc sluit; kies een gebied, dan een klim)</color></size>";
+            var all = _world.Regions.SelectMany(r => r.Climbs).Select(c => c.Name).ToList();
+            _title.text = $"Wereldkaart  <color=#ffd060>{profile.BadgeCount(all)}/{all.Count} badges</color>  " +
+                          "<size=16><color=#bbb>(K of Esc sluit; kies een gebied, dan een klim)</color></size>";
         }
 
         void BuildRegions()
@@ -135,8 +148,7 @@ namespace FietsApp
                 var rt = button.GetComponent<RectTransform>();
                 rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
                 rt.anchoredPosition = Pos(r);
-                label.text = $"{r.Name} ({r.Climbs.Count})";
-                label.fontSize = 16;
+                label.fontSize = 16; // tekst met badges volgt in Select
                 _regionButtons.Add((button, r));
             }
         }
@@ -156,6 +168,7 @@ namespace FietsApp
                 var stats = ClimbStats.Of(climb.Route);
                 bool current = routeView.Climb != null && routeView.Climb.name == climb.Id;
                 Line(_detail, foot, top, current ? 7f : 5f, CategoryColor(ClimbCategories.Of(stats)));
+                if (ProfileStore.Current.HasBadge(climb.Name)) Badge(_detail, top, 16f);
             }
             var hub = new GameObject("Knooppunt", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
             hub.SetParent(_detail, false);
@@ -179,8 +192,11 @@ namespace FietsApp
                 var c = climb;
                 var stats = ClimbStats.Of(climb.Route);
                 var category = ClimbCategories.Of(stats);
+                var record = ProfileStore.Current.Record(climb.Name);
                 var (button, label) = UiFactory.Button(_list, climb.Id, new Vector2(0f, y), ListWidth - 32f, rowHeight, () => Ride(c));
-                button.GetComponent<Image>().color = new Color(0.16f, 0.3f, 0.5f, 1f);
+                // Uitgereden klimmen (badge, 9.1) in brons met een gouden ruit.
+                button.GetComponent<Image>().color = record != null ? new Color(0.42f, 0.32f, 0.1f, 1f) : new Color(0.16f, 0.3f, 0.5f, 1f);
+                if (record != null) Badge((RectTransform)button.transform, new Vector2(ListWidth / 2f - 32f, 0f), Mathf.Min(16f, rowHeight - 10f));
                 label.alignment = TextAnchor.MiddleLeft;
                 label.supportRichText = true;
                 label.fontSize = rowHeight < 30f ? 14 : 17;
@@ -190,7 +206,8 @@ namespace FietsApp
                 label.text = $"<b>{climb.Name}</b>{(current ? "  <color=#9fd>(nu)</color>" : "")}   " +
                              $"<color=#ddd>{(stats.LengthMeters / 1000f).ToString("0.0", Dutch)} km · " +
                              $"{stats.AverageGradePercent.ToString("0.0", Dutch)}%</color>  " +
-                             $"<color=#{color}>{ClimbCategories.Label(category)}</color>";
+                             $"<color=#{color}>{ClimbCategories.Label(category)}</color>" +
+                             (record != null ? $"  <color=#ffd060>PR {ClimbResult.Clock(record.bestSeconds)}</color>" : "");
                 y -= rowHeight + 4f;
             }
         }
@@ -204,6 +221,23 @@ namespace FietsApp
             ClimbCategory.Cat4 => new Color(0.5f, 0.8f, 0.35f),
             _ => new Color(0.6f, 0.6f, 0.6f),
         };
+
+        /// <summary>Badge: een gouden ruit met donkere rand, gecentreerd op <paramref name="at"/>.</summary>
+        static void Badge(RectTransform parent, Vector2 at, float size)
+        {
+            foreach (var (s, color) in new[] { (size + 4f, new Color(0.25f, 0.18f, 0.02f)), (size, new Color(1f, 0.82f, 0.25f)) })
+            {
+                var rt = new GameObject("Badge", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
+                rt.SetParent(parent, false);
+                rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.anchoredPosition = at;
+                rt.sizeDelta = new Vector2(s, s);
+                rt.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                var image = rt.GetComponent<Image>();
+                image.color = color;
+                image.raycastTarget = false;
+            }
+        }
 
         /// <summary>Lijn als dun gedraaid rechthoekje van <paramref name="from"/> naar <paramref name="to"/>.</summary>
         static void Line(RectTransform parent, Vector2 from, Vector2 to, float width, Color color)

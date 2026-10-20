@@ -14,8 +14,12 @@ namespace FietsApp
     public sealed class RouteView : MonoBehaviour
     {
         [SerializeField] Material roadMaterial;
-        [Tooltip("Onverharde weg, voor het stuk dat de klim als onverhard aangeeft.")]
+        [Tooltip("Grindweg, voor de stukken grind van een klim (story 4.13).")]
         [SerializeField] Material unpavedRoadMaterial;
+        [Tooltip("Kasseien (story 4.13).")]
+        [SerializeField] Material cobblesRoadMaterial;
+        [Tooltip("Sneeuw op de weg (story 4.13).")]
+        [SerializeField] Material snowRoadMaterial;
         [SerializeField] Material vergeMaterial;
         [Tooltip("Berm boven de boomgrens: grind in plaats van gras.")]
         [SerializeField] Material bareVergeMaterial;
@@ -129,6 +133,10 @@ namespace FietsApp
         /// <summary>Na <see cref="SetClimb"/>: de weg is opnieuw gebouwd; terrein en HUD bouwen zich hierop opnieuw op.</summary>
         public event System.Action ClimbChanged;
 
+        /// <summary>De ondergrond op <paramref name="distance"/> m langs <see cref="Route"/>; buiten de klim (dalweg) asfalt.</summary>
+        public Surface SurfaceAt(float distance) =>
+            climb != null && ClimbDistanceAt(distance) is float d ? climb.SurfaceAt(d) : Surface.Asphalt;
+
         /// <summary>Kies een andere klim tijdens het spelen (ritmenu, story 6.3).</summary>
         public void SetClimb(Climb value)
         {
@@ -171,8 +179,12 @@ namespace FietsApp
                 new Vector2(half, 0f), new Vector2(half + vergeWidth, -0.15f),
             };
 
-            AddStrip("Weg", road, new[] { roadMaterial, unpavedRoadMaterial ?? roadMaterial }, pts,
-                i => climb != null && ClimbDistanceAt(pts[i].Distance) is float d && climb.IsUnpaved(d) ? 1 : 0);
+            // Submesh per ondergrond, in de volgorde van Surface: asfalt, grind, kasseien, sneeuw.
+            AddStrip("Weg", road, new[]
+                {
+                    roadMaterial, unpavedRoadMaterial ?? roadMaterial, cobblesRoadMaterial ?? roadMaterial, snowRoadMaterial ?? roadMaterial,
+                }, pts,
+                i => (int)SurfaceAt(pts[i].Distance));
             float gravelFrom = climb != null && climb.gravelVergeAboveTreeLine ? climb.treeLine : float.MaxValue;
             AddStrip("Berm", verges, new[] { vergeMaterial, bareVergeMaterial ?? vergeMaterial }, pts,
                 i => RealElevation(pts[i].Elevation) > gravelFrom ? 1 : 0);

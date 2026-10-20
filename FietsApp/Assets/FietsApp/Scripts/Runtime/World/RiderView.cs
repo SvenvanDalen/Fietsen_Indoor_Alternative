@@ -23,6 +23,7 @@ namespace FietsApp
         [Tooltip("Hoe ver de rijder in een bocht hooguit schuin hangt (graden).")]
         [SerializeField, Range(0f, 45f)] float maxLean = 35f;
         float _lean;
+        Vector3 _shake; // trilling van de vorige frame, eerst weer weghalen zodat de camera-demping hem niet opstapelt
 
         void Awake()
         {
@@ -55,6 +56,7 @@ namespace FietsApp
             // Voor bochten remt de rijder vanzelf af (afdalingen, story 4.12) en hangt hij schuin in de bocht.
             var corners = routeView.Corners;
             ride.SpeedLimit = corners.SpeedLimitAt(distance);
+            ride.Surface = routeView.SurfaceAt(distance); // ondergrond: rolweerstand en trilling (story 4.13)
             float curvature = corners.CurvatureAt(distance);
             float targetLean = Mathf.Clamp(Mathf.Atan(ride.SpeedMs * ride.SpeedMs * curvature / 9.81f) * Mathf.Rad2Deg, -maxLean, maxLean);
             _lean = Mathf.Lerp(_lean, targetLean, 1f - Mathf.Exp(-6f * Time.deltaTime));
@@ -69,8 +71,14 @@ namespace FietsApp
             var target = CameraPose(distance);
             float t = jumped ? 1f : 1f - Mathf.Exp(-cameraSmoothing * Time.deltaTime);
             chaseCamera.transform.SetPositionAndRotation(
-                Vector3.Lerp(chaseCamera.transform.position, target.position, t),
+                Vector3.Lerp(chaseCamera.transform.position - _shake, target.position, t),
                 Quaternion.Slerp(chaseCamera.transform.rotation, target.rotation, t));
+
+            // Kasseien en grind: het beeld trilt, harder naarmate je sneller gaat.
+            float amplitude = FietsApp.World.Surfaces.Shake(ride.Surface) * Mathf.Clamp(ride.SpeedMs / 8.3f, 0f, 1.5f);
+            float time = Time.time * 23f;
+            _shake = amplitude * new Vector3(Mathf.PerlinNoise(time, 0.3f) - 0.5f, Mathf.PerlinNoise(0.7f, time) - 0.5f, 0f) * 2f;
+            chaseCamera.transform.position += _shake;
         }
 
         void SnapCamera()
