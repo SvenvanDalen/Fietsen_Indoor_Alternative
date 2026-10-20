@@ -113,9 +113,11 @@ namespace FietsApp.Tests
         {
             var draft = new WorkoutDraft();
             int i = draft.Add(ramp: true); // 50 → 80%
+            draft.Blocks[i].Name = "Opwarmen";
             draft.SetPower(i, 0.60);
             Assert.AreEqual(0.60, draft.Blocks[i].StartFtp, 1e-9);
             Assert.AreEqual(0.90, draft.Blocks[i].EndFtp, 1e-9);
+            Assert.AreEqual("Opwarmen", draft.Blocks[i].Name, "zelfde richting: naam blijft");
             draft.SetPower(i, 0.40, end: true);
             Assert.AreEqual(0.60, draft.Blocks[i].StartFtp, 1e-9);
             Assert.AreEqual(0.40, draft.Blocks[i].EndFtp, 1e-9);
@@ -135,7 +137,7 @@ namespace FietsApp.Tests
             Assert.AreEqual("Klimblokken", w.Name);
             Assert.AreEqual(900, w.TotalSeconds, 1e-9);
             // (0,65·300 + 1,0·300 + 1,0·300) / 900 = 88%.
-            Assert.AreEqual("eigen workout, 15 min, gemiddeld 88% FTP", w.Description);
+            Assert.AreEqual("eigen workout, gemiddeld 88% FTP", w.Description);
             Assert.Throws<InvalidOperationException>(() => new WorkoutDraft().ToWorkout());
         }
     }

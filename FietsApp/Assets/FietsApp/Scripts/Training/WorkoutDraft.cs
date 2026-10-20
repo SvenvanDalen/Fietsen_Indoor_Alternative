@@ -58,7 +58,7 @@ namespace FietsApp.Training
             var steps = Blocks.Select(b => new WorkoutStep(b.Name, b.Seconds, b.StartFtp, b.EndFtp)).ToList();
             var probe = new Workout(Name, "", steps);
             string name = string.IsNullOrWhiteSpace(Name) ? "Mijn workout" : Name.Trim();
-            return new Workout(name, $"eigen workout, {Math.Round(probe.TotalSeconds / 60)} min, gemiddeld {probe.AverageFtp * 100:0}% FTP", steps);
+            return new Workout(name, $"eigen workout, gemiddeld {probe.AverageFtp * 100:0}% FTP", steps);
         }
 
         /// <summary>
@@ -102,11 +102,12 @@ namespace FietsApp.Training
 
         /// <summary>
         /// Nieuw doel (deel van de FTP), afgerond op 5%. Bij een ramp kies je met <paramref name="end"/> het begin of het
-        /// eind; <c>null</c> zet het hele blok (een ramp blijft dan even steil). De naam volgt de nieuwe zone.
+        /// eind; <c>null</c> zet het hele blok (een ramp blijft dan even steil). Een blok krijgt de naam van zijn nieuwe zone.
         /// </summary>
         public void SetPower(int index, double ftp, bool? end = null)
         {
             var b = Blocks[index];
+            bool wasRamp = b.IsRamp, wasRising = b.EndFtp > b.StartFtp;
             ftp = Clamp(Math.Round(ftp / FtpStep) * FtpStep, MinFtp, MaxFtp);
             if (end == true) b.EndFtp = ftp;
             else if (end == false) b.StartFtp = ftp;
@@ -116,7 +117,9 @@ namespace FietsApp.Training
                 b.StartFtp = ftp;
                 b.EndFtp = Clamp(b.EndFtp + shift, MinFtp, MaxFtp);
             }
-            b.Name = b.IsRamp ? (b.EndFtp > b.StartFtp ? "Opbouw" : "Afbouw") : ZwoFormat.StepName(b.StartFtp);
+            // Een ramp die dezelfde kant op blijft gaan houdt zijn naam (zoals "Opwarmen").
+            if (!b.IsRamp) b.Name = ZwoFormat.StepName(b.StartFtp);
+            else if (!wasRamp || wasRising != b.EndFtp > b.StartFtp) b.Name = b.EndFtp > b.StartFtp ? "Opbouw" : "Afbouw";
         }
 
         static double Clamp(double v, double min, double max) => v < min ? min : v > max ? max : v;
