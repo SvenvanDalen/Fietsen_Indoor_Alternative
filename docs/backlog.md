@@ -367,8 +367,8 @@ Epic: E4 · Fase: V1 · Prio: Should · Punten: 8
 
 Als rijder wil ik meerdere klimmen aan elkaar (etappe).
 
-- [ ] Etappe van 2-4 klimmen
-- [ ] Korte afdaling ertussen
+- [x] Etappe van 2-4 klimmen
+- [x] Korte afdaling ertussen
 
 #### 4.8 Fantasieklimmen met extreme stijgingen
 
@@ -426,8 +426,8 @@ Epic: E4 · Fase: V1 · Prio: Should · Punten: 8
 
 Als rijder wil ik ondergronden zien en merken (kassei, grind, sneeuw), alleen via beeld en extra weerstand.
 
-- [ ] Extra rolweerstand en visuele trilling per ondergrond
-- [ ] Colle delle Finestre heeft grindstroken
+- [x] Extra rolweerstand en visuele trilling per ondergrond
+- [x] Colle delle Finestre heeft grindstroken
 
 ### E5 Ritopname en export (MVP)
 
@@ -586,8 +586,8 @@ Epic: E9 · Fase: V1 · Prio: Should · Punten: 5
 
 Als rijder wil ik badges voor klimmen die ik heb voltooid.
 
-- [ ] Badge per klim
-- [ ] Overzichtskaart
+- [x] Badge per klim
+- [x] Overzichtskaart
 
 #### 9.2 Beste tijd per klim
 
@@ -604,8 +604,8 @@ Epic: E9 · Fase: V1 · Prio: Could · Punten: 5
 
 Als rijder wil ik een Everesting-uitdaging (8848 hoogtemeter).
 
-- [ ] Teller over meerdere ritten
-- [ ] Voortgangsbalk
+- [x] Teller over meerdere ritten
+- [x] Voortgangsbalk
 
 #### 9.4 Ghost van mijn beste poging
 
