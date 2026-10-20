@@ -11,18 +11,24 @@ namespace FietsApp
     /// workout zet dit component elk frame het doelvermogen op de trainer en toont het blok, de resterende tijd
     /// en een blokkengrafiek. N slaat een blok over, X stopt. De tijd loopt alleen zolang je trapt, dus even
     /// stoppen pauzeert de workout. Je rijdt ondertussen gewoon over de gekozen klim.
+    /// De lijst toont ook je eigen workouts uit <see cref="WorkoutStore"/>; die bewerk en maak je in de
+    /// <see cref="WorkoutEditor"/> (story 8.3).
     /// </summary>
     public sealed class WorkoutController : MonoBehaviour
     {
         [SerializeField] RideController ride;
         [SerializeField] RideMenu rideMenu;
         [SerializeField] FtpTestController ftpTest;
+        [SerializeField] WorkoutEditor editor;
 
         const float PanelWidth = 420f, ChartHeight = 70f;
         const float FinishedMessageSeconds = 8f;
 
         WorkoutPlayer _player;
         GameObject _list, _panel, _donePanel;
+        RectTransform _listRect;
+        readonly List<GameObject> _listRows = new List<GameObject>();
+        readonly List<Workout> _choices = new List<Workout>(); // ingebouwd, dan eigen; cijfertoetsen kiezen hieruit
         Text _listTitle, _title, _step, _next, _done;
         RectTransform _chart, _marker;
         float _doneUntil;
@@ -36,6 +42,7 @@ namespace FietsApp
             if (ride == null) ride = FindAnyObjectByType<RideController>();
             if (rideMenu == null) rideMenu = FindAnyObjectByType<RideMenu>();
             if (ftpTest == null) ftpTest = FindAnyObjectByType<FtpTestController>();
+            if (editor == null) editor = FindAnyObjectByType<WorkoutEditor>();
             UiFactory.EnsureEventSystem();
             BuildUi();
         }
@@ -62,13 +69,14 @@ namespace FietsApp
             var kb = UiFactory.IsTyping ? null : Keyboard.current; // niet tijdens typen in een tekstveld
             if (kb == null) return;
             if (rideMenu != null && rideMenu.IsOpen) return;
+            if (editor != null && editor.IsOpen) return;
 
             if (kb.wKey.wasPressedThisFrame && (ftpTest == null || !ftpTest.IsRunning)) ShowList(!IsListOpen);
             if (IsListOpen)
             {
                 if (kb.escapeKey.wasPressedThisFrame) ShowList(false);
-                for (int i = 0; i < WorkoutLibrary.All.Length && i < 9; i++)
-                    if (kb[Key.Digit1 + i].wasPressedThisFrame) Begin(WorkoutLibrary.All[i]);
+                for (int i = 0; i < _choices.Count && i < 9; i++)
+                    if (kb[Key.Digit1 + i].wasPressedThisFrame) Begin(_choices[i]);
                 return;
             }
             if (_player == null) return;
@@ -80,6 +88,7 @@ namespace FietsApp
         {
             _listTitle.text = "Kies een workout  <size=16><color=#bbb>(W sluit, cijfer kiest; " +
                               $"doelen naar je FTP van {ProfileStore.Current.ftpWatts} W)</color></size>";
+            if (show) FillList();
             _list.SetActive(show);
         }
 
@@ -134,24 +143,10 @@ namespace FietsApp
         {
             var canvas = UiFactory.Canvas(transform, "Workout Canvas", 15);
 
-            // Lijst met workouts, midden in beeld.
-            var list = UiFactory.Panel(canvas, "Workoutlijst", new Vector2(0.5f, 0.5f), Vector2.zero,
-                new Vector2(760f, 90f + WorkoutLibrary.All.Length * 40f));
-            _list = list.gameObject;
-            _listTitle = UiFactory.Text(list, "Titel", 28, -14f, 40f);
-            float y = -64f;
-            for (int i = 0; i < WorkoutLibrary.All.Length; i++)
-            {
-                var w = WorkoutLibrary.All[i];
-                var workout = w;
-                var (button, label) = UiFactory.Button(list, w.Name, new Vector2(16f, y), 728f, 34f, () => Begin(workout));
-                button.GetComponent<Image>().color = new Color(0.16f, 0.3f, 0.5f, 1f);
-                label.alignment = TextAnchor.MiddleLeft;
-                label.supportRichText = true;
-                label.rectTransform.offsetMin = new Vector2(12f, 0f);
-                label.text = $"{i + 1}.  <b>{w.Name}</b>   {Clock(w.TotalSeconds)}   <color=#ddd>{w.Description}</color>";
-                y -= 40f;
-            }
+            // Lijst met workouts, midden in beeld; de rijen komen bij het openen (FillList).
+            _listRect = UiFactory.Panel(canvas, "Workoutlijst", new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(760f, 200f));
+            _list = _listRect.gameObject;
+            _listTitle = UiFactory.Text(_listRect, "Titel", 28, -14f, 40f);
             _list.SetActive(false);
 
             // Paneel tijdens de workout, linksboven.
@@ -180,6 +175,61 @@ namespace FietsApp
             _donePanel = done.gameObject;
             _done = UiFactory.Text(done, "Tekst", 20, -6f, 32f);
             _donePanel.SetActive(false);
+        }
+
+        /// <summary>Vult de lijst: ingebouwde workouts, dan je eigen (met bewerken), dan een knop voor een nieuwe.</summary>
+        void FillList()
+        {
+            foreach (var row in _listRows) Destroy(row);
+            _listRows.Clear();
+            var own = WorkoutStore.LoadAll();
+            _choices.Clear();
+            _choices.AddRange(WorkoutLibrary.All);
+            foreach (var (w, _) in own) _choices.Add(w);
+
+            float y = -64f;
+            void Row(Workout w, string path, int number)
+            {
+                bool editable = path != null && editor != null;
+                var (button, label) = UiFactory.Button(_listRect, w.Name, new Vector2(16f, y), editable ? 600f : 728f, 34f, () => Begin(w));
+                button.GetComponent<Image>().color = path != null ? new Color(0.2f, 0.38f, 0.26f, 1f) : new Color(0.16f, 0.3f, 0.5f, 1f);
+                label.alignment = TextAnchor.MiddleLeft;
+                label.supportRichText = true;
+                label.rectTransform.offsetMin = new Vector2(12f, 0f);
+                string key = number < 9 ? $"{number + 1}." : "   ";
+                label.text = $"{key}  <b>{w.Name}</b>   {Clock(w.TotalSeconds)}   <color=#ddd>{w.Description}</color>";
+                _listRows.Add(button.gameObject);
+                if (editable)
+                {
+                    var (edit, editLabel) = UiFactory.Button(_listRect, "Bewerken", new Vector2(626f, y), 118f, 34f, () => Edit(w, path));
+                    editLabel.text = "bewerken";
+                    edit.GetComponent<Image>().color = new Color(0.35f, 0.35f, 0.4f, 1f);
+                    _listRows.Add(edit.gameObject);
+                }
+                y -= 40f;
+            }
+            for (int i = 0; i < WorkoutLibrary.All.Length; i++) Row(WorkoutLibrary.All[i], null, i);
+            for (int i = 0; i < own.Count; i++) Row(own[i].workout, own[i].path, WorkoutLibrary.All.Length + i);
+
+            if (editor != null)
+            {
+                y -= 6f;
+                var (create, createLabel) = UiFactory.Button(_listRect, "Nieuw", new Vector2(16f, y), 728f, 38f, () => Edit(null, null));
+                createLabel.text = own.Count == 0
+                    ? "+ Nieuwe workout  <color=#ddd>(eigen workouts staan als .zwo in de map Workouts, om te delen)</color>"
+                    : "+ Nieuwe workout";
+                createLabel.supportRichText = true;
+                create.GetComponent<Image>().color = new Color(0.2f, 0.45f, 0.25f, 1f);
+                _listRows.Add(create.gameObject);
+                y -= 44f;
+            }
+            _listRect.sizeDelta = new Vector2(760f, -y + 16f);
+        }
+
+        void Edit(Workout workout, string path)
+        {
+            _list.SetActive(false);
+            editor.Open(workout, path);
         }
 
         /// <summary>Blokken als staafjes: hoogte naar het doel (tot 130% FTP), kleur naar de zone; ramps in stapjes.</summary>
