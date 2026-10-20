@@ -24,6 +24,7 @@ namespace FietsApp
         float _toastUntil;
         bool _summitShown;
         string _recordLine; // uitkomst van de klimtijd tegen het record (9.2), voor de samenvatting
+        StageController _stage;
 
         public bool IsOpen => _panel != null && _panel.activeSelf;
 
@@ -32,6 +33,7 @@ namespace FietsApp
             if (ride == null) ride = FindAnyObjectByType<RideController>();
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             if (recorder == null) recorder = FindAnyObjectByType<RideRecorder>();
+            _stage = FindAnyObjectByType<StageController>();
             UiFactory.EnsureEventSystem();
             BuildUi();
         }
@@ -80,11 +82,20 @@ namespace FietsApp
         public void Show(RideLog log)
         {
             if (log.Count == 0) return;
+            if (_stage != null && _stage.IsRunning) return; // etappe: één samenvatting na de laatste klim (ShowStage)
             string name = recorder.ClimbName ?? "Rit";
             var climb = log.SecondsBetween(routeView.ClimbStart, routeView.ClimbEnd);
             _title.text = $"<b>{name}</b>  <color=#bbb>ritsamenvatting</color>";
             _body.text = RideSummaryText.Of(log, climb, log.AveragePowerBetween(routeView.ClimbStart, routeView.ClimbEnd)) +
                          (_recordLine != null ? $"\n<color=#bbb>Record:</color>  <b>{_recordLine}</b>" : "");
+            _panel.SetActive(true);
+        }
+
+        /// <summary>Toont de samenvatting van een hele etappe (story 4.7).</summary>
+        public void ShowStage(string title, string body)
+        {
+            _title.text = title;
+            _body.text = body;
             _panel.SetActive(true);
         }
 

@@ -32,8 +32,13 @@ namespace FietsApp
         ClimbSummary[] _summaries;
         GameObject _panel;
         RectTransform _panelRect, _footer;
-        Text _lengthLabel, _gradeLabel, _categoryLabel, _regionLabel, _countryLabel, _empty, _pageLabel, _scaleLabel, _everestingLabel;
+        Text _lengthLabel, _gradeLabel, _categoryLabel, _regionLabel, _countryLabel, _empty, _pageLabel, _scaleLabel, _everestingLabel, _stageLabel, _title;
         EverestingView _everesting;
+        StageController _stageController;
+        // Etappe samenstellen (4.7): zolang dit aan staat, kiest een klik een klim voor de etappe in plaats van te starten.
+        readonly Stage _stage = new Stage();
+        bool _composing;
+        string _stageNote;
         InputField _search;
         int _gradeScale = RiderProfile.DefaultGradeScale;
         readonly List<(Button button, Text label)> _rows = new List<(Button, Text)>();
@@ -47,6 +52,7 @@ namespace FietsApp
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             if (ride == null) ride = FindAnyObjectByType<RideController>();
             _everesting = FindAnyObjectByType<EverestingView>();
+            _stageController = FindAnyObjectByType<StageController>();
             var source = library != null && library.climbs.Length > 0 ? library.climbs : climbs ?? new Climb[0];
             climbs = source.Where(c => c != null && c.gpx != null).ToArray();
             UiFactory.EnsureEventSystem();
@@ -104,11 +110,17 @@ namespace FietsApp
                 UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null); // zoekveld los, sneltoetsen weer aan
             _panel.SetActive(false);
             ride.Release(this);
+            StopComposing();
         }
 
         /// <summary>Start een rit op klim <paramref name="index"/> uit de lijst, aan de voet.</summary>
         public void Choose(int index)
         {
+            if (_composing)
+            {
+                ChooseForStage(climbs[index]);
+                return;
+            }
             if (climbs[index] != routeView.Climb) routeView.SetClimb(climbs[index]);
             if (ProfileStore.Current.GradeScale(climbs[index].displayName) != _gradeScale)
             {
@@ -130,6 +142,46 @@ namespace FietsApp
             ride.GradeScale = ProfileStore.Current.GradeScale(climb.displayName) / 100f;
             ride.StartAt(0f);
             if (IsOpen) Close();
+        }
+
+        /// <summary>Etappeknop: eerst samenstellen, met twee of meer klimmen starten, anders annuleren.</summary>
+        void StageButton()
+        {
+            if (!_composing) _composing = true;
+            else if (_stage.CanStart)
+            {
+                var chosen = _stage.Climbs.Select(id => climbs.First(c => c.name == id)).ToList();
+                StopComposing();
+                _stageController.Begin(chosen);
+                return;
+            }
+            else StopComposing();
+            Refresh();
+        }
+
+        void ChooseForStage(Climb climb)
+        {
+            _stageNote = _stage.Toggle(climb.name, climb.region) switch
+            {
+                StageChoice.OtherRegion => $"alleen klimmen uit {_stage.Region}",
+                StageChoice.Full => $"hooguit {Stage.MaxClimbs} klimmen",
+                _ => null,
+            };
+            Refresh();
+        }
+
+        static int IndexOf(IReadOnlyList<string> list, string item)
+        {
+            for (int i = 0; i < list.Count; i++)
+                if (list[i] == item) return i;
+            return -1;
+        }
+
+        void StopComposing()
+        {
+            _composing = false;
+            _stage.Clear();
+            _stageNote = null;
         }
 
         /// <summary>De klimmen in het menu, voor de wereldkaart.</summary>
@@ -165,6 +217,14 @@ namespace FietsApp
             _scaleLabel.text = $"Weerstand {_gradeScale}%";
             if (_everesting != null)
                 _everestingLabel.text = _everesting.IsActive ? "Everesting stoppen" : "Everesting starten";
+            _stageLabel.text = !_composing ? "Etappe samenstellen"
+                : _stage.CanStart ? $"Etappe starten ({_stage.Count})"
+                : "Etappe annuleren";
+            _title.text = _composing
+                ? $"Etappe{(_stage.Region != null ? " " + _stage.Region : "")}  <size=16>" +
+                  (_stageNote != null ? $"<color=#ff9a60>{_stageNote}</color>"
+                      : $"<color=#bbb>{_stage.Count}/{Stage.MaxClimbs} gekozen; klik 2-4 klimmen uit één gebied</color>") + "</size>"
+                : "Kies een klim  <size=16><color=#bbb>(M sluit, 1-9 kiest, G weerstand)</color></size>";
 
             _shown.Clear();
             if (_summaries != null) _shown.AddRange(_filter.Apply(_summaries));
@@ -182,14 +242,16 @@ namespace FietsApp
                 int index = _shown[first + i];
                 var climb = _summaries[index];
                 bool current = climbs[index] == routeView.Climb;
-                label.text = $"{i + 1}.  <b>{climb.Name}</b>{(current ? "  <color=#9fd>(nu)</color>" : "")}" +
+                int inStage = IndexOf(_stage.Climbs, climbs[index].name);
+                label.text = (inStage >= 0 ? $"<color=#ffd060>[{inStage + 1}]</color> " : "") +
+                             $"{i + 1}.  <b>{climb.Name}</b>{(current ? "  <color=#9fd>(nu)</color>" : "")}" +
                              $"   <color=#ddd>{climb.Details(Dutch)}</color>" +
                              Place(climb) +
                              ScaleNote(climbs[index].displayName) +
                              RecordNote(climbs[index].displayName);
             }
             _empty.gameObject.SetActive(_shown.Count == 0);
-            _pageLabel.text = $"{_shown.Count} klimmen   pagina {_page + 1}/{pages}   <color=#bbb>(← →)</color>";
+            _pageLabel.text = $"{_shown.Count} klimmen · {_page + 1}/{pages}";
 
             float listHeight = Mathf.Max(1, onPage) * (RowHeight + 6f);
             _footer.anchoredPosition = new Vector2(0f, -HeaderHeight - listHeight);
@@ -210,8 +272,7 @@ namespace FietsApp
             _panelRect = panel;
 
             float y = -14f;
-            UiFactory.Text(panel, "Titel", 30, y, 40f).text =
-                "Kies een klim  <size=16><color=#bbb>(M sluit, 1-9 kiest, G weerstand)</color></size>";
+            _title = UiFactory.Text(panel, "Titel", 30, y, 40f);
             var (scaleButton, scaleLabel) = UiFactory.Button(panel, "Weerstand", new Vector2(Width - 236f, y), 220f, 40f,
                 NextGradeScale);
             scaleButton.GetComponent<Image>().color = new Color(0.45f, 0.3f, 0.12f, 1f);
@@ -257,14 +318,21 @@ namespace FietsApp
             _footer.pivot = new Vector2(0.5f, 1f);
             _footer.sizeDelta = new Vector2(0f, FooterHeight);
             UiFactory.Button(_footer, "Vorige", new Vector2(16f, -6f), 120f, 40f, () => Page(-1)).label.text = "← vorige";
+            // Tussen vorige en volgende: Everesting (9.3), etappe (4.7) en het paginanummer.
             _pageLabel = UiFactory.Text(_footer, "Pagina", 18, -6f, 40f);
             _pageLabel.alignment = TextAnchor.MiddleCenter;
-            // Everesting-uitdaging (9.3) aan of uit; de voortgang staat rechtsonder in beeld.
-            var (everestingButton, everestingLabel) = UiFactory.Button(_footer, "Everesting", new Vector2(150f, -6f), 210f, 40f,
+            _pageLabel.rectTransform.offsetMin = new Vector2(586f, _pageLabel.rectTransform.offsetMin.y);
+            _pageLabel.rectTransform.offsetMax = new Vector2(-146f, _pageLabel.rectTransform.offsetMax.y);
+            // Everesting-uitdaging aan of uit; de voortgang staat rechtsonder in beeld.
+            var (everestingButton, everestingLabel) = UiFactory.Button(_footer, "Everesting", new Vector2(146f, -6f), 210f, 40f,
                 () => { _everesting.Toggle(); Refresh(); });
             everestingButton.GetComponent<Image>().color = new Color(0.45f, 0.36f, 0.1f, 1f);
             everestingButton.gameObject.SetActive(_everesting != null);
             _everestingLabel = everestingLabel;
+            var (stageButton, stageLabel) = UiFactory.Button(_footer, "Etappe", new Vector2(366f, -6f), 210f, 40f, StageButton);
+            stageButton.GetComponent<Image>().color = new Color(0.2f, 0.42f, 0.25f, 1f);
+            stageButton.gameObject.SetActive(_stageController != null);
+            _stageLabel = stageLabel;
             UiFactory.Button(_footer, "Volgende", new Vector2(Width - 136f, -6f), 120f, 40f, () => Page(+1)).label.text = "volgende →";
         }
 

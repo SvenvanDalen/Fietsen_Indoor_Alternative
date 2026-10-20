@@ -29,7 +29,7 @@ namespace FietsApp.Recording
             return sb.ToString().TrimEnd('\n');
         }
 
-        static void Line(StringBuilder sb, string label, string value) =>
+        internal static void Line(StringBuilder sb, string label, string value) =>
             sb.Append("<color=#bbb>").Append(label).Append(":</color>  <b>").Append(value).Append("</b>\n");
     }
 }
