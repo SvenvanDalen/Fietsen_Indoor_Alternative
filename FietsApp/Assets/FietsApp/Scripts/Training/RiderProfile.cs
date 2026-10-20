@@ -54,7 +54,10 @@ namespace FietsApp.Training
             var record = Record(climb);
             if (record == null)
             {
-                records.Add(new ClimbRecord { climb = climb, bestSeconds = seconds, bestOn = date, lastSeconds = seconds, lastOn = date, attempts = 1 });
+                records.Add(new ClimbRecord
+                {
+                    climb = climb, firstOn = date, bestSeconds = seconds, bestOn = date, lastSeconds = seconds, lastOn = date, attempts = 1,
+                });
                 return new ClimbResult(seconds, null, null);
             }
             var result = new ClimbResult(seconds, record.bestSeconds, record.lastSeconds);
@@ -71,6 +74,18 @@ namespace FietsApp.Training
 
         /// <summary>De Everesting-uitdaging over meerdere ritten (9.3).</summary>
         public EverestingChallenge everesting = new EverestingChallenge();
+
+        /// <summary>Badge van een klim (9.1): je hebt hem van voet tot top gereden.</summary>
+        public bool HasBadge(string climb) => Record(climb) != null;
+
+        /// <summary>Hoeveel van deze klimmen je al hebt uitgereden.</summary>
+        public int BadgeCount(IEnumerable<string> climbs)
+        {
+            int n = 0;
+            foreach (var c in climbs)
+                if (HasBadge(c)) n++;
+            return n;
+        }
 
         static int Clamp(int p) => p < MinGradeScale ? MinGradeScale : p > MaxGradeScale ? MaxGradeScale : p;
     }

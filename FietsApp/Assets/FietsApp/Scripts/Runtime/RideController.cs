@@ -15,6 +15,7 @@ namespace FietsApp
         [SerializeField, Range(0.15f, 0.6f)] float dragAreaM2 = 0.32f;
 
         RiderPhysics _physics;
+        FietsApp.World.Surface _surface;
         float _gradePercent;
         float _gradeScale = 1f;
 
@@ -33,6 +34,22 @@ namespace FietsApp
         /// bij als hij erboven komt. Oneindig = geen grens.
         /// </summary>
         public float SpeedLimit { get; set; } = float.PositiveInfinity;
+
+        /// <summary>
+        /// Ondergrond onder de wielen (story 4.13): de fysica rekent met zijn rolweerstand, en de trainer voelt het
+        /// verschil met asfalt als extra helling.
+        /// </summary>
+        public FietsApp.World.Surface Surface
+        {
+            get => _surface;
+            set
+            {
+                if (_surface == value) return;
+                _surface = value;
+                if (_physics != null) _physics.Parameters = CurrentParameters();
+                PushGrade();
+            }
+        }
 
         /// <summary>Of de rijder deze frame vanzelf bijremde voor een bocht.</summary>
         public bool CornerBraking { get; private set; }
@@ -100,7 +117,9 @@ namespace FietsApp
         void OnDisable() => PushGrade();
 
         /// <summary>Helling naar de trainer: die van de route maal de gevoeligheid, of vlak als de rit stilstaat.</summary>
-        void PushGrade() => Trainer?.SetGrade(isActiveAndEnabled ? _gradePercent * _gradeScale : 0f);
+        void PushGrade() => Trainer?.SetGrade(isActiveAndEnabled
+            ? _gradePercent * _gradeScale + FietsApp.World.Surfaces.TrainerGradeBonus(_surface)
+            : 0f);
 
         void OnValidate()
         {
@@ -144,7 +163,9 @@ namespace FietsApp
         RiderParameters CurrentParameters() => new RiderParameters
         {
             TotalMassKg = totalMassKg,
-            RollingResistance = rollingResistance,
+            // Op asfalt de ingestelde waarde; op andere ondergrond de hogere Crr daarvan, met hetzelfde verschil erbovenop.
+            RollingResistance = rollingResistance + FietsApp.World.Surfaces.RollingResistance(_surface)
+                                - FietsApp.World.Surfaces.RollingResistance(FietsApp.World.Surface.Asphalt),
             DragAreaM2 = dragAreaM2,
             AirDensity = RiderParameters.Default.AirDensity,
         };
