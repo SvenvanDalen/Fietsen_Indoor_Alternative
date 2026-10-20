@@ -3,15 +3,32 @@ using System.Collections.Generic;
 namespace FietsApp.Training
 {
     /// <summary>
-    /// Het lokale rijdersprofiel (stories 8.1, 8.5, 2.3 en 9.2): FTP voor zones en workouts, en per klim de
-    /// weerstandsgevoeligheid en de beste tijd. Velden in kleine letters, zodat <c>JsonUtility</c> het kan opslaan (die kent geen
-    /// dictionary, vandaar de lijst); accounts en een profiel in de cloud volgen bij E7.
+    /// Het rijdersprofiel (stories 8.1, 8.5, 2.3, 9.2 en 7.2): FTP voor zones en workouts, gewicht en max hartslag, en per
+    /// klim de weerstandsgevoeligheid en de beste tijd. Velden in kleine letters, zodat <c>JsonUtility</c> het kan opslaan (die
+    /// kent geen dictionary, vandaar de lijst). Lokaal in profiel.json; met een GitHub-account ook in een privé-Gist, zodat
+    /// het tussen apparaten meegaat (zie <see cref="ProfileMerge"/>).
     /// </summary>
     [System.Serializable]
     public sealed class RiderProfile
     {
         public const int DefaultFtpWatts = 200;
         public const int MinGradeScale = 50, MaxGradeScale = 150, DefaultGradeScale = 100;
+        public const float DefaultWeightKg = 72f, MinWeightKg = 30f, MaxWeightKg = 200f;
+
+        /// <summary>Gewicht van de fiets; samen met <see cref="weightKg"/> de massa die de fysica omhoog trapt.</summary>
+        public const float BikeMassKg = 8f;
+
+        /// <summary>Wanneer het profiel het laatst gewijzigd is (UTC, ISO 8601), voor het samenvoegen tussen apparaten (7.2).</summary>
+        public string updatedAt = "";
+
+        /// <summary>Gewicht van de rijder in kg (7.2).</summary>
+        public float weightKg = DefaultWeightKg;
+
+        /// <summary>Maximale hartslag in slagen per minuut; 0 = onbekend (7.2).</summary>
+        public int maxHeartRateBpm;
+
+        /// <summary>Rijder plus fiets, voor de fysica.</summary>
+        public float TotalMassKg => (weightKg >= MinWeightKg && weightKg <= MaxWeightKg ? weightKg : DefaultWeightKg) + BikeMassKg;
 
         /// <summary>Functional Threshold Power in watt; wordt bijgewerkt door de FTP-test (8.1).</summary>
         public int ftpWatts = DefaultFtpWatts;

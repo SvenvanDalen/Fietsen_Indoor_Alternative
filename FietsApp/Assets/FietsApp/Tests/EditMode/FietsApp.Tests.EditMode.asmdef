@@ -9,7 +9,8 @@
         "FietsApp.World",
         "FietsApp.Runtime",
         "FietsApp.Recording",
-        "FietsApp.Training"
+        "FietsApp.Training",
+        "FietsApp.Accounts"
     ],
     "includePlatforms": [
         "Editor"
