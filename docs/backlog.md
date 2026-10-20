@@ -558,8 +558,8 @@ Epic: E8 · Fase: V1 · Prio: Could · Punten: 8
 
 Als rijder wil ik een workout-editor.
 
-- [ ] Blokken slepen
-- [ ] Opslaan en delen
+- [x] Blokken slepen
+- [x] Opslaan en delen
 
 #### 8.4 Trainingsplannen voor een klim of event
 
