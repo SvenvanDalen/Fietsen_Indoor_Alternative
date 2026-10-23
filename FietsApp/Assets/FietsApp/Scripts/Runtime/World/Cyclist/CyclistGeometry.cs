@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FietsApp
 {
     /// <summary>Materiaal-slots van de fietser; elk slot is een submesh met een eigen kleur.</summary>
-    public enum CyclistSlot { Frame, Metal, Black, Tyre, Rim, Jersey, Accent, Shorts, Skin, Helmet, Shoe, Sock, Lens, Bottle, Count }
+    public enum CyclistSlot { Frame, Metal, Black, Tyre, Rim, Jersey, Accent, Shorts, Skin, Helmet, Shoe, Sock, Lens, Bottle, Hair, Count }
 
     /// <summary>
     /// Maten van fiets en rijder in meters, in het assenstelsel van de fiets: x naar rechts, y omhoog, z vooruit, de

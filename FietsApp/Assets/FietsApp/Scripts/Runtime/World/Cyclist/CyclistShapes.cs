@@ -51,77 +51,153 @@ namespace FietsApp
             var torsoRotation = Quaternion.LookRotation(back, torsoDir); // y langs de romp, z naar de rug
             var spineStart = g.Pelvis + new Vector3(0f, 0.03f, 0.03f);
             float spineLength = Vector3.Distance(spineStart, g.ShoulderCenter) + 0.05f;
-            Vector3 Spine(float f) => spineStart + torsoDir * (f * spineLength) + back * (0.028f * Mathf.Sin(Mathf.PI * f));
+            Vector3 Spine(float f) => spineStart + torsoDir * (f * spineLength) + back * (0.03f * Mathf.Sin(Mathf.PI * f));
+            // Punt in de romp: f langs de wervelkolom, x opzij, z naar de rug.
+            Vector3 T(float f, float x, float z) => Spine(f) + Vector3.right * x + back * z;
 
             sdf.Bone = BoneTorso;
             // Bekken en billen in de koersbroek.
             sdf.Paint((int)CyclistSlot.Shorts);
-            sdf.Ellipsoid(g.Pelvis + new Vector3(0f, 0.025f, 0.05f), torsoRotation, new Vector3(0.145f, 0.11f, 0.1f), 0f);
+            sdf.Ellipsoid(g.Pelvis + new Vector3(0f, 0.025f, 0.05f), torsoRotation, new Vector3(0.14f, 0.105f, 0.098f), 0f);
             for (int side = -1; side <= 1; side += 2)
-                sdf.Ellipsoid(g.Pelvis + new Vector3(0.06f * side, 0f, 0.005f), torsoRotation, new Vector3(0.067f, 0.078f, 0.07f), 0.04f);
+                sdf.Ellipsoid(g.Pelvis + new Vector3(0.062f * side, -0.002f, 0.0f), torsoRotation, new Vector3(0.07f, 0.084f, 0.074f), 0.045f);
 
-            // Romp: buik, borstkas en schoudergordel, vloeiend.
-            // Langs de rug: broek, shirt, band, shirt.
+            // Romp als een reeks ovale doorsneden van heup tot taille (breedte, diepte, verschuiving naar de rug), met
+            // daarboven borstkas, schoudergordel en spieren; langs de rug: broek, shirt, band, shirt.
             sdf.PaintAlong(spineStart, spineStart + torsoDir * spineLength, new[] { 0.1f, 0.5f, 0.6f },
                 new[] { (int)CyclistSlot.Shorts, (int)CyclistSlot.Jersey, (int)CyclistSlot.Accent, (int)CyclistSlot.Jersey });
-            sdf.Ellipsoid(Spine(0.3f), torsoRotation, new Vector3(0.138f, 0.17f, 0.1f), 0.07f);
-            sdf.Ellipsoid(Spine(0.66f), torsoRotation, new Vector3(0.162f, 0.2f, 0.118f), 0.07f);
-            var shoulderR = g.Arm(true).shoulder;
-            var shoulderL = g.Arm(false).shoulder;
-            sdf.Cone(shoulderL + back * 0.01f, shoulderR + back * 0.01f, 0.062f, 0.062f, 0.06f);
-            sdf.Cone(Spine(0.82f) + back * 0.03f, Spine(1f) + back * 0.01f, 0.07f, 0.055f, 0.05f); // monnikskapspier
-
-            // Nek en hoofd.
-            var head = g.HeadCenter;
-            var neckTop = head + new Vector3(0f, -0.055f, -0.025f);
-            sdf.PaintAlong(Spine(0.92f), neckTop, new[] { 0.32f }, new[] { (int)CyclistSlot.Jersey, (int)CyclistSlot.Skin }); // kraag
-            sdf.Cone(Spine(0.92f), neckTop, 0.052f, 0.046f, 0.035f);
-            sdf.Paint((int)CyclistSlot.Skin);
-            sdf.Ellipsoid(head, Quaternion.identity, new Vector3(0.077f, 0.097f, 0.095f), 0.02f);
-            sdf.Ellipsoid(head + new Vector3(0f, -0.052f, 0.04f), Quaternion.Euler(22f, 0f, 0f), new Vector3(0.058f, 0.04f, 0.056f), 0.035f); // kaak
-            sdf.Ellipsoid(head + new Vector3(0f, -0.008f, 0.094f), Quaternion.Euler(-18f, 0f, 0f), new Vector3(0.012f, 0.022f, 0.014f), 0.012f); // neus
+            var sections = new[]
+            {
+                new Vector4(0.10f, 0.142f, 0.1f, 0f), new Vector4(0.24f, 0.136f, 0.093f, 0f), new Vector4(0.38f, 0.128f, 0.09f, -0.004f),
+                new Vector4(0.52f, 0.133f, 0.097f, -0.008f),
+            };
+            for (int i = 0; i < sections.Length - 1; i++)
+            {
+                Vector4 a = sections[i], b = sections[i + 1];
+                sdf.FlatCone(T(a.x, 0f, a.w), T(b.x, 0f, b.w), a.y, b.y, back, a.z / a.y, b.z / b.y, i == 0 ? 0.05f : 0.03f);
+            }
+            sdf.Ellipsoid(T(0.68f, 0f, -0.012f), torsoRotation, new Vector3(0.148f, 0.18f, 0.108f), 0.05f);   // borstkas
+            sdf.Ellipsoid(T(0.88f, 0f, 0.008f), torsoRotation, new Vector3(0.158f, 0.085f, 0.098f), 0.05f);  // schoudergordel
             for (int side = -1; side <= 1; side += 2)
-                sdf.Ellipsoid(head + new Vector3(0.076f * side, -0.004f, -0.004f), Quaternion.identity, new Vector3(0.011f, 0.027f, 0.018f), 0.008f); // oren
+            {
+                sdf.Ellipsoid(T(0.78f, 0.068f * side, -0.088f), torsoRotation, new Vector3(0.066f, 0.058f, 0.038f), 0.045f); // borstspier
+                sdf.Ellipsoid(T(0.8f, 0.07f * side, 0.075f), torsoRotation, new Vector3(0.058f, 0.07f, 0.032f), 0.045f);     // schouderblad
+                sdf.Ellipsoid(T(0.55f, 0.105f * side, 0.025f), torsoRotation, new Vector3(0.04f, 0.13f, 0.06f), 0.05f);      // brede rugspier
+            }
 
-            // Armen: schouder, bovenarm, onderarm en een hand in een handschoen om de remgreep.
+            // Monnikskapspieren van de nek naar de schouders, dan de deltaspieren.
+            var neckBase = T(0.93f, 0f, 0f);
+            for (int side = -1; side <= 1; side += 2)
+            {
+                var (shoulder, elbow, _) = g.Arm(side > 0);
+                sdf.FlatCone(T(0.95f, 0f, 0.03f), shoulder + Vector3.up * 0.022f + back * 0.012f, 0.05f, 0.03f, back, 0.6f, 0.75f, 0.045f);
+                var upper = (elbow - shoulder).normalized;
+                sdf.Ellipsoid(shoulder + Vector3.right * (0.01f * side) + upper * 0.025f, Quaternion.LookRotation(upper, back), new Vector3(0.05f, 0.05f, 0.075f), 0.045f);
+            }
+
+            // Nek met kraag, en het hoofd.
+            var head = g.HeadCenter;
+            Vector3 H(float x, float y, float z) => head + new Vector3(x, y, z);
+            var neckTop = H(0f, -0.045f, -0.03f);
+            sdf.PaintAlong(neckBase, neckTop, new[] { 0.3f }, new[] { (int)CyclistSlot.Jersey, (int)CyclistSlot.Skin });
+            sdf.Cone(neckBase, neckTop, 0.056f, 0.047f, 0.04f);
+            sdf.Cone(Vector3.Lerp(neckBase, neckTop, 0.1f), Vector3.Lerp(neckBase, neckTop, 0.27f), 0.061f, 0.058f, 0.008f); // kraag
+            for (int side = -1; side <= 1; side += 2)
+                sdf.Cone(H(0.046f * side, -0.05f, -0.016f), neckBase - back * 0.05f + Vector3.right * (0.012f * side), 0.011f, 0.012f, 0.025f); // halsspier
+            sdf.Paint((int)CyclistSlot.Skin);
+
+            sdf.Ellipsoid(H(0f, 0.022f, -0.014f), Quaternion.identity, new Vector3(0.074f, 0.082f, 0.096f), 0.02f);       // schedel
+            sdf.Ellipsoid(H(0f, -0.022f, 0.03f), Quaternion.Euler(8f, 0f, 0f), new Vector3(0.058f, 0.07f, 0.066f), 0.03f);  // gezicht
+            sdf.Ellipsoid(H(0f, -0.092f, 0.072f), Quaternion.identity, new Vector3(0.018f, 0.016f, 0.016f), 0.035f);       // kin
+            for (int side = -1; side <= 1; side += 2)
+            {
+                sdf.Ellipsoid(H(0.044f * side, -0.012f, 0.068f), Quaternion.identity, new Vector3(0.016f, 0.012f, 0.016f), 0.02f); // jukbeen
+                sdf.Ellipsoid(H(0.036f * side, -0.04f, 0.062f), Quaternion.identity, new Vector3(0.018f, 0.022f, 0.02f), 0.03f);  // wang
+                sdf.Chain(new[] { H(0.047f * side, -0.05f, 0f), H(0.034f * side, -0.084f, 0.042f), H(0.011f * side, -0.096f, 0.066f) },
+                    new[] { 0.013f, 0.012f, 0.013f }, 0.025f); // kaaklijn
+                sdf.Ellipsoid(H(0.076f * side, -0.006f, -0.006f), Quaternion.Euler(0f, 12f * side, 0f), new Vector3(0.01f, 0.028f, 0.019f), 0.008f); // oor
+                sdf.Ellipsoid(H(0.084f * side, -0.01f, -0.002f), Quaternion.identity, new Vector3(0.006f, 0.013f, 0.009f), 0.003f, subtract: true);
+                sdf.Sphere(H(0.011f * side, -0.031f, 0.097f), 0.007f, 0.006f); // neusvleugel
+            }
+            sdf.Cone(H(0f, 0.006f, 0.088f), H(0f, -0.026f, 0.106f), 0.007f, 0.0105f, 0.01f);                               // neus
+            sdf.Ellipsoid(H(0f, -0.052f, 0.092f), Quaternion.identity, new Vector3(0.019f, 0.0055f, 0.007f), 0.016f);       // bovenlip
+            sdf.Ellipsoid(H(0f, -0.061f, 0.089f), Quaternion.identity, new Vector3(0.016f, 0.006f, 0.007f), 0.018f);        // onderlip
+            sdf.Paint((int)CyclistSlot.Hair);
+            sdf.Ellipsoid(H(0f, 0.02f, -0.024f), Quaternion.identity, new Vector3(0.078f, 0.086f, 0.09f), 0f);              // kort haar
+
+            // Armen: biceps en triceps, elleboog, onderarm, en een hand in een handschoen zonder vingers om de remgreep.
             for (int side = -1; side <= 1; side += 2)
             {
                 var (shoulder, elbow, hand) = g.Arm(side > 0);
-                var upper = elbow - shoulder;
+                var upper = (elbow - shoulder).normalized;
+                var wrist = hand - (hand - elbow).normalized * 0.055f;
+                var lower = (wrist - elbow).normalized;
+                var inside = Vector3.ProjectOnPlane(lower, upper).normalized; // kant van de biceps
                 // Eén kleurlijn voor de hele arm: mouw, boord, huid en vanaf de pols de handschoen.
                 var reach = hand - shoulder;
                 float elbowAt = Vector3.Dot(elbow - shoulder, reach) / reach.sqrMagnitude;
-                sdf.PaintAlong(shoulder, hand, new[] { 0.45f * elbowAt, 0.53f * elbowAt, 1f - 0.065f / reach.magnitude },
+                sdf.PaintAlong(shoulder, hand, new[] { 0.45f * elbowAt, 0.53f * elbowAt, 1f - 0.062f / reach.magnitude },
                     new[] { (int)CyclistSlot.Jersey, (int)CyclistSlot.Accent, (int)CyclistSlot.Skin, (int)CyclistSlot.Black });
-                sdf.Ellipsoid(shoulder + new Vector3(0.012f * side, 0f, 0f), Quaternion.LookRotation(upper), new Vector3(0.06f, 0.064f, 0.075f), 0.045f);
-                sdf.Cone(shoulder, elbow, 0.05f, 0.039f, 0.035f);
-                var wrist = hand - (hand - elbow).normalized * 0.05f;
-                sdf.Cone(elbow, wrist, 0.041f, 0.028f, 0.02f);
-                sdf.Ellipsoid(Vector3.Lerp(elbow, wrist, 0.3f), Quaternion.LookRotation(wrist - elbow), new Vector3(0.04f, 0.038f, 0.08f), 0.03f);
-                sdf.Ellipsoid(hand, Quaternion.LookRotation(hand - elbow), new Vector3(0.04f, 0.03f, 0.055f), 0.02f);
-                sdf.Ellipsoid(hand + new Vector3(0.004f * side, -0.022f, 0.028f), Quaternion.Euler(30f, 0f, 0f), new Vector3(0.038f, 0.03f, 0.028f), 0.018f); // vingers om de greep
+                sdf.Cone(shoulder, elbow, 0.044f, 0.034f, 0.04f);
+                sdf.Ellipsoid(Vector3.Lerp(shoulder, elbow, 0.55f) + inside * 0.014f, Quaternion.LookRotation(upper, inside), new Vector3(0.033f, 0.03f, 0.085f), 0.035f); // biceps
+                sdf.Ellipsoid(Vector3.Lerp(shoulder, elbow, 0.42f) - inside * 0.016f, Quaternion.LookRotation(upper, inside), new Vector3(0.036f, 0.032f, 0.1f), 0.035f); // triceps
+                sdf.Sphere(elbow - inside * 0.008f, 0.034f, 0.03f);
+                sdf.FlatCone(elbow, wrist, 0.038f, 0.026f, Vector3.up, 1f, 0.72f, 0.03f);
+                sdf.Ellipsoid(Vector3.Lerp(elbow, wrist, 0.28f) + inside * 0.006f, Quaternion.LookRotation(lower, inside), new Vector3(0.04f, 0.036f, 0.085f), 0.035f); // onderarmspier
+
+                // Hand: de handpalm op de remgreep, vingers naar voren eroverheen gekruld, de duim aan de binnenkant.
+                var q = Quaternion.Euler(-18f, 0f, 0f);
+                Vector3 Hand(float x, float y, float z) => hand + q * new Vector3(x * side, y, z);
+                sdf.FlatCone(wrist, Hand(0f, 0.004f, 0.012f), 0.026f, 0.034f, q * Vector3.up, 0.72f, 0.6f, 0.02f);
+                sdf.Ellipsoid(Hand(0f, 0f, 0.012f), q, new Vector3(0.041f, 0.02f, 0.042f), 0.02f);
+                var fingers = new[] { new Vector2(-0.025f, 0.075f), new Vector2(-0.008f, 0.08f), new Vector2(0.009f, 0.076f), new Vector2(0.025f, 0.062f) };
+                foreach (var f in fingers)
+                {
+                    float k = f.y / 0.08f;
+                    var path = new List<Vector3> { Hand(f.x, -0.002f, 0.04f), Hand(f.x, -0.012f * k, 0.04f + 0.024f * k), Hand(f.x, -0.036f * k, 0.04f + 0.036f * k), Hand(f.x * 0.95f, -0.056f * k, 0.04f + 0.028f * k) };
+                    sdf.PaintAlong(path[0], path[3], new[] { 0.3f }, new[] { (int)CyclistSlot.Black, (int)CyclistSlot.Skin });
+                    sdf.Chain(Smooth(path, 3), Smooth(new[] { 0.0085f, 0.008f, 0.0075f, 0.0068f }, 3), 0.01f);
+                }
+                var thumb = new List<Vector3> { Hand(-0.03f, -0.006f, -0.004f), Hand(-0.04f, -0.018f, 0.028f), Hand(-0.036f, -0.03f, 0.054f) };
+                sdf.PaintAlong(thumb[0], thumb[2], new[] { 0.55f }, new[] { (int)CyclistSlot.Black, (int)CyclistSlot.Skin });
+                sdf.Chain(Smooth(thumb, 3), Smooth(new[] { 0.013f, 0.0105f, 0.0092f }, 3), 0.015f);
             }
 
-            // Benen in de ruststand, elk met een eigen dij- en scheenbot.
+            // Benen in de ruststand, elk met een eigen dij- en scheenbot: dijspieren met de druppel boven de knie,
+            // hamstrings, knieschijf, kuit met twee koppen en de achillespees.
             for (int side = 0; side < 2; side++)
             {
                 bool right = side == 0;
+                var inner = right ? Vector3.left : Vector3.right;
                 var (hip, knee, ankle, _) = g.Leg(CyclistGeometry.RestCrank, right);
                 var thighDir = (knee - hip).normalized;
-                var top = Vector3.ProjectOnPlane(Vector3.up, thighDir).normalized;
+                var shinDir = (ankle - knee).normalized;
+                var under = Vector3.ProjectOnPlane(ankle - knee, thighDir).normalized; // hamstringkant
+                var front = -under;
+                var calfSide = Vector3.ProjectOnPlane(hip - knee, shinDir).normalized;
+                var kneeFront = (front - calfSide).normalized;
+
                 sdf.Bone = right ? BoneThighRight : BoneThighLeft;
                 sdf.PaintAlong(hip, knee, new[] { 0.66f }, new[] { (int)CyclistSlot.Shorts, (int)CyclistSlot.Skin });
-                sdf.Cone(hip, knee, 0.082f, 0.052f, 0.06f);
-                sdf.Ellipsoid(Vector3.Lerp(hip, knee, 0.5f) + top * 0.018f, Quaternion.LookRotation(thighDir, top), new Vector3(0.068f, 0.066f, 0.17f), 0.05f); // dijspier
-                var shinDir = (ankle - knee).normalized;
-                var calfSide = Vector3.ProjectOnPlane(Vector3.back, shinDir).normalized;
+                sdf.Cone(hip, knee, 0.076f, 0.047f, 0.06f);
+                var thighRotation = Quaternion.LookRotation(thighDir, front);
+                sdf.Ellipsoid(Vector3.Lerp(hip, knee, 0.45f) + front * 0.022f - inner * 0.006f, thighRotation, new Vector3(0.062f, 0.052f, 0.19f), 0.05f); // dijspieren
+                sdf.Ellipsoid(Vector3.Lerp(hip, knee, 0.8f) + front * 0.012f + inner * 0.03f, thighRotation, new Vector3(0.03f, 0.03f, 0.06f), 0.03f);   // druppel
+                sdf.Ellipsoid(Vector3.Lerp(hip, knee, 0.45f) + under * 0.02f, thighRotation, new Vector3(0.056f, 0.048f, 0.18f), 0.05f);               // hamstrings
+                sdf.Sphere(knee + kneeFront * 0.004f, 0.045f, 0.03f);
+                sdf.Ellipsoid(knee + kneeFront * 0.036f, Quaternion.LookRotation(kneeFront, thighDir - shinDir), new Vector3(0.022f, 0.026f, 0.012f), 0.02f); // knieschijf
+
                 sdf.Bone = right ? BoneShinRight : BoneShinLeft;
                 sdf.PaintAlong(knee, ankle, new[] { 0.78f }, new[] { (int)CyclistSlot.Skin, (int)CyclistSlot.Sock });
-                sdf.Cone(knee, ankle, 0.049f, 0.034f, 0.035f);
-                sdf.Ellipsoid(Vector3.Lerp(knee, ankle, 0.3f) + calfSide * 0.022f, Quaternion.LookRotation(shinDir, calfSide), new Vector3(0.046f, 0.05f, 0.12f), 0.04f); // kuit
+                sdf.Cone(knee, ankle, 0.042f, 0.031f, 0.035f);
+                var calfRotation = Quaternion.LookRotation(shinDir, calfSide);
+                for (int head2 = -1; head2 <= 1; head2 += 2)
+                    sdf.Ellipsoid(Vector3.Lerp(knee, ankle, 0.3f) + calfSide * 0.026f + Vector3.right * (0.014f * head2), calfRotation,
+                        new Vector3(0.03f, 0.036f, 0.1f), 0.035f); // kuit
+                sdf.Cone(Vector3.Lerp(knee, ankle, 0.5f) + calfSide * 0.02f, ankle + calfSide * 0.022f, 0.026f, 0.012f, 0.03f); // achillespees
             }
 
-            return SurfaceNets.Build(sdf, 0.0055f, slots, BoneCount, 0.025f);
+            return SurfaceNets.Build(sdf, 0.0045f, slots, BoneCount, 0.025f);
         }
 
         // ---- Helm en bril ----
@@ -151,6 +227,18 @@ namespace FietsApp
                 }
                 for (int i = 0; i < path.Count - 1; i++) sdf.Cone(path[i], path[i + 1], 0.011f, 0.011f, 0.004f, subtract: true);
             }
+
+            // Kinriem: voor en achter het oor langs, onder het oor samen, en onder de kin door.
+            sdf.Paint((int)CyclistSlot.Black);
+            Vector3 H(float x, float y, float z) => g.HeadCenter + new Vector3(x, y, z);
+            for (int side = -1; side <= 1; side += 2)
+            {
+                var join = H(0.066f * side, -0.05f, 0.012f);
+                sdf.Chain(new[] { H(0.074f * side, 0.03f, 0.04f), H(0.073f * side, -0.01f, 0.03f), join }, new[] { 0.0035f, 0.0035f, 0.0035f }, 0.002f);
+                sdf.Chain(new[] { H(0.078f * side, 0.03f, -0.05f), H(0.073f * side, -0.025f, -0.02f), join }, new[] { 0.0035f, 0.0035f, 0.0035f }, 0.002f);
+                sdf.Chain(new[] { join, H(0.054f * side, -0.094f, 0.03f), H(0.02f * side, -0.124f, 0.05f) }, new[] { 0.004f, 0.004f, 0.004f }, 0.004f);
+            }
+            sdf.Box(H(0f, -0.126f, 0.05f), Quaternion.identity, new Vector3(0.016f, 0.005f, 0.009f), 0.003f, 0.004f); // gesp
             return SurfaceNets.Build(sdf, 0.0038f, slots);
         }
 
@@ -168,7 +256,14 @@ namespace FietsApp
             {
                 var mid = (points[i] + points[i + 1]) * 0.5f;
                 var outward = new Vector3(mid.x - g.HeadCenter.x, 0f, mid.z - g.HeadCenter.z);
-                sdf.FlatCone(points[i], points[i + 1], 0.019f, 0.019f, outward, 0.3f, 0.006f);
+                sdf.FlatCone(points[i], points[i + 1], 0.019f, 0.019f, outward, 0.2f, 0f);
+            }
+            // Pootjes naar de oren.
+            sdf.Paint((int)CyclistSlot.Black);
+            foreach (var end in new[] { points[0], points[points.Count - 1] })
+            {
+                float side = Mathf.Sign(end.x - g.HeadCenter.x);
+                sdf.Cone(end, g.HeadCenter + new Vector3(0.08f * side, 0.012f, -0.035f), 0.003f, 0.0025f, 0.003f);
             }
             return SurfaceNets.Build(sdf, 0.0028f, slots);
         }
@@ -276,7 +371,7 @@ namespace FietsApp
                 sdf.Ellipsoid(hood + new Vector3(0f, 0.016f, 0.036f), Quaternion.Euler(-40f, 0f, 0f), new Vector3(0.012f, 0.012f, 0.016f), 0.01f); // knop
                 sdf.Paint((int)CyclistSlot.Metal);
                 sdf.Chain(Smooth(new List<Vector3> { hood + new Vector3(0f, 0.004f, 0.045f), hood + new Vector3(0f, -0.04f, 0.07f), hood + new Vector3(0.004f * side, -0.1f, 0.065f), hood + new Vector3(0.008f * side, -0.13f, 0.045f) }, 3),
-                    Smooth(new[] { 0.007f, 0.0065f, 0.006f, 0.005f }, 3), 0.004f);
+                    Smooth(new[] { 0.0095f, 0.009f, 0.0082f, 0.0068f }, 3), 0.004f);
                 sdf.Paint((int)CyclistSlot.Black);
             }
 

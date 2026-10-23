@@ -110,7 +110,7 @@ namespace FietsApp
             }.Schedule(activeCount, 1).Complete();
 
             Smooth(positions, triangles, 6);
-            Snap(positions, triangles, prims, cell);
+            Snap(positions, triangles, prims, near, nearCount, vertexBlock, cell);
             new NormalJob { Prims = prims, Near = near, NearCount = nearCount, Block = vertexBlock, Positions = positions, Normals = normals, Eps = cell * 0.5f }
                 .Schedule(count, 64).Complete();
 
@@ -181,40 +181,103 @@ namespace FietsApp
         }
 
         /// <summary>
-        /// Maakt kleurgrenzen strak: een hoekpunt tussen driehoeken van verschillende kleur schuift langs de kleurlijn
-        /// van zijn onderdeel naar het dichtstbijzijnde breekpunt, zodat de rand van een mouw of broekspijp een rechte
-        /// lijn wordt in plaats van een trap over de driehoeken.
+        /// Maakt kleurgrenzen strak: een hoekpunt tussen driehoeken van verschillende kleur schuift naar de echte grens,
+        /// zodat de rand van een mouw, kraag of haarlijn een vloeiende lijn wordt in plaats van een trap over de
+        /// driehoeken. Wisselt de kleur langs de kleurlijn van één onderdeel, dan schuift het hoekpunt langs die lijn
+        /// naar het breekpunt; grenzen twee onderdelen met elk hun eigen kleur, dan schuift het over het oppervlak naar
+        /// waar ze even dichtbij zijn.
         /// </summary>
-        static void Snap(NativeArray<float3> positions, NativeList<int4> triangles, NativeArray<SdfPrim> prims, float cell)
+        static void Snap(NativeArray<float3> positions, NativeList<int4> triangles, NativeArray<SdfPrim> prims, NativeArray<int> near,
+            NativeArray<int> nearCount, NativeArray<int> block, float cell)
         {
             int count = positions.Length;
-            var slot = new int[count];
-            var prim = new int[count];
-            var mixed = new bool[count];
-            for (int v = 0; v < count; v++) { slot[v] = -1; prim[v] = -1; }
+            // Per hoekpunt de eerste twee (onderdeel, slot)-paren met een verschillend slot.
+            var pairs = new NativeArray<int4>(count, Allocator.TempJob);
+            for (int v = 0; v < count; v++) pairs[v] = new int4(-1);
             for (int t = 0; t < triangles.Length; t++)
             {
                 var tri = triangles[t];
-                int s = tri.w % SlotSpan, owner = tri.w / SlotSpan - 1;
-                foreach (int v in new[] { tri.x, tri.y, tri.z })
+                int slot = tri.w % SlotSpan, owner = tri.w / SlotSpan - 1;
+                if (owner < 0) continue;
+                for (int e = 0; e < 3; e++)
                 {
-                    if (slot[v] < 0) slot[v] = s;
-                    else if (slot[v] != s) mixed[v] = true;
-                    if (owner >= 0 && prims[owner].PaintsAlong) prim[v] = owner;
+                    int v = e == 0 ? tri.x : e == 1 ? tri.y : tri.z;
+                    var pair = pairs[v];
+                    if (pair.x < 0) pair.xy = new int2(owner, slot);
+                    else if (pair.z < 0 && pair.y != slot) pair.zw = new int2(owner, slot);
+                    pairs[v] = pair;
                 }
             }
-            for (int v = 0; v < count; v++)
+            new SnapJob { Prims = prims, Near = near, NearCount = nearCount, Block = block, Pairs = pairs, Positions = positions, Cell = cell }
+                .Schedule(count, 64).Complete();
+            pairs.Dispose();
+        }
+
+        [BurstCompile(CompileSynchronously = true)]
+        struct SnapJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<SdfPrim> Prims;
+            [ReadOnly] public NativeArray<int> Near, NearCount, Block;
+            [ReadOnly] public NativeArray<int4> Pairs;
+            public NativeArray<float3> Positions;
+            public float Cell;
+
+            public void Execute(int v)
             {
-                if (!mixed[v] || prim[v] < 0) continue;
-                var p = prims[prim[v]];
-                float t = SdfMath.Along(p, positions[v]);
-                float best = 9f;
-                for (int b = 0; b < 4; b++)
-                    if (p.Breaks[b] < 8f && math.abs(p.Breaks[b] - t) < math.abs(best - t)) best = p.Breaks[b];
-                var axis = p.PaintB - p.PaintA;
-                float shift = (best - t) * math.length(axis);
-                if (math.abs(shift) < cell * 1.5f) positions[v] += math.normalize(axis) * shift;
+                var pair = Pairs[v];
+                if (pair.z < 0) return;
+                var start = Positions[v];
+                var p = start;
+                var a = Prims[pair.x];
+                var b = Prims[pair.z];
+                bool alongA = SdfMath.Paint(a, p) == SdfMath.Paint(b, p) || pair.x == pair.z;
+                if (alongA && (a.PaintsAlong || b.PaintsAlong))
+                {
+                    // Binnen één kleurlijn: naar het dichtstbijzijnde breekpunt.
+                    var rule = a.PaintsAlong ? a : b;
+                    float t = SdfMath.Along(rule, p), best = 9f;
+                    for (int i = 0; i < 4; i++)
+                        if (rule.Breaks[i] < 8f && math.abs(rule.Breaks[i] - t) < math.abs(best - t)) best = rule.Breaks[i];
+                    if (best > 8f) return;
+                    var axis = rule.PaintB - rule.PaintA;
+                    p += math.normalize(axis) * ((best - t) * math.length(axis));
+                }
+                else if (!alongA)
+                {
+                    // Tussen twee onderdelen: over het oppervlak naar waar ze even ver zijn.
+                    int offset = Block[v] * MaxNear, n = NearCount[Block[v]];
+                    for (int step = 0; step < 3; step++)
+                    {
+                        float eps = Cell * 0.25f;
+                        float f = Difference(a, b, p);
+                        var df = new float3(
+                            Difference(a, b, p + new float3(eps, 0f, 0f)) - Difference(a, b, p - new float3(eps, 0f, 0f)),
+                            Difference(a, b, p + new float3(0f, eps, 0f)) - Difference(a, b, p - new float3(0f, eps, 0f)),
+                            Difference(a, b, p + new float3(0f, 0f, eps)) - Difference(a, b, p - new float3(0f, 0f, eps))) / (2f * eps);
+                        var normal = math.normalizesafe(SdfMath.Gradient(Prims, Near, offset, n, p, eps));
+                        var tangent = df - normal * math.dot(df, normal);
+                        float t2 = math.lengthsq(tangent);
+                        if (t2 < 1e-6f) return;
+                        p -= tangent * (f / t2);
+                    }
+                }
+                else return;
+                if (math.distance(p, start) > Cell * 1.5f) return;
+
+                // Terug op het oppervlak.
+                {
+                    int offset = Block[v] * MaxNear, n = NearCount[Block[v]];
+                    var g = SdfMath.Gradient(Prims, Near, offset, n, p, Cell * 0.25f);
+                    float g2 = math.lengthsq(g);
+                    if (g2 > 1e-8f) p -= g * (SdfMath.Evaluate(Prims, Near, offset, n, p, out _) / g2);
+                }
+                if (math.distance(p, start) <= Cell * 1.5f) Positions[v] = p;
             }
+
+            // Nul op de grens: twee onderdelen even dichtbij, of een uitsnede die precies het oppervlak raakt.
+            static float Difference(SdfPrim a, SdfPrim b, float3 p) => Side(a, p) - Side(b, p);
+
+            static float Side(SdfPrim prim, float3 p) => prim.Subtract != 0 ? -SdfMath.Single(prim, p) : SdfMath.Single(prim, p);
         }
 
         /// <summary>Normaal van het veld op elk (gladgestreken) hoekpunt.</summary>

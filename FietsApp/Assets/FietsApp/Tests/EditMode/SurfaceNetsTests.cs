@@ -68,6 +68,36 @@ namespace FietsApp.Tests
         }
 
         [Test]
+        public void ColourBoundary_BetweenTwoParts_FollowsWhereTheyMeet()
+        {
+            // Twee even grote bollen met elk een eigen kleur: de grens ligt waar ze even dichtbij zijn, het vlak x = 0.
+            var sdf = new Sdf();
+            sdf.Paint(1);
+            sdf.Sphere(new Vector3(-0.04f, 0f, 0f), 0.06f, 0f);
+            sdf.Paint(2);
+            sdf.Sphere(new Vector3(0.04f, 0f, 0f), 0.06f, 0.02f);
+            var data = SurfaceNets.Build(sdf, 0.008f, 3);
+
+            float leftMax = float.MinValue, rightMin = float.MaxValue;
+            foreach (int i in data.Triangles[1]) leftMax = Mathf.Max(leftMax, data.Vertices[i].x);
+            foreach (int i in data.Triangles[2]) rightMin = Mathf.Min(rightMin, data.Vertices[i].x);
+            Assert.AreEqual(0f, leftMax, 0.001f);
+            Assert.AreEqual(0f, rightMin, 0.001f);
+        }
+
+        [Test]
+        public void TaperedFlatCone_GetsFlatterTowardsTheEnd()
+        {
+            // Rond aan het begin, aan het eind half zo dik in x.
+            var sdf = new Sdf();
+            sdf.FlatCone(Vector3.zero, new Vector3(0f, 0.2f, 0f), 0.05f, 0.05f, Vector3.right, 1f, 0.5f, 0f);
+            Assert.AreEqual(0f, sdf.Distance(new Vector3(0.05f, 0f, 0f)), 0.001f);
+            Assert.AreEqual(0f, sdf.Distance(new Vector3(0f, 0.2f, 0.05f)), 0.001f);
+            Assert.AreEqual(0f, sdf.Distance(new Vector3(0.025f, 0.2f, 0f)), 0.001f);
+            Assert.Greater(sdf.Distance(new Vector3(0.04f, 0.2f, 0f)), 0.005f);
+        }
+
+        [Test]
         public void Body_BendsAtKneeAndHip()
         {
             var body = CyclistShapes.For(BikeKind.Allround).Body;

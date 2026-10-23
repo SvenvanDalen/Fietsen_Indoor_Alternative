@@ -214,7 +214,7 @@ namespace FietsApp
             TyreSlot = (int)CyclistSlot.Tyre, RimSlot = (int)CyclistSlot.Rim, Jersey = (int)CyclistSlot.Jersey,
             Accent = (int)CyclistSlot.Accent, Shorts = (int)CyclistSlot.Shorts, Skin = (int)CyclistSlot.Skin,
             Helmet = (int)CyclistSlot.Helmet, Shoe = (int)CyclistSlot.Shoe, Sock = (int)CyclistSlot.Sock,
-            Lens = (int)CyclistSlot.Lens, Bottle = (int)CyclistSlot.Bottle;
+            Lens = (int)CyclistSlot.Lens, Bottle = (int)CyclistSlot.Bottle, Hair = (int)CyclistSlot.Hair;
 
         void BuildWheel(MeshKit k, bool rear)
         {
@@ -327,6 +327,7 @@ namespace FietsApp
             slots[Sock] = M("Sok", new Color(0.96f, 0.96f, 0.96f), 0.15f);
             slots[Lens] = M("Glas", new Color(0.05f, 0.06f, 0.1f), 0.95f, 0.7f);
             slots[Bottle] = M("Bidon", Hex(avatar.AccentColor), 0.4f);
+            slots[Hair] = M("Haar", new Color(0.13f, 0.09f, 0.06f), 0.25f);
             return slots;
         }
 

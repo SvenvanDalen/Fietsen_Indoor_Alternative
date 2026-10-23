@@ -20,7 +20,7 @@ namespace FietsApp
         public float3 Radii;         // ellipsoïde: stralen; blok: halve maten
         public quaternion Inverse;
         public float3 Side;          // afgeplatte kegel: de richting die smaller wordt
-        public float Flat;           // breedte opzij gedeeld door de straal (1 = rond)
+        public float Flat, FlatB;    // breedte opzij gedeeld door de straal, aan begin en eind (1 = rond)
         public float Blend;          // zachtheid van de overgang naar de rest (m)
         public int Subtract;
         public int Bone;
@@ -75,26 +75,38 @@ namespace FietsApp
         public void Cone(Vector3 a, Vector3 b, float ra, float rb, float blend, bool subtract = false)
         {
             var p = New(SdfPrim.Cone, blend, subtract);
-            p.A = a; p.B = b; p.Ra = ra; p.Rb = rb; p.Flat = 1f;
+            p.A = a; p.B = b; p.Ra = ra; p.Rb = rb;
             Add(p, Vector3.Min(a - Vector3.one * ra, b - Vector3.one * rb), Vector3.Max(a + Vector3.one * ra, b + Vector3.one * rb));
         }
 
         /// <summary>Kegel met een platte doorsnede: in de richting <paramref name="side"/> maar <paramref name="flat"/> keer zo dik.</summary>
-        public void FlatCone(Vector3 a, Vector3 b, float ra, float rb, Vector3 side, float flat, float blend)
+        public void FlatCone(Vector3 a, Vector3 b, float ra, float rb, Vector3 side, float flat, float blend) =>
+            FlatCone(a, b, ra, rb, side, flat, flat, blend);
+
+        /// <summary>
+        /// Kegel met een platte doorsnede die verloopt: aan het begin <paramref name="flatA"/>, aan het eind
+        /// <paramref name="flatB"/> keer zo dik in de richting <paramref name="side"/>. Een keten hiervan is een
+        /// vloeiende romp of ledemaat met ovale doorsneden.
+        /// </summary>
+        public void FlatCone(Vector3 a, Vector3 b, float ra, float rb, Vector3 side, float flatA, float flatB, float blend)
         {
             var p = New(SdfPrim.Cone, blend, false);
             p.A = a; p.B = b; p.Ra = ra; p.Rb = rb;
             p.Side = Vector3.ProjectOnPlane(side, (b - a).normalized).normalized;
-            p.Flat = flat;
-            float r = Mathf.Max(ra, rb);
+            p.Flat = flatA;
+            p.FlatB = flatB;
+            float r = Mathf.Max(ra, rb) * Mathf.Max(1f, Mathf.Max(flatA, flatB));
             Add(p, Vector3.Min(a, b) - Vector3.one * r, Vector3.Max(a, b) + Vector3.one * r);
         }
 
-        /// <summary>Keten van kegels door de punten, met per punt een straal.</summary>
+        /// <summary>
+        /// Keten van kegels door de punten, met per punt een straal. Alleen het begin loopt zacht over in de rest; de
+        /// schakels sluiten precies op elkaar aan, zodat er geen bobbels op de naden komen.
+        /// </summary>
         public void Chain(IList<Vector3> points, IList<float> radii, float blend)
         {
             for (int i = 0; i < points.Count - 1; i++)
-                Cone(points[i], points[i + 1], radii[i], radii[i + 1], i == 0 ? blend : Mathf.Min(blend, 0.004f));
+                Cone(points[i], points[i + 1], radii[i], radii[i + 1], i == 0 ? blend : 0f);
         }
 
         public void Ellipsoid(Vector3 center, Quaternion rotation, Vector3 radii, float blend, bool subtract = false)
@@ -124,7 +136,7 @@ namespace FietsApp
             p.Subtract = subtract ? 1 : 0;
             p.Bone = Bone;
             p.Inverse = quaternion.identity;
-            p.Flat = 1f;
+            p.Flat = p.FlatB = 1f;
             return p;
         }
 
@@ -245,12 +257,14 @@ namespace FietsApp
                 var a = math.abs(q) - (p.Radii - p.Ra);
                 return math.length(math.max(a, 0f)) + math.min(math.cmax(a), 0f) - p.Ra;
             }
-            if (p.Flat >= 0.999f) return RoundCone(point, p.A, p.B, p.Ra, p.Rb);
+            if (math.abs(p.Flat - 1f) < 0.001f && math.abs(p.FlatB - 1f) < 0.001f) return RoundCone(point, p.A, p.B, p.Ra, p.Rb);
             // Afgeplat: de zijrichting oprekken, rekenen als ronde kegel, en terugschalen.
             var rel = point - p.A;
+            var ab = p.B - p.A;
+            float flat = math.lerp(p.Flat, p.FlatB, math.saturate(math.dot(rel, ab) / math.max(math.dot(ab, ab), 1e-10f)));
             float side = math.dot(rel, p.Side);
-            var stretched = p.A + rel + p.Side * (side / p.Flat - side);
-            return RoundCone(stretched, p.A, p.B, p.Ra, p.Rb) * p.Flat;
+            var stretched = p.A + rel + p.Side * (side / flat - side);
+            return RoundCone(stretched, p.A, p.B, p.Ra, p.Rb) * math.min(flat, 1f);
         }
 
         /// <summary>Afgeronde kegel (Inigo Quilez, "sdRoundCone" met twee punten).</summary>
