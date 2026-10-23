@@ -17,7 +17,9 @@ De app start de brug zelf. Draait er al een brug (bijvoorbeeld via `dotnet run`)
 - Bij het opstarten kijkt de app of er een nieuwere release is. Zo ja, dan downloadt hij die op de achtergrond, controleert de sha256 en zet hem klaar in `%LOCALAPPDATA%\FietsApp\updates\`.
 - Rechtsonder verschijnt dan "Update … staat klaar". De update gaat erin bij afsluiten, of meteen met *Nu herstarten*. Midden in een rit gebeurt er niets.
 - `apply-update.ps1` wacht tot de app en de brug dicht zijn, verwisselt de map en zet bij een fout de oude versie terug.
+- Lukt installeren niet (bijvoorbeeld omdat een map in gebruik is), dan blijft de oude versie werken en probeert de app het bij de volgende keer afsluiten opnieuw. Na drie mislukte pogingen toont hij een knop om de nieuwe versie handmatig te downloaden.
 - Wat er gebeurde staat in `%LOCALAPPDATA%\FietsApp\update.log`.
+- Een lokale testbuild heeft versie `0.1.0` en wordt dus ook bijgewerkt (en bij afsluiten vervangen); start hem met `--no-update`.
 - Starten met `FietsApp.exe --no-update` slaat de controle over.
 - Het versienummer staat altijd klein rechtsonder in beeld.
 
@@ -33,4 +35,4 @@ De workflow bouwt met [GameCI](https://game.ci) en heeft een Unity-licentie nodi
 
 Zie <https://game.ci/docs/github/activation> voor een Personal-licentie. Controle: `gh secret list` toont alle drie. Verloopt de licentie, vervang dan `UNITY_LICENSE`.
 
-Handmatig een release maken kan met `gh workflow run release.yml` (of *Run workflow* op GitHub).
+Handmatig een release maken kan met `gh workflow run release.yml` (of *Run workflow* op GitHub), alleen vanaf `main`. Op een andere branch draaien alleen de tests en de build.

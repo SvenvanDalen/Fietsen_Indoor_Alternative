@@ -20,16 +20,17 @@ namespace FietsApp.Updates
             return restart ? args + " -Restart" : args;
         }
 
-        public static void Launch(UpdateResult ready, UpdatePaths paths, bool restart)
-        {
-            int pid = Process.GetCurrentProcess().Id;
-            var info = new ProcessStartInfo("powershell.exe",
-                BuildArguments(ScriptPath(ready.StagingDir), pid, paths.InstallDir, ready.StagingDir, ExeName, paths.LogPath, restart))
+        public static ProcessStartInfo StartInfo(UpdateResult ready, UpdatePaths paths, int processId, bool restart) =>
+            new ProcessStartInfo("powershell.exe",
+                BuildArguments(ScriptPath(ready.StagingDir), processId, paths.InstallDir, ready.StagingDir, ExeName, paths.LogPath, restart))
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
+                // Niet de werkmap van de app erven: die ligt vaak in de installatiemap en blokkeert dan het hernoemen.
+                WorkingDirectory = paths.UpdatesRoot,
             };
-            Process.Start(info);
-        }
+
+        public static void Launch(UpdateResult ready, UpdatePaths paths, bool restart) =>
+            Process.Start(StartInfo(ready, paths, Process.GetCurrentProcess().Id, restart));
     }
 }

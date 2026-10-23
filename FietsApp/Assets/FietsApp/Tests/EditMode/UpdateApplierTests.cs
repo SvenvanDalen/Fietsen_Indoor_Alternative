@@ -38,5 +38,18 @@ namespace FietsApp.Tests
         [Test]
         public void ScriptPath_IsInStaging() =>
             Assert.AreEqual(Staging + @"\apply-update.ps1", UpdateApplier.ScriptPath(Staging));
+
+        [Test]
+        public void StartInfo_WorkingDirectoryOutsideInstallAndStaging()
+        {
+            // Een werkmap in de installatiemap blokkeert het hernoemen; de staging-map wordt zelf verplaatst.
+            var paths = new UpdatePaths(Install, @"C:\Users\Jan de Vries\AppData\Local\FietsApp\updates");
+            var ready = new UpdateResult { Status = UpdateStatus.ReadyToApply, StagingDir = Staging };
+            var info = UpdateApplier.StartInfo(ready, paths, 4242, false);
+            Assert.AreEqual(paths.UpdatesRoot, info.WorkingDirectory);
+            Assert.AreEqual("powershell.exe", info.FileName);
+            Assert.IsFalse(info.UseShellExecute);
+            Assert.IsTrue(info.CreateNoWindow);
+        }
     }
 }

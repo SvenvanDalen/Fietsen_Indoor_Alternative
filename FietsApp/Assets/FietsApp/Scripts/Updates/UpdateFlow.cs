@@ -37,6 +37,10 @@ namespace FietsApp.Updates
         // Zonder deze bestanden kan de nieuwe versie niet starten of zichzelf niet plaatsen.
         static readonly string[] RequiredFiles = { "FietsApp.exe", "apply-update.ps1" };
 
+        // Geschreven door apply-update.ps1 in de staging-map; bevat het aantal mislukte installaties.
+        const string FailedMarker = "apply-failed.txt";
+        const int MaxFailedApplies = 3;
+
         readonly AppVersion _current;
         readonly IReleaseSource _source;
         readonly IDownloader _downloader;
@@ -66,7 +70,13 @@ namespace FietsApp.Updates
                 return new UpdateResult { Status = UpdateStatus.ManualDownloadRequired, Version = v, ReleasePageUrl = candidate.ReleasePageUrl };
 
             string staging = _paths.StagingDir(v);
-            if (HasRequiredFiles(staging)) return Ready(v, staging, candidate);
+            if (HasRequiredFiles(staging))
+            {
+                // apply-update.ps1 telt mislukte pogingen; blijft het misgaan, dan liever een downloadknop dan eeuwig "staat klaar".
+                if (FailedApplies(staging) >= MaxFailedApplies)
+                    return new UpdateResult { Status = UpdateStatus.ManualDownloadRequired, Version = v, ReleasePageUrl = candidate.ReleasePageUrl };
+                return Ready(v, staging, candidate);
+            }
 
             string zip = _paths.ZipPath(v);
             string part = zip + ".part";
@@ -125,6 +135,16 @@ namespace FietsApp.Updates
             for (var inner = e.InnerException; inner != null; inner = inner.InnerException)
                 error += " → " + inner.GetType().Name + ": " + inner.Message;
             return new UpdateResult { Status = UpdateStatus.Failed, Version = v, Error = error };
+        }
+
+        static int FailedApplies(string staging)
+        {
+            try
+            {
+                var marker = Path.Combine(staging, FailedMarker);
+                return File.Exists(marker) && int.TryParse(File.ReadAllText(marker).Trim(), out int count) ? count : 0;
+            }
+            catch (IOException) { return 0; }
         }
 
         static bool HasRequiredFiles(string dir)

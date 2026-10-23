@@ -81,6 +81,8 @@ jobs:
 
   release:
     name: Brug, zip en release
+    # Alleen vanaf main: een handmatige run op een andere branch mag nooit een release worden waar alle installaties naar bijwerken.
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: windows-latest
     defaults:

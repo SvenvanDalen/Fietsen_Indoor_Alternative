@@ -276,6 +276,35 @@ namespace FietsApp.Tests
             Assert.AreEqual(0, downloader.Calls);
         }
 
+        string StageWithFailures(string count)
+        {
+            var staging = _paths.StagingDir(V("0.1.6"));
+            Directory.CreateDirectory(staging);
+            File.WriteAllText(Path.Combine(staging, "FietsApp.exe"), "x");
+            File.WriteAllText(Path.Combine(staging, "apply-update.ps1"), "x");
+            File.WriteAllText(Path.Combine(staging, "apply-failed.txt"), count + "\r\n");
+            return staging;
+        }
+
+        [Test]
+        public void RunAsync_InstallFailedOnce_StillReadyToApply()
+        {
+            StageWithFailures("1");
+            var result = Run(new FakeReleaseSource(Release("v0.1.6")), ValidDownloader());
+            Assert.AreEqual(UpdateStatus.ReadyToApply, result.Status);
+        }
+
+        [Test]
+        public void RunAsync_InstallFailedThreeTimes_ReturnsManual()
+        {
+            StageWithFailures("3");
+            var downloader = ValidDownloader();
+            var result = Run(new FakeReleaseSource(Release("v0.1.6")), downloader);
+            Assert.AreEqual(UpdateStatus.ManualDownloadRequired, result.Status);
+            Assert.AreEqual("https://example.org/release/v0.1.6", result.ReleasePageUrl);
+            Assert.AreEqual(0, downloader.Calls);
+        }
+
         [Test]
         public void RunAsync_RemovesStagingOfOtherVersions()
         {

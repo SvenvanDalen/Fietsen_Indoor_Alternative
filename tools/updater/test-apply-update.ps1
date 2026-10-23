@@ -58,8 +58,46 @@ Run 'vergrendelde map' {
     }
     finally { $lock.Dispose() }
     $log = if (Test-Path $s.Log) { Get-Content $s.Log -Raw } else { '' }
-    $ok = $code -eq 1 -and (Read-Exe $s) -eq 'oud' -and (Test-Path (Join-Path $s.Staging 'FietsApp.exe')) -and $log -match 'mislukt'
-    Report 'vergrendelde map' $ok "exit=$code"
+    $marker = Join-Path $s.Staging 'apply-failed.txt'
+    $count = if (Test-Path $marker) { (Get-Content $marker -Raw).Trim() } else { '' }
+    $ok = $code -eq 1 -and (Read-Exe $s) -eq 'oud' -and (Test-Path (Join-Path $s.Staging 'FietsApp.exe')) -and $log -match 'mislukt' -and $count -eq '1'
+    Report 'vergrendelde map' $ok "exit=$code teller=$count"
+}
+
+Run 'tweede mislukking telt op' {
+    $s = New-Scenario 'count'
+    Set-Content (Join-Path $s.Staging 'apply-failed.txt') '1'
+    $p = Start-Dummy 120
+    try { $code = Invoke-Apply $s $p.Id 2 }
+    finally { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
+    $count = (Get-Content (Join-Path $s.Staging 'apply-failed.txt') -Raw).Trim()
+    Report 'tweede mislukking telt op' ($code -eq 1 -and $count -eq '2') "exit=$code teller=$count"
+}
+
+# De app start het script met zijn eigen werkmap; staat die in de installatiemap, dan mag dat het hernoemen niet blokkeren.
+Run 'werkmap in installatie' {
+    $s = New-Scenario 'cwd'
+    $p = Start-Dummy 1
+    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$script`" -ProcessId $($p.Id) -InstallDir `"$($s.Install)`" " +
+            "-StagingDir `"$($s.Staging)`" -ExeName FietsApp.exe -LogPath `"$($s.Log)`""
+    $proc = Start-Process powershell -ArgumentList $args -WorkingDirectory $s.Install -WindowStyle Hidden -Wait -PassThru
+    $ok = $proc.ExitCode -eq 0 -and (Read-Exe $s) -eq 'nieuw'
+    Report 'werkmap in installatie' $ok "exit=$($proc.ExitCode)"
+}
+
+# Installatie op een andere schijf dan %LOCALAPPDATA%: met subst krijgt dezelfde map een eigen stationsletter.
+Run 'ander volume' {
+    $s = New-Scenario 'volume'
+    $letter = [char[]](90..68) | Where-Object { -not (Test-Path "$($_):\") } | Select-Object -First 1
+    subst "$($letter):" $s.Root | Out-Null
+    try {
+        $remote = [pscustomobject]@{ Install = "$($letter):\install"; Staging = $s.Staging; Log = $s.Log }
+        $p = Start-Dummy 1
+        $code = Invoke-Apply $remote $p.Id
+        $ok = $code -eq 0 -and (Read-Exe $s) -eq 'nieuw' -and -not (Test-Path "$($s.Install).old") -and -not (Test-Path "$($s.Install).new")
+    }
+    finally { subst "$($letter):" /d | Out-Null }
+    Report 'ander volume' $ok "exit=$code"
 }
 
 Run 'proces blijft draaien' {
