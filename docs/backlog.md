@@ -531,7 +531,7 @@ Epic: E7 · Fase: V1 · Prio: Could · Punten: 5
 
 Als rijder wil ik een avatar en fietskeuze.
 
-- [ ] Eenvoudige aanpasbare figuur
+- [x] Eenvoudige aanpasbare figuur
 
 ### E8 Training (MVP)
 
