@@ -84,6 +84,30 @@ namespace FietsApp
             return (pedal + back, pitch);
         }
 
+        /// <summary>Crankhoek waarin het lichaam gemodelleerd wordt: rechterpedaal voor, linker achter (knie half gebogen).</summary>
+        public const float RestCrank = Mathf.PI / 2f;
+
+        /// <summary>Heup, knie en enkel van één been bij een crankhoek, en de kanteling van de voet.</summary>
+        public (Vector3 hip, Vector3 knee, Vector3 ankle, float pitch) Leg(float angleRadians, bool right)
+        {
+            var hip = right ? HipRight : Mirror(HipRight);
+            var (ankle, pitch) = Ankle(angleRadians, right);
+            // Knie naar voren en een fractie naar buiten.
+            var knee = Joint(hip, ankle, Thigh, Shin, new Vector3(right ? 0.12f : -0.12f, 0.2f, 1f));
+            return (hip, knee, ankle, pitch);
+        }
+
+        /// <summary>Schouder, elleboog en hand van één arm; de hand ligt op de remgreep.</summary>
+        public (Vector3 shoulder, Vector3 elbow, Vector3 hand) Arm(bool right)
+        {
+            var shoulder = right ? ShoulderRight : Mirror(ShoulderRight);
+            var hand = (right ? HoodRight : Mirror(HoodRight)) + new Vector3(0f, 0.03f, -0.005f);
+            var elbow = Joint(shoulder, hand, UpperArm, Forearm, new Vector3(right ? 0.7f : -0.7f, -0.35f, -0.6f));
+            return (shoulder, elbow, hand);
+        }
+
+        public static Vector3 Mirror(Vector3 v) => new Vector3(-v.x, v.y, v.z);
+
         /// <summary>
         /// Twee-delige ketting (dij en scheen, of boven- en onderarm): waar het middelste gewricht komt als het begin op
         /// <paramref name="root"/> zit en het eind op <paramref name="end"/>, gebogen naar <paramref name="pole"/>.
