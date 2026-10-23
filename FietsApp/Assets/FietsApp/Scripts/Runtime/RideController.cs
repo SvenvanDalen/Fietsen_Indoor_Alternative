@@ -130,7 +130,7 @@ namespace FietsApp
 
         void OnDestroy() => ProfileStore.Changed -= OnProfileChanged;
 
-        /// <summary>Gewicht gewijzigd (of een profiel van een ander apparaat binnengehaald): andere massa voor de fysica.</summary>
+        /// <summary>Gewicht of fiets gewijzigd (of een profiel van een ander apparaat binnengehaald): andere massa voor de fysica.</summary>
         void OnProfileChanged()
         {
             totalMassKg = ProfileStore.Current.TotalMassKg;
@@ -185,7 +185,8 @@ namespace FietsApp
             // Op asfalt de ingestelde waarde; op andere ondergrond de hogere Crr daarvan, met hetzelfde verschil erbovenop.
             RollingResistance = rollingResistance + FietsApp.World.Surfaces.RollingResistance(_surface)
                                 - FietsApp.World.Surfaces.RollingResistance(FietsApp.World.Surface.Asphalt),
-            DragAreaM2 = dragAreaM2,
+            // De gekozen fiets (7.3) maakt de rijder iets meer of minder aerodynamisch.
+            DragAreaM2 = dragAreaM2 + (massFromProfile ? ProfileStore.Current.Bike.DragAreaDeltaM2 : 0f),
             AirDensity = RiderParameters.Default.AirDensity,
         };
     }

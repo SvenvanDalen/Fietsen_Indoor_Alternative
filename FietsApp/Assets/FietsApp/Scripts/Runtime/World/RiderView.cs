@@ -11,6 +11,8 @@ namespace FietsApp
         [SerializeField] RideController ride;
         [SerializeField] RouteView routeView;
         [SerializeField] Transform rider;
+        [Tooltip("Het model van de renner (7.3); krijgt snelheid en cadans voor wielen en benen.")]
+        [SerializeField] CyclistModel cyclist;
         [SerializeField] Camera chaseCamera;
         [SerializeField] Vector3 cameraOffset = new Vector3(0f, 2.6f, -7f);
         [SerializeField, Min(0f)] float lookAhead = 12f;
@@ -30,7 +32,26 @@ namespace FietsApp
             if (ride == null) ride = FindAnyObjectByType<RideController>();
             if (routeView == null) routeView = FindAnyObjectByType<RouteView>();
             if (chaseCamera == null) chaseCamera = Camera.main;
+            if (cyclist == null && rider != null) cyclist = rider.GetComponent<CyclistModel>();
         }
+
+        /// <summary>
+        /// Laat de renner van opzij zien terwijl de camera langzaam om hem heen draait, bijvoorbeeld bij het kiezen van
+        /// avatar en fiets (7.3). Hij trapt dan rustig door, zodat je ook de benen en wielen ziet bewegen.
+        /// </summary>
+        public bool Showcase
+        {
+            get => _showcase;
+            set
+            {
+                if (_showcase == value) return;
+                _showcase = value;
+                _cut = true; // in één keer naar de nieuwe kijkhoek
+            }
+        }
+
+        bool _showcase, _cut;
+        float _orbit;
 
         void Start()
         {
@@ -66,7 +87,21 @@ namespace FietsApp
             // Positieve kromming is een bocht naar links: rol om de rijrichting naar links (positieve z-rotatie).
             rider.SetPositionAndRotation(position, Quaternion.LookRotation(forward, Vector3.up) * Quaternion.Euler(0f, 0f, _lean));
 
-            bool jumped = Mathf.Abs(distance - _lastDistance) > SnapDistance;
+            if (cyclist != null)
+            {
+                bool riding = ride.isActiveAndEnabled;
+                cyclist.SpeedMs = Showcase ? 5f : riding ? ride.SpeedMs : 0f;
+                cyclist.CadenceRpm = Showcase ? 55f : riding ? ride.Trainer.CadenceRpm : 0f;
+            }
+
+            if (Showcase)
+            {
+                ShowcaseCamera(position);
+                return;
+            }
+
+            bool jumped = Mathf.Abs(distance - _lastDistance) > SnapDistance || _cut;
+            _cut = false;
             _lastDistance = distance;
             var target = CameraPose(distance);
             float t = jumped ? 1f : 1f - Mathf.Exp(-cameraSmoothing * Time.deltaTime);
@@ -79,6 +114,24 @@ namespace FietsApp
             float time = Time.time * 23f;
             _shake = amplitude * new Vector3(Mathf.PerlinNoise(time, 0.3f) - 0.5f, Mathf.PerlinNoise(0.7f, time) - 0.5f, 0f) * 2f;
             chaseCamera.transform.position += _shake;
+        }
+
+        void ShowcaseCamera(Vector3 position)
+        {
+            _orbit += Time.unscaledDeltaTime;
+            var look = rider.rotation;
+            var flat = Quaternion.LookRotation(Vector3.ProjectOnPlane(look * Vector3.forward, Vector3.up), Vector3.up);
+            // Van rechtsvoor, langzaam heen en weer draaiend tussen de zijkant en schuin voor.
+            var offset = flat * Quaternion.Euler(0f, 70f + 35f * Mathf.Sin(_orbit * 0.35f), 0f) * new Vector3(0f, 0f, 3.1f);
+            var target = position + Vector3.up * 0.85f;
+            var pose = (position: target + offset + Vector3.up * 0.35f, rotation: Quaternion.identity);
+            pose.rotation = Quaternion.LookRotation(target - pose.position, Vector3.up);
+            float t = _cut ? 1f : 1f - Mathf.Exp(-5f * Time.unscaledDeltaTime);
+            _cut = false;
+            chaseCamera.transform.SetPositionAndRotation(
+                Vector3.Lerp(chaseCamera.transform.position - _shake, pose.position, t),
+                Quaternion.Slerp(chaseCamera.transform.rotation, pose.rotation, t));
+            _shake = Vector3.zero;
         }
 
         void SnapCamera()
