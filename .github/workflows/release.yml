@@ -1,0 +1,128 @@
+# Windows-release bij elke push naar main (story 13.6): tests, Unity-build, brug, zip en GitHub Release.
+# De app haalt de nieuwste release op en werkt zichzelf bij; zie docs/releases.md.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'FietsApp/**'
+      - 'Bridge/**'
+      - 'tools/updater/**'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  VERSION: 0.1.${{ github.run_number }}
+
+jobs:
+  test:
+    name: Unity-tests (EditMode)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: actions/cache@v4
+        with:
+          path: FietsApp/Library
+          key: Library-${{ hashFiles('FietsApp/Packages/packages-lock.json', 'FietsApp/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-
+
+      - uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: FietsApp
+          testMode: editmode
+
+  build:
+    name: Unity-build (Windows 64-bit)
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - uses: actions/cache@v4
+        with:
+          path: FietsApp/Library
+          key: Library-${{ hashFiles('FietsApp/Packages/packages-lock.json', 'FietsApp/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-
+
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: FietsApp
+          targetPlatform: StandaloneWindows64
+          buildName: FietsApp
+          versioning: Custom
+          version: ${{ env.VERSION }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: build/StandaloneWindows64
+          if-no-files-found: error
+
+  release:
+    name: Brug, zip en release
+    needs: build
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Brug testen
+        run: dotnet test Bridge
+
+      - name: Verwisselscript testen
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tools/updater/test-apply-update.ps1
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: dist
+
+      - name: Brug publiceren
+        run: dotnet publish Bridge/FietsBridge -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o dist/Bridge
+
+      - name: Zip en sha256 maken
+        run: |
+          Copy-Item tools/updater/apply-update.ps1 dist/
+          foreach ($required in 'dist/FietsApp.exe', 'dist/Bridge/FietsBridge.exe', 'dist/apply-update.ps1') {
+            if (-not (Test-Path $required)) { throw "$required ontbreekt in de build." }
+          }
+          Get-ChildItem dist -Recurse -Filter *.pdb | Remove-Item
+          Get-ChildItem dist -Directory -Filter *_DoNotShip | Remove-Item -Recurse
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [IO.Compression.ZipFile]::CreateFromDirectory((Resolve-Path dist), "$PWD/FietsApp-Windows.zip")
+          $hash = (Get-FileHash FietsApp-Windows.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText("$PWD/FietsApp-Windows.zip.sha256", "$hash  FietsApp-Windows.zip`n", [Text.Encoding]::ASCII)
+
+      - name: Release publiceren
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "v$env:VERSION" FietsApp-Windows.zip FietsApp-Windows.zip.sha256
+          --target $env:GITHUB_SHA --title "FietsApp $env:VERSION" --generate-notes
