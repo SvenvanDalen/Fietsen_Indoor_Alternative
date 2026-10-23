@@ -6,7 +6,7 @@ namespace FietsApp.Training
 {
     /// <summary>
     /// Voegt twee versies van het profiel samen, bijvoorbeeld van de laptop en uit de Gist (story 7.2). Instellingen (FTP,
-    /// gewicht, max hartslag, weerstand per klim, Everesting) komen uit de laatst gewijzigde versie. Klimtijden gaan
+    /// gewicht, max hartslag, weerstand per klim, Everesting, avatar en fiets) komen uit de laatst gewijzigde versie. Klimtijden gaan
     /// nooit verloren: per klim de snelste tijd, de laatste poging en de vroegste badge uit beide.
     /// </summary>
     public static class ProfileMerge
@@ -28,6 +28,7 @@ namespace FietsApp.Training
                 maxHeartRateBpm = newer.maxHeartRateBpm,
                 climbs = newer.climbs.Select(c => new ClimbSetting { climb = c.climb, gradeScalePercent = c.gradeScalePercent }).ToList(),
                 everesting = Copy(newer.everesting ?? new EverestingChallenge()),
+                avatar = (newer.avatar ?? new AvatarSettings()).Copy(),
             };
 
             var names = newer.records.Select(r => r.climb).Concat(older.records.Select(r => r.climb)).Distinct();

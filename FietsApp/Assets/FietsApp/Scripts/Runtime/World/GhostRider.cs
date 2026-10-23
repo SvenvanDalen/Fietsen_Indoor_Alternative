@@ -14,15 +14,14 @@ namespace FietsApp
     {
         [SerializeField] RideController ride;
         [SerializeField] RouteView routeView;
-        [Tooltip("Het model van de renner; de ghost is een kopie ervan.")]
-        [SerializeField] Transform riderModel;
         [Tooltip("Doorzichtig materiaal voor de ghost.")]
         [SerializeField] Material ghostMaterial;
         [Tooltip("Hoe ver de ghost naast je rijdt (m, naar links).")]
         [SerializeField] float sideOffset = 1.4f;
 
         GhostTrace _trace;
-        Transform _ghost;
+        CyclistModel _ghost;
+        float _lastGhostDistance;
         Text _label;
         GameObject _labelPanel;
         double? _footTime; // ElapsedSeconds toen je de voet passeerde
@@ -55,6 +54,7 @@ namespace FietsApp
             _trace = routeView.Climb != null ? GhostStore.Load(routeView.Climb.name) : null;
             if (_trace != null && _ghost == null) _ghost = MakeGhost();
             if (_ghost != null) _ghost.gameObject.SetActive(false);
+            _lastGhostDistance = -1f;
             _labelPanel.SetActive(false);
         }
 
@@ -77,8 +77,13 @@ namespace FietsApp
             var here = routeView.Route.Sample(ghostDistance);
             var forward = new Vector3(here.HeadingX, here.GradePercent / 100f, here.HeadingZ).normalized;
             var left = new Vector3(-here.HeadingZ, 0f, here.HeadingX);
-            _ghost.SetPositionAndRotation(new Vector3(here.X, here.Elevation, here.Z) + left * sideOffset,
+            _ghost.transform.SetPositionAndRotation(new Vector3(here.X, here.Elevation, here.Z) + left * sideOffset,
                 Quaternion.LookRotation(forward, Vector3.up));
+            // De ghost trapt mee zolang hij vooruitkomt.
+            float speed = _lastGhostDistance >= 0f && Time.deltaTime > 0f ? (ghostDistance - _lastGhostDistance) / Time.deltaTime : 0f;
+            _lastGhostDistance = ghostDistance;
+            _ghost.SpeedMs = Mathf.Max(0f, speed);
+            _ghost.CadenceRpm = speed > 0.5f && ride.isActiveAndEnabled ? 85f : 0f;
 
             // Verschil: hoe lang geleden de ghost op mijn plek was (positief = ik lig achter).
             double gap = time - _trace.TimeAt(Mathf.Clamp(mine, 0f, _trace.length));
@@ -87,19 +92,12 @@ namespace FietsApp
                           (gap > 0.5 ? $"<color=#ff9a7a>{verdict}</color>" : $"<color=#8fe08f>{verdict}</color>");
         }
 
-        Transform MakeGhost()
+        /// <summary>Een renner zoals jij (zelfde avatar en fiets), helemaal in het doorzichtige ghostmateriaal.</summary>
+        CyclistModel MakeGhost()
         {
-            if (riderModel == null) return null;
-            var ghost = Instantiate(riderModel.gameObject, transform).transform;
-            ghost.name = "Ghost";
-            foreach (var behaviour in ghost.GetComponentsInChildren<MonoBehaviour>()) Destroy(behaviour);
-            foreach (var renderer in ghost.GetComponentsInChildren<Renderer>())
-            {
-                var materials = new Material[renderer.sharedMaterials.Length];
-                for (int i = 0; i < materials.Length; i++) materials[i] = ghostMaterial;
-                renderer.sharedMaterials = materials;
-                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            }
+            var ghost = new GameObject("Ghost").AddComponent<CyclistModel>();
+            ghost.transform.SetParent(transform, false);
+            ghost.OverrideMaterial = ghostMaterial;
             return ghost;
         }
 

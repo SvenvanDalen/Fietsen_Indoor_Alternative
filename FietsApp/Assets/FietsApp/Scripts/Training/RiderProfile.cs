@@ -15,9 +15,6 @@ namespace FietsApp.Training
         public const int MinGradeScale = 50, MaxGradeScale = 150, DefaultGradeScale = 100;
         public const float DefaultWeightKg = 72f, MinWeightKg = 30f, MaxWeightKg = 200f;
 
-        /// <summary>Gewicht van de fiets; samen met <see cref="weightKg"/> de massa die de fysica omhoog trapt.</summary>
-        public const float BikeMassKg = 8f;
-
         /// <summary>Wanneer het profiel het laatst gewijzigd is (UTC, ISO 8601), voor het samenvoegen tussen apparaten (7.2).</summary>
         public string updatedAt = "";
 
@@ -27,8 +24,14 @@ namespace FietsApp.Training
         /// <summary>Maximale hartslag in slagen per minuut; 0 = onbekend (7.2).</summary>
         public int maxHeartRateBpm;
 
+        /// <summary>Uiterlijk van de rijder en de gekozen fiets (7.3).</summary>
+        public AvatarSettings avatar = new AvatarSettings();
+
+        /// <summary>De gekozen fiets; zijn gewicht en luchtweerstand tellen mee in de fysica.</summary>
+        public Bike Bike => Bike.Of((avatar ?? new AvatarSettings()).Bike);
+
         /// <summary>Rijder plus fiets, voor de fysica.</summary>
-        public float TotalMassKg => (weightKg >= MinWeightKg && weightKg <= MaxWeightKg ? weightKg : DefaultWeightKg) + BikeMassKg;
+        public float TotalMassKg => (weightKg >= MinWeightKg && weightKg <= MaxWeightKg ? weightKg : DefaultWeightKg) + Bike.MassKg;
 
         /// <summary>Functional Threshold Power in watt; wordt bijgewerkt door de FTP-test (8.1).</summary>
         public int ftpWatts = DefaultFtpWatts;

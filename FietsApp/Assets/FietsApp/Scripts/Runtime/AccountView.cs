@@ -99,6 +99,11 @@ namespace FietsApp
             var (sync, syncLabel) = UiFactory.Button(panel, "Synchroniseren", new Vector2(290f, -100f), 220f, 46f, () => account.SyncNow());
             syncLabel.text = "Nu synchroniseren";
             _syncButton = sync;
+            UiFactory.Button(panel, "Avatar", new Vector2(524f, -100f), 240f, 46f, () =>
+            {
+                Close();
+                FindAnyObjectByType<AvatarView>()?.Open();
+            }).label.text = "Avatar en fiets (V)";
 
             // Code voor github.com/login/device, alleen tijdens het inloggen.
             var box = new GameObject("Code", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
