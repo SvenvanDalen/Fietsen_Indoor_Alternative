@@ -12,6 +12,8 @@ namespace FietsApp.Updates
     /// <summary>De velden van een GitHub-release die de updater nodig heeft (story 13.6).</summary>
     public sealed class GitHubRelease
     {
+        public const string LatestUrl = "https://api.github.com/repos/SvenvanDalen/Fietsen_Indoor_Alternative/releases/latest";
+
         public string TagName;
         public string HtmlUrl;
         public bool Draft;

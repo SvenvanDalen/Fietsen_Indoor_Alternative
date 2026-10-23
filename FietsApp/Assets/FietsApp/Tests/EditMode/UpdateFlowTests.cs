@@ -197,6 +197,15 @@ namespace FietsApp.Tests
         }
 
         [Test]
+        public void RunAsync_SourceThrowsWrapped_ErrorIncludesInnerMessage()
+        {
+            var error = new HttpRequestException("An error occurred while sending the request",
+                new System.Net.WebException("Unable to read data from the transport connection"));
+            var result = Run(new FakeReleaseSource(error), ValidDownloader());
+            StringAssert.Contains("Unable to read data from the transport connection", result.Error);
+        }
+
+        [Test]
         public void RunAsync_InstallNotWritable_ReturnsManualWithoutDownloading()
         {
             var downloader = ValidDownloader();

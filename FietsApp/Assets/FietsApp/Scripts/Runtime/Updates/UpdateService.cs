@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using FietsApp.Updates;
 using UnityEngine;
 
@@ -42,12 +41,12 @@ namespace FietsApp
         {
             _paths = new UpdatePaths(Path.GetDirectoryName(Application.dataPath), UpdatePaths.DefaultUpdatesRoot());
             _cts = new CancellationTokenSource();
-            var flow = new UpdateFlow(current, new GitHubReleaseSource(), new HttpDownloader(), _paths,
+            var flow = new UpdateFlow(current, new UnityReleaseSource(), new UnityDownloader(), _paths,
                 UpdatePaths.IsWritable(_paths.InstallDir));
             try
             {
-                // Uitpakken is synchroon werk; buiten de hoofdthread blijft de app vloeiend.
-                Result = await Task.Run(() => flow.RunAsync(_cts.Token));
+                // Op de hoofdthread (UnityWebRequest); UpdateFlow doet hashen en uitpakken zelf op de achtergrond.
+                Result = await flow.RunAsync(_cts.Token);
             }
             catch (Exception e)
             {

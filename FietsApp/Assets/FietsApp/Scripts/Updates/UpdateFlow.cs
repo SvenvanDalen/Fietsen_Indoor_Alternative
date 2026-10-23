@@ -76,28 +76,10 @@ namespace FietsApp.Updates
                 Directory.CreateDirectory(_paths.UpdatesRoot);
                 RemoveOtherVersions(staging);
 
+                // De downloader mag de hoofdthread nodig hebben (UnityWebRequest); hashen en uitpakken niet, dat kost seconden.
                 await _downloader.DownloadFileAsync(candidate.ZipUrl, part, ct);
                 string sha = await _downloader.GetStringAsync(candidate.Sha256Url, ct);
-                if (!Sha256Verifier.Matches(part, sha))
-                {
-                    DeleteFile(part);
-                    return Failed(v, new InvalidDataException("De sha256 van de download klopt niet."));
-                }
-                DeleteFile(zip);
-                File.Move(part, zip);
-
-                DeleteDir(tmp);
-                ZipFile.ExtractToDirectory(zip, tmp);
-                if (!HasRequiredFiles(tmp))
-                {
-                    DeleteDir(tmp);
-                    DeleteFile(zip);
-                    return Failed(v, new InvalidDataException("De download mist FietsApp.exe of apply-update.ps1."));
-                }
-                DeleteDir(staging);
-                Directory.Move(tmp, staging);
-                DeleteFile(zip);
-                return Ready(v, staging, candidate);
+                return await Task.Run(() => VerifyAndExtract(v, candidate, sha, part, zip, tmp, staging), ct).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -108,11 +90,42 @@ namespace FietsApp.Updates
             }
         }
 
+        static UpdateResult VerifyAndExtract(AppVersion v, UpdateCandidate candidate, string sha, string part, string zip, string tmp,
+            string staging)
+        {
+            if (!Sha256Verifier.Matches(part, sha))
+            {
+                DeleteFile(part);
+                return Failed(v, new InvalidDataException("De sha256 van de download klopt niet."));
+            }
+            DeleteFile(zip);
+            File.Move(part, zip);
+
+            DeleteDir(tmp);
+            ZipFile.ExtractToDirectory(zip, tmp);
+            if (!HasRequiredFiles(tmp))
+            {
+                DeleteDir(tmp);
+                DeleteFile(zip);
+                return Failed(v, new InvalidDataException("De download mist FietsApp.exe of apply-update.ps1."));
+            }
+            DeleteDir(staging);
+            Directory.Move(tmp, staging);
+            DeleteFile(zip);
+            return Ready(v, staging, candidate);
+        }
+
         static UpdateResult Ready(AppVersion v, string staging, UpdateCandidate c) =>
             new UpdateResult { Status = UpdateStatus.ReadyToApply, Version = v, StagingDir = staging, ReleasePageUrl = c.ReleasePageUrl };
 
-        static UpdateResult Failed(AppVersion v, Exception e) =>
-            new UpdateResult { Status = UpdateStatus.Failed, Version = v, Error = e.GetType().Name + ": " + e.Message };
+        static UpdateResult Failed(AppVersion v, Exception e)
+        {
+            // HttpClient verstopt de echte oorzaak (TLS, DNS, verbinding) in de InnerException; die hoort in het log.
+            var error = e.GetType().Name + ": " + e.Message;
+            for (var inner = e.InnerException; inner != null; inner = inner.InnerException)
+                error += " → " + inner.GetType().Name + ": " + inner.Message;
+            return new UpdateResult { Status = UpdateStatus.Failed, Version = v, Error = error };
+        }
 
         static bool HasRequiredFiles(string dir)
         {
