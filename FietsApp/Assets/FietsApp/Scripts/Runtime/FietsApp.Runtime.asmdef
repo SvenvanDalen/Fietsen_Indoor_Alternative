@@ -7,6 +7,7 @@
         "FietsApp.World",
         "FietsApp.Recording",
         "FietsApp.Training",
+        "FietsApp.Accounts",
         "Unity.InputSystem",
         "UnityEngine.UI"
     ],

@@ -39,6 +39,7 @@ Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
 | `FietsApp.Trainers` | `ITrainer` en implementaties (simulator, later FTMS en ANT+) | `noEngineReferences` |
 | `FietsApp.Recording` | Ritopname en `.fit`-bestanden (`RideLog`, `FitWriter`) | `noEngineReferences` |
 | `FietsApp.Training` | Rijdersprofiel, vermogenszones, FTP-test en workouts | `noEngineReferences` |
+| `FietsApp.Accounts` | GitHub-account (device flow) en profiel-Gist: berichten, JSON-lezer | `noEngineReferences` |
 | `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer, brugclient (`Bluetooth/`) | Mag Unity gebruiken |
 | `FietsApp.Tests.EditMode` | NUnit-tests | |
 

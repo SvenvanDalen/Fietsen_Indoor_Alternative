@@ -10,7 +10,9 @@ namespace FietsApp
     /// </summary>
     public sealed class RideController : MonoBehaviour
     {
+        [Tooltip("Rijder plus fiets; met 'Gewicht uit profiel' aan komt hij uit het profiel (story 7.2).")]
         [SerializeField, Min(30f)] float totalMassKg = 80f;
+        [SerializeField] bool massFromProfile = true;
         [SerializeField, Range(0.002f, 0.02f)] float rollingResistance = 0.004f;
         [SerializeField, Range(0.15f, 0.6f)] float dragAreaM2 = 0.32f;
 
@@ -84,6 +86,11 @@ namespace FietsApp
 
         void Awake()
         {
+            if (massFromProfile)
+            {
+                totalMassKg = ProfileStore.Current.TotalMassKg;
+                ProfileStore.Changed += OnProfileChanged;
+            }
             _physics = new RiderPhysics(CurrentParameters());
             Simulator = new SimulatorTrainer();
             UseTrainer(Simulator);
@@ -120,6 +127,18 @@ namespace FietsApp
         void PushGrade() => Trainer?.SetGrade(isActiveAndEnabled
             ? _gradePercent * _gradeScale + FietsApp.World.Surfaces.TrainerGradeBonus(_surface)
             : 0f);
+
+        void OnDestroy() => ProfileStore.Changed -= OnProfileChanged;
+
+        /// <summary>Gewicht gewijzigd (of een profiel van een ander apparaat binnengehaald): andere massa voor de fysica.</summary>
+        void OnProfileChanged()
+        {
+            totalMassKg = ProfileStore.Current.TotalMassKg;
+            if (_physics != null) _physics.Parameters = CurrentParameters();
+        }
+
+        /// <summary>Rijder plus fiets in kg, zoals de fysica rekent.</summary>
+        public float TotalMassKg => totalMassKg;
 
         void OnValidate()
         {

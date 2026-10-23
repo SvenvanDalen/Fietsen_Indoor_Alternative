@@ -1,0 +1,16 @@
+{
+    "name": "FietsApp.Accounts",
+    "rootNamespace": "FietsApp.Accounts",
+    "references": [
+        "FietsApp.Training"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
