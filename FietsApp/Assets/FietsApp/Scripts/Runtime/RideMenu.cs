@@ -11,7 +11,7 @@ namespace FietsApp
 {
     /// <summary>
     /// Ritmenu (story 6.3): kies een klim uit de bibliotheek (story 4.5), gefilterd op lengte, gemiddelde helling,
-    /// categorie, gebied en land of gezocht op naam (story 4.6), per pagina van negen. Enter in het zoekveld kiest de eerste. Opent bij de start en met M; zolang het open is staat de rit stil.
+    /// categorie, gebied en land of gezocht op naam (story 4.6), per pagina van negen. Enter in het zoekveld kiest de eerste. Opent met M of via Rijden op het startscherm; zolang het open is staat de rit stil.
     /// Een klim kiezen zet je aan de voet. Cijfertoetsen 1-9 kiezen, pijl links/rechts bladert. De knop Weerstand
     /// (of G) stelt in hoeveel van de helling de trainer laat voelen (story 2.3); dat wordt per klim onthouden.
     /// </summary>
@@ -67,7 +67,7 @@ namespace FietsApp
             _filter.SetCountries(_summaries.Select(s => s.Country));
             if (routeView.Climb != null)
                 ride.GradeScale = ProfileStore.Current.GradeScale(routeView.Climb.displayName) / 100f;
-            if (openAtStart) Open();
+            if (openAtStart && FindAnyObjectByType<HomeScreen>() == null) Open(); // anders opent het startscherm
         }
 
         /// <summary>Opgeslagen kerncijfers als die er zijn; anders de GPX inlezen.</summary>

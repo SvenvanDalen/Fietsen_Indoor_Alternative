@@ -68,6 +68,9 @@ namespace FietsApp.Bluetooth
             if (kb != null && kb.bKey.wasPressedThisFrame) _panel.SetActive(!_panel.activeSelf);
         }
 
+        /// <summary>Toont het paneel (vanaf het startscherm).</summary>
+        public void Show() => _panel.SetActive(true);
+
         void OnConnectionChanged(bool connected)
         {
             // Na herverbinden het zoeken hervatten als dat de bedoeling was.
