@@ -29,6 +29,17 @@ Unity heeft op Windows geen Bluetooth LE; `Bridge/FietsBridge` (.NET 10, Windows
 
 Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, hoogte uit SRTM) en een hoogtebestand van het landschap (`tools/terrain_from_tiles.py`), beide in `FietsApp/Assets/FietsApp/Routes/`. Maak daar een `Climb`-asset (menu *FietsApp/Klim*) met de bestanden, de boom- en bosgrens en de grond boven de boomgrens, en koppel die aan `RouteView`. Leg bij elke klim de bron vast in `docs/bronnen.md`, en controleer het profiel tegen de bekende cijfers van de klim met een test (zie `MontVentouxTests`). Alleen open data; geen Strava-segmenten.
 
+## Releases en updates
+
+Elke push naar `main` maakt via `.github/workflows/release.yml` een Windows-release; de app werkt zichzelf daarmee bij (`docs/releases.md`).
+
+- Logica in `FietsApp.Updates` (engine-vrij, getest), lijm in `Runtime/Updates/` en `Runtime/Bluetooth/BridgeLauncher.cs`; ze draaien alleen in de Windows-speler, niet in de Editor.
+- `tools/installer/FietsApp.iss` maakt `FietsApp-Setup.exe` (Inno Setup); het updatescript neemt het verwijderprogramma (`unins*`) over uit de oude map, want dat zit niet in de zip.
+- `tools/updater/apply-update.ps1` verwisselt de installatie; test wijzigingen met `powershell -ExecutionPolicy Bypass -File tools/updater/test-apply-update.ps1`.
+- Assetnamen (`FietsApp-Windows.zip`, `.sha256`) en de tag `v0.1.<run>` staan in de workflow én in `UpdateDecision`; wijzig ze samen.
+- Netwerk in de speler via `UnityWebRequest`, niet `HttpClient`: Mono's eigen TLS faalt daar op GitHub ("TrustFailure: Chain instance is empty"), terwijl het in de Editor wel werkt.
+- Lokaal proberen: bouw met `Unity.exe -batchmode -quit -projectPath FietsApp -buildTarget Win64 -buildWindows64Player <map>\FietsApp.exe` en start de speler met `-batchmode -nographics -logFile <log>`; zoek naar `[Update]`.
+
 ## Unity-project (`FietsApp/`)
 
 Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
@@ -40,6 +51,7 @@ Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
 | `FietsApp.Recording` | Ritopname en `.fit`-bestanden (`RideLog`, `FitWriter`) | `noEngineReferences` |
 | `FietsApp.Training` | Rijdersprofiel, vermogenszones, FTP-test en workouts | `noEngineReferences` |
 | `FietsApp.Accounts` | GitHub-account (device flow) en profiel-Gist: berichten, JSON-lezer | `noEngineReferences` |
+| `FietsApp.Updates` | Updater: release-check, download, sha256, staging (`UpdateFlow`) | `noEngineReferences` |
 | `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer, brugclient (`Bluetooth/`) | Mag Unity gebruiken |
 | `FietsApp.Tests.EditMode` | NUnit-tests | |
 
