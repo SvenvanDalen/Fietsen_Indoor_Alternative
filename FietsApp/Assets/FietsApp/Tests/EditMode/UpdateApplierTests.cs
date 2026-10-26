@@ -1,3 +1,4 @@
+using System.IO;
 using FietsApp.Updates;
 using NUnit.Framework;
 
@@ -37,7 +38,8 @@ namespace FietsApp.Tests
 
         [Test]
         public void ScriptPath_IsInStaging() =>
-            Assert.AreEqual(Staging + @"\apply-update.ps1", UpdateApplier.ScriptPath(Staging));
+            // Path.Combine: de tests draaien ook in CI op Linux, de app zelf alleen op Windows.
+            Assert.AreEqual(Path.Combine(Staging, "apply-update.ps1"), UpdateApplier.ScriptPath(Staging));
 
         [Test]
         public void StartInfo_WorkingDirectoryOutsideInstallAndStaging()
