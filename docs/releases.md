@@ -1,14 +1,18 @@
 # Releases en updates (story 13.6)
 
-Elke push naar `main` die iets in `FietsApp/`, `Bridge/` of `tools/updater/` verandert, maakt via `.github/workflows/release.yml` een nieuwe Windows-versie: release `v0.1.<runnummer>` met `FietsApp-Windows.zip` en `FietsApp-Windows.zip.sha256`. De zip bevat de app, de Bluetooth-brug (`Bridge/FietsBridge.exe`) en het updatescript.
+Elke push naar `main` die iets in `FietsApp/`, `Bridge/`, `tools/updater/` of `tools/installer/` verandert, maakt via `.github/workflows/release.yml` een nieuwe Windows-versie: release `v0.1.<runnummer>` met
+
+- `FietsApp-Setup.exe`: de installer voor nieuwe gebruikers (Inno Setup, `tools/installer/FietsApp.iss`);
+- `FietsApp-Windows.zip` en `FietsApp-Windows.zip.sha256`: wat de app zelf gebruikt om bij te werken. De zip bevat de app, de Bluetooth-brug (`Bridge/FietsBridge.exe`) en het updatescript.
 
 ## Installeren
 
-1. Download `FietsApp-Windows.zip` van de [nieuwste release](https://github.com/SvenvanDalen/Fietsen_Indoor_Alternative/releases/latest).
-2. Pak hem uit naar `%LOCALAPPDATA%\Programs\FietsApp` (plak dat pad in de adresbalk van Verkenner). Een map onder `C:\Program Files` werkt ook, maar daar kan de app zichzelf niet bijwerken; je krijgt dan alleen een melding met een downloadknop.
-3. Maak een snelkoppeling naar `FietsApp.exe`.
+1. Download `FietsApp-Setup.exe` van de [nieuwste release](https://github.com/SvenvanDalen/Fietsen_Indoor_Alternative/releases/latest) en start hem.
+2. De installer zet de app zonder adminrechten in `%LOCALAPPDATA%\Programs\FietsApp`, maakt een snelkoppeling in het Startmenu (en desgewenst op het bureaublad) en zet FietsApp onder *Instellingen → Apps*, waar je hem ook weer verwijdert.
 
-De build is niet digitaal ondertekend. Bij de eerste start toont Windows SmartScreen een waarschuwing: kies *Meer informatie* → *Toch uitvoeren*.
+Liever zonder installer: pak `FietsApp-Windows.zip` uit naar dezelfde map. Een map onder `C:\Program Files` werkt ook, maar daar kan de app zichzelf niet bijwerken; je krijgt dan alleen een melding met een downloadknop.
+
+De installer en de app zijn niet digitaal ondertekend. Windows SmartScreen toont daarom een waarschuwing: kies *Meer informatie* → *Toch uitvoeren*.
 
 De app start de brug zelf. Draait er al een brug (bijvoorbeeld via `dotnet run`), dan gebruikt hij die.
 

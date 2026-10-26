@@ -47,6 +47,18 @@ Run 'succes' {
     Report 'succes' $ok "exit=$code"
 }
 
+# Geinstalleerd met FietsApp-Setup.exe: het verwijderprogramma van Inno Setup staat alleen in de oude map.
+Run 'verwijderprogramma blijft' {
+    $s = New-Scenario 'uninstall'
+    Set-Content (Join-Path $s.Install 'unins000.exe') 'uninstaller' -Encoding ASCII
+    Set-Content (Join-Path $s.Install 'unins000.dat') 'data' -Encoding ASCII
+    $p = Start-Dummy 1
+    $code = Invoke-Apply $s $p.Id
+    $ok = $code -eq 0 -and (Read-Exe $s) -eq 'nieuw' -and (Test-Path (Join-Path $s.Install 'unins000.exe')) -and
+          (Test-Path (Join-Path $s.Install 'unins000.dat'))
+    Report 'verwijderprogramma blijft' $ok "exit=$code"
+}
+
 Run 'vergrendelde map' {
     $s = New-Scenario 'lock'
     $lockPath = Join-Path $s.Install 'lock.txt'

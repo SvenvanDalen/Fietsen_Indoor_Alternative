@@ -117,6 +117,12 @@ if (-not (Retry { Move-Item -Path $source -Destination $InstallDir } 3)) {
 if (-not $sameVolume) { Remove-Item -Recurse -Force $StagingDir -ErrorAction SilentlyContinue }
 Remove-Item -Force (Join-Path $InstallDir 'apply-failed.txt') -ErrorAction SilentlyContinue
 
+# Het verwijderprogramma van FietsApp-Setup.exe (Inno Setup) zit niet in de zip; neem het over uit de oude versie.
+foreach ($uninstaller in @(Get-ChildItem -Path $oldDir -Filter 'unins*' -File -ErrorAction SilentlyContinue)) {
+    try { Copy-Item -Path $uninstaller.FullName -Destination $InstallDir -Force }
+    catch { Write-Log "  verwijderprogramma $($uninstaller.Name) overnemen mislukt: $($_.Exception.Message)" }
+}
+
 # 7. Opruimen en eventueel herstarten.
 Remove-Item -Recurse -Force $oldDir -ErrorAction SilentlyContinue
 Write-Log "Update geslaagd."

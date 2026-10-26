@@ -34,6 +34,7 @@ Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, 
 Elke push naar `main` maakt via `.github/workflows/release.yml` een Windows-release; de app werkt zichzelf daarmee bij (`docs/releases.md`).
 
 - Logica in `FietsApp.Updates` (engine-vrij, getest), lijm in `Runtime/Updates/` en `Runtime/Bluetooth/BridgeLauncher.cs`; ze draaien alleen in de Windows-speler, niet in de Editor.
+- `tools/installer/FietsApp.iss` maakt `FietsApp-Setup.exe` (Inno Setup); het updatescript neemt het verwijderprogramma (`unins*`) over uit de oude map, want dat zit niet in de zip.
 - `tools/updater/apply-update.ps1` verwisselt de installatie; test wijzigingen met `powershell -ExecutionPolicy Bypass -File tools/updater/test-apply-update.ps1`.
 - Assetnamen (`FietsApp-Windows.zip`, `.sha256`) en de tag `v0.1.<run>` staan in de workflow én in `UpdateDecision`; wijzig ze samen.
 - Netwerk in de speler via `UnityWebRequest`, niet `HttpClient`: Mono's eigen TLS faalt daar op GitHub ("TrustFailure: Chain instance is empty"), terwijl het in de Editor wel werkt.
