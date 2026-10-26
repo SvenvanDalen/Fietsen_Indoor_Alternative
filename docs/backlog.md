@@ -745,6 +745,17 @@ Als ontwikkelaar wil ik per klim een bronvermelding bijhouden.
 
 - [x] Lijst met herkomst en licentie van GPX, hoogtedata en assets
 
+#### 13.6 Windows-release met automatische updates
+
+Epic: E13 · Fase: MVP · Prio: Should · Punten: 5
+
+Als rijder wil ik de app voor Windows downloaden van GitHub en dat hij zichzelf daarna bijwerkt.
+
+- [ ] Elke push naar `main` maakt een GitHub Release met de app en de brug
+- [ ] De app zet een nieuwere release op de achtergrond klaar en installeert hem bij afsluiten of via "Nu herstarten"
+- [ ] Mislukt de update, dan blijft de oude versie werken
+- [ ] De app start de meegeleverde brug zelf
+
 ### E14 Mobiele versie (V1)
 
 #### 14.1 App op de telefoon draaien

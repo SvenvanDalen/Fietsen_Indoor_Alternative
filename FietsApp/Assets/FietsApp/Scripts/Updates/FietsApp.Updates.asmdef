@@ -1,0 +1,16 @@
+{
+    "name": "FietsApp.Updates",
+    "rootNamespace": "FietsApp.Updates",
+    "references": [
+        "FietsApp.Accounts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
