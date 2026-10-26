@@ -19,6 +19,8 @@ concurrency:
 
 permissions:
   contents: write
+  # GameCI zet de testuitslag als check op de commit.
+  checks: write
 
 env:
   VERSION: 0.1.${{ github.run_number }}
