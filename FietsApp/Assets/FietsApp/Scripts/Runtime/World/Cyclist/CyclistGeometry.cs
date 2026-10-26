@@ -9,7 +9,8 @@ namespace FietsApp
     /// <summary>
     /// Maten van fiets en rijder in meters, in het assenstelsel van de fiets: x naar rechts, y omhoog, z vooruit, de
     /// grond op y = 0 midden tussen de wielen (story 7.3). Gebaseerd op een racefiets maat 56 (wielbasis 99 cm,
-    /// zitbuishoek 73°, crank 172,5 mm) en een rijder van ongeveer 1,80 m.
+    /// zitbuishoek 73°, crank 172,5 mm) en een rijder gebouwd als Tadej Pogačar: 1,76 m en 66 kg, slank, met een
+    /// vlakke rug, gebogen ellebogen en het hoofd laag naar voren.
     /// </summary>
     public sealed class CyclistGeometry
     {
@@ -28,7 +29,7 @@ namespace FietsApp
         public readonly Vector3 HoodRight; // de rechterhand rust op de remgreep; links gespiegeld
 
         // Rijder
-        public readonly float Thigh = 0.445f, Shin = 0.435f, UpperArm = 0.31f, Forearm = 0.30f;
+        public readonly float Thigh = 0.445f, Shin = 0.435f, UpperArm = 0.30f, Forearm = 0.29f;
         public readonly Vector3 HipRight, ShoulderRight, Pelvis, ShoulderCenter, HeadCenter;
 
         public CyclistGeometry(BikeKind kind)
@@ -59,9 +60,9 @@ namespace FietsApp
 
             Pelvis = SaddleTop + new Vector3(0f, 0.085f, 0f);
             HipRight = Pelvis + new Vector3(0.095f, -0.01f, 0.05f);
-            ShoulderCenter = Pelvis + new Vector3(0f, 0.34f, 0.50f);
-            ShoulderRight = ShoulderCenter + new Vector3(0.185f, -0.02f, 0f);
-            HeadCenter = ShoulderCenter + new Vector3(0f, 0.19f, 0.11f);
+            ShoulderCenter = Pelvis + new Vector3(0f, 0.25f, 0.45f);
+            ShoulderRight = ShoulderCenter + new Vector3(0.175f, -0.02f, 0f);
+            HeadCenter = ShoulderCenter + new Vector3(0f, 0.15f, 0.15f);
         }
 
         /// <summary>Plek van het rechterpedaal bij een crankhoek (0 = crank recht omhoog, vooruit draaiend); links is +180°.</summary>
@@ -102,7 +103,7 @@ namespace FietsApp
         {
             var shoulder = right ? ShoulderRight : Mirror(ShoulderRight);
             var hand = (right ? HoodRight : Mirror(HoodRight)) + new Vector3(0f, 0.03f, -0.005f);
-            var elbow = Joint(shoulder, hand, UpperArm, Forearm, new Vector3(right ? 0.7f : -0.7f, -0.35f, -0.6f));
+            var elbow = Joint(shoulder, hand, UpperArm, Forearm, new Vector3(right ? 0.25f : -0.25f, -0.6f, -0.3f));
             return (shoulder, elbow, hand);
         }
 
