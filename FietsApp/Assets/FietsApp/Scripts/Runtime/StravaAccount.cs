@@ -307,7 +307,8 @@ namespace FietsApp
             form.AddField("data_type", "fit");
             form.AddField("external_id", name);
             form.AddField("name", RideFileName.ActivityName(name));
-            form.AddField("trainer", "1");
+            // Geen trainer=1: dan toont Strava de rit als binnentraining zonder kaart. Het type (virtuele rit) en de
+            // GPS-punten van de echte klim komen uit de .fit zelf, zoals bij Zwift en MyWhoosh.
 
             string body = null, error = null;
             long code = 0;
