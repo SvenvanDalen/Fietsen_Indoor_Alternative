@@ -76,7 +76,7 @@ namespace FietsApp
             if (kb.digit2Key.wasPressedThisFrame) Begin(new TwentyMinuteTest(ProfileStore.Current.ftpWatts));
         }
 
-        void ShowChoice(bool show)
+        public void ShowChoice(bool show)
         {
             var profile = ProfileStore.Current;
             string tested = profile.ftpTestedOn.Length > 0 ? $"getest op {profile.ftpTestedOn}" : "nog niet getest";

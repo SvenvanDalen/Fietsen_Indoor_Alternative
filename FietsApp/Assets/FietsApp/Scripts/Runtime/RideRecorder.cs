@@ -9,7 +9,7 @@ namespace FietsApp
     /// <summary>
     /// Neemt de rit op (story 5.1): elke seconde vermogen, cadans, hartslag, snelheid, afstand, hoogte en de echte
     /// plek op de klim. Slaat de rit op als .fit in <c>Ritten/</c> onder <see cref="Application.persistentDataPath"/>
-    /// zodra je de top haalt, een nieuwe rit begint of de app sluit. Pauzes (rit uit, bijvoorbeeld in het menu) tellen niet.
+    /// zodra je de top haalt, een nieuwe rit begint, je op Opslaan (O) drukt of de app sluit. Pauzes (rit uit, bijvoorbeeld in het menu) tellen niet.
     /// </summary>
     public sealed class RideRecorder : MonoBehaviour
     {
@@ -39,6 +39,9 @@ namespace FietsApp
 
         /// <summary>Een rit is afgesloten en telt mee (lang genoeg); precies één keer per rit, ook als het schrijven mislukt (Everesting, story 9.3).</summary>
         public event Action<RideLog> Closed;
+
+        /// <summary>Een rit is als .fit geschreven, met het volledige pad (Strava-upload, story 5.2).</summary>
+        public event Action<string> Saved;
 
         /// <summary>Het laatst opgeslagen bestand, of null.</summary>
         public string LastSavedPath { get; private set; }
@@ -92,6 +95,28 @@ namespace FietsApp
         void OnRideStarting()
         {
             Save();
+            StartNewLog();
+        }
+
+        /// <summary>
+        /// Slaat de rit tot hier op (en zet hem zo op Strava), en neemt daarna gewoon verder op als een nieuwe rit.
+        /// False als er nog niets te bewaren is: te kort, of op de top al bewaard.
+        /// </summary>
+        public bool SaveNow()
+        {
+            if (_finished || _log.Count < minimumSeconds)
+            {
+                _savedMessage = _finished ? "rit is al opgeslagen" : $"rit nog te kort om op te slaan (minstens {minimumSeconds} s)";
+                _savedUntil = Time.unscaledTime + 5f;
+                return false;
+            }
+            Save();
+            StartNewLog();
+            return true;
+        }
+
+        void StartNewLog()
+        {
             _log = new RideLog();
             _sinceSample = 0f;
             _finished = false;
@@ -111,6 +136,7 @@ namespace FietsApp
                 LastSavedPath = path;
                 _savedMessage = $"rit opgeslagen: {Path.GetFileName(path)}";
                 Debug.Log($"Rit opgeslagen: {path} ({_log.Count} s, {_log.DistanceM / 1000f:0.00} km)");
+                Saved?.Invoke(path);
             }
             catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
             {

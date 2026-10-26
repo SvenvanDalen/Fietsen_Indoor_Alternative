@@ -9,6 +9,7 @@
         "FietsApp.Training",
         "FietsApp.Accounts",
         "FietsApp.Updates",
+        "FietsApp.Strava",
         "Unity.InputSystem",
         "UnityEngine.UI",
         "Unity.Burst",
