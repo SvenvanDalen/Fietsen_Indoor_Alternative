@@ -450,6 +450,8 @@ Als rijder wil ik automatisch uploaden naar Strava.
 - [ ] OAuth-koppeling
 - [ ] Rit verschijnt als virtuele rit
 
+**Stand (2026-10-26):** gebouwd, nog niet met een echt Strava-account geprobeerd. `StravaAccount` koppelt via de browser met de eigen API-app van de rijder (besluit "Strava") en uploadt elke bewaarde rit als .fit met `trainer=1`; de FIT zelf is al een virtuele fietsrit. Het Strava-paneel (S) en het nieuwe startscherm (T) tonen wat er op Strava staat. Logica in `FietsApp.Strava`, gedekt door `StravaTests`.
+
 #### 5.3 Ritsamenvatting
 
 Epic: E5 · Fase: MVP · Prio: Should · Punten: 3

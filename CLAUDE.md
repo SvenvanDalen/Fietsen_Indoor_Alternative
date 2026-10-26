@@ -51,6 +51,7 @@ Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
 | `FietsApp.Recording` | Ritopname en `.fit`-bestanden (`RideLog`, `FitWriter`) | `noEngineReferences` |
 | `FietsApp.Training` | Rijdersprofiel, vermogenszones, FTP-test en workouts | `noEngineReferences` |
 | `FietsApp.Accounts` | GitHub-account (device flow) en profiel-Gist: berichten, JSON-lezer | `noEngineReferences` |
+| `FietsApp.Strava` | Strava-koppeling: OAuth-berichten, uploads, welke ritten nog moeten (`UploadQueue`) | `noEngineReferences` |
 | `FietsApp.Updates` | Updater: release-check, download, sha256, staging (`UpdateFlow`) | `noEngineReferences` |
 | `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer, brugclient (`Bluetooth/`) | Mag Unity gebruiken |
 | `FietsApp.Tests.EditMode` | NUnit-tests | |
