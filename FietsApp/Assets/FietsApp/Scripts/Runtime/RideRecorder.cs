@@ -40,6 +40,9 @@ namespace FietsApp
         /// <summary>Een rit is afgesloten en telt mee (lang genoeg); precies één keer per rit, ook als het schrijven mislukt (Everesting, story 9.3).</summary>
         public event Action<RideLog> Closed;
 
+        /// <summary>Een rit is als .fit geschreven, met het volledige pad (Strava-upload, story 5.2).</summary>
+        public event Action<string> Saved;
+
         /// <summary>Het laatst opgeslagen bestand, of null.</summary>
         public string LastSavedPath { get; private set; }
 
@@ -111,6 +114,7 @@ namespace FietsApp
                 LastSavedPath = path;
                 _savedMessage = $"rit opgeslagen: {Path.GetFileName(path)}";
                 Debug.Log($"Rit opgeslagen: {path} ({_log.Count} s, {_log.DistanceM / 1000f:0.00} km)");
+                Saved?.Invoke(path);
             }
             catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
             {
