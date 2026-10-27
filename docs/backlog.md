@@ -7,12 +7,12 @@
 Dit bestand is de enige bron van waarheid voor de backlog. Doe het volgende:
 
 1. Maak in de GitHub-repository de volgende labels aan (met `gh label create`, sla bestaande over):
-   - Fase: `fase:MVP`, `fase:V1`, `fase:V2`
+   - Fase: `fase:MVP`, `fase:V1`, `fase:V2`, `fase:V3`
    - Prioriteit: `prio:Must`, `prio:Should`, `prio:Could`, `prio:Later`
    - Epic: `epic:E1` t/m `epic:E14`
    - Type: `type:story`, `type:epic`
    - Punten: `pt:1`, `pt:2`, `pt:3`, `pt:5`, `pt:8`, `pt:13`, `pt:21`
-2. Maak milestones aan: MVP, V1, V2.
+2. Maak milestones aan: MVP, V1, V2, V3.
 3. Maak per epic (sectie 4) één epic-issue met label `type:epic`, de epic-omschrijving en een takenlijst (`- [ ] #nummer`) met alle stories van die epic. Werk de takenlijst bij nadat de story-issues bestaan.
 4. Maak per story (`#### x.y ...` in sectie 4) één issue:
    - Titel: `x.y Titel van de story`
@@ -52,7 +52,7 @@ De app is een virtuele fietswereld voor een slimme trainer (zoals MyWhoosh en Zw
 | GPX-import door gebruikers | Nog niet |
 | Hellingsvolging | De trainer volgt de helling; gevoeligheid per klim instelbaar in het menu, niet tijdens de rit |
 | Training | Workouts en FTP-test vanaf het begin; adaptief coachplan nog niet |
-| Versnellingen | Geen virtuele versnellingen, vaste weerstand zoals MyWhoosh |
+| Versnellingen | Vaste weerstand zoals MyWhoosh; virtuele versnellingen komen erbij als keuze (2.7, herzien 2026-10-27) |
 | Multiplayer | Voorlopig solo |
 | Leaderboards, ghosts, badges | Ja |
 | Ranglijst-backend | Gratis via GitHub (Action en Pages), niet vals-spel-bestendig, prima voor een hobbyproject |
@@ -175,6 +175,26 @@ Als ontwikkelaar wil ik testen welk protocol de FitBike Smart Drive 50 aanbiedt.
 - [ ] Bluetooth FTMS of ANT+ FE-C vastgesteld
 - [ ] Helling begrensd op 20% (maximum van deze trainer)
 
+#### 1.9 Trainer kalibreren (spindown)
+
+Epic: E1 · Fase: V2 · Prio: Could · Punten: 3
+
+Als rijder wil ik mijn trainer vanuit de app kalibreren, zodat vermogen en weerstand kloppen.
+
+- [ ] Spindown gestart via het FTMS Control Point, uitslag in beeld
+- [ ] Instructies op het scherm: versnellen tot de doelsnelheid, dan uitrollen
+- [ ] Een trainer zonder spindown geeft een nette melding
+
+#### 1.10 Slimme ventilator
+
+Epic: E1 · Fase: V3 · Prio: Could · Punten: 3
+
+Als rijder wil ik dat een slimme ventilator meewaait met mijn snelheid.
+
+- [ ] Ventilator met een open Bluetooth-protocol gekoppeld via de brug
+- [ ] Windkracht volgt de snelheid, in afdalingen harder
+- [ ] Maximum zelf in te stellen
+
 ### E2 Fysica en ritbesturing (MVP)
 
 #### 2.1 Snelheid volgt uit vermogen
@@ -232,6 +252,18 @@ Als rijder wil ik wind en slipstream.
 - [ ] Wind op het parcours
 - [ ] Groepseffect
 
+#### 2.7 Virtuele versnellingen
+
+Epic: E2 · Fase: V2 · Prio: Should · Punten: 8
+
+Als rijder wil ik virtuele versnellingen, zodat ik op mijn trainer schakel zoals op de weg; vaste weerstand blijft mogelijk.
+
+- [ ] In het ritmenu te kiezen: vaste weerstand (zoals nu) of virtuele versnellingen
+- [ ] Op- en afschakelen tijdens het rijden (toetsenbord, later ook 6.7); de versnelling staat in de HUD
+- [ ] Een zwaardere versnelling geeft de trainer meer weerstand bij dezelfde helling; snelheid en klimtijden volgen nog steeds uit het vermogen, zodat records vergelijkbaar blijven
+- [ ] Verzet instelbaar (bijv. 2×12 of 1×12), ook bruikbaar in afdalingen
+- [ ] Besluit "Versnellingen" bijgewerkt in `docs/decisions.md`
+
 ### E3 Wereld en routerendering (MVP)
 
 #### 3.1 3D-weg langs een route
@@ -286,11 +318,62 @@ Als rijder wil ik dorpjes en publiek in de klim.
 
 - [ ] Props en NPC's langs de weg
 
+#### 3.6 Echt weer op de echte klim
+
+Epic: E3 · Fase: V2 · Prio: Could · Punten: 5
+
+Als rijder wil ik het weer van vandaag op de echte klim, zodat elke rit anders is.
+
+- [ ] Weer van vandaag op de echte plek via Open-Meteo (gratis, open data)
+- [ ] Wind gaat naar de fysica (2.6), bewolking en regen naar het beeld (3.3)
+- [ ] Zonder internet het ingestelde weer
+
+#### 3.7 Geluid
+
+Epic: E3 · Fase: V2 · Prio: Should · Punten: 3
+
+Als rijder wil ik geluid tijdens het rijden, zodat de klim leeft.
+
+- [ ] Wind die meegroeit met de snelheid, bandengeluid per ondergrond
+- [ ] Sfeer langs de weg: koeienbellen, publiek bij de top
+- [ ] Signalen bij intervallen en bij de laatste kilometer
+- [ ] Volume en uit in de instellingen
+- [ ] Alleen vrije geluiden (CC0) of zelf gemaakt, met bron in `docs/bronnen.md`
+
+#### 3.8 Camerastanden en fotomodus
+
+Epic: E3 · Fase: V2 · Prio: Could · Punten: 2
+
+Als rijder wil ik van camerastand wisselen en een foto maken.
+
+- [ ] Wisselen tussen achter de renner, eerstepersoons en helikopter
+- [ ] Screenshot opslaan zonder HUD
+
+#### 3.9 Computerrenners op de klim
+
+Epic: E3 · Fase: V2 · Prio: Could · Punten: 5
+
+Als rijder wil ik computerrenners op de klim, zodat ik solo toch iemand heb om in te halen.
+
+- [ ] Renners met een eigen vermogen op de klim
+- [ ] Inhalen en in het wiel zitten (slipstream uit 2.6)
+- [ ] Aan of uit en het aantal in het ritmenu
+
+#### 3.10 VR via OpenXR
+
+Epic: E3 · Fase: V3 · Prio: Could · Punten: 13
+
+Als rijder wil ik de klim in VR rijden.
+
+- [ ] Rijden met een OpenXR-bril op Windows
+- [ ] HUD als paneel in de wereld
+- [ ] Minstens 72 fps
+
 ### E4 Klimmen-content (MVP, het onderscheidende deel)
 
 Hier wint of verliest het product: de klimmen moeten er veel zijn, anders verschilt de app niet van Zwift en MyWhoosh. De route is simpel: GPX met hoogte als bron, een automatische pijplijn die er een rijdbare wereld van maakt.
 
-**Bronnen en rechten:** gebruik GPX van openbare bronnen of zelf getekende routes met open hoogtedata. Neem geen gelicentieerde kaartdata of Strava-segmentgegevens zonder toestemming over.
+**Bronnen en rechten:** gebruik GPX van openbare bronnen of zelf getekende routes met open hoogtedata. Neem geen gelicentieerde kaartdata of Strava-segmentgegevens zonder toestemming over. Uitzondering: een rijder mag zijn eigen gesterde Strava-segmenten als klim rijden (12.3); die blijven lokaal bij hem en komen nooit in de catalogus.
 
 #### 4.1 Pijplijn: GPX naar klim
 
@@ -433,6 +516,60 @@ Als rijder wil ik ondergronden zien en merken (kassei, grind, sneeuw), alleen vi
 - [x] Extra rolweerstand en visuele trilling per ondergrond
 - [x] Colle delle Finestre heeft grindstroken
 
+#### 4.14 Nauwkeuriger hoogtedata per land
+
+Epic: E4 · Fase: V2 · Prio: Should · Punten: 8
+
+Als rijder wil ik dat korte steile muren net zo steil zijn als in het echt.
+
+- [ ] Open hoogtemodellen met een fijner raster waar die er zijn (swissALTI3D, IGN RGE ALTI, TINITALY, AHN); elders SRTM
+- [ ] Kapelmuur, Mur de Huy en Paterberg binnen 0,5 procentpunt van de bekende helling, met een test
+- [ ] Bronnen en licenties in `docs/bronnen.md`
+
+#### 4.15 Klimpakket: één vast formaat per klim
+
+Epic: E4 · Fase: V2 · Prio: Should · Punten: 5
+
+Als ontwikkelaar wil ik dat elke klim één vast pakket is dat de app tijdens het draaien inleest, zodat een klim data is en geen Unity-asset.
+
+- [ ] Pakket met `klim.json` (naam, gebied, land, kerncijfers, begroeiing, ondergrond, herkenningspunt, bron en licentie), de GPX en het landschap
+- [ ] Versienummer van het formaat in het pakket
+- [ ] `tools/build_climbs.py` maakt de pakketten
+- [ ] De app laadt klimmen uit pakketten in plaats van uit `Climb`-assets
+- [ ] De bestaande klimmen omgezet; `ClimbLibraryTests` draait op de pakketten
+
+#### 4.16 Klimmen toevoegen zonder nieuwe release
+
+Epic: E4 · Fase: V2 · Prio: Should · Punten: 8
+
+Als rijder wil ik nieuwe klimmen krijgen zonder dat de app een nieuwe versie nodig heeft.
+
+- [ ] Online catalogus (per klim versie en sha256 van het pakket uit 4.15), gratis op GitHub
+- [ ] De app haalt bij het opstarten de catalogus op (`UnityWebRequest`), downloadt nieuwe of gewijzigde pakketten op de achtergrond en controleert de sha256
+- [ ] Zonder internet werken de meegeleverde en al gedownloade klimmen
+- [ ] Een klim publiceren is een push naar de catalogus, zonder app-release
+- [ ] Een pakket met een nieuwer formaat dan de app kent wordt overgeslagen met een melding
+
+#### 4.17 Fantasiegebergte
+
+Epic: E4 · Fase: V3 · Prio: Could · Punten: 13
+
+Als rijder wil ik een heel verzonnen gebergte met eigen klimmen.
+
+- [ ] Een gebied met minstens tien fantasieklimmen uit de routegenerator (4.10)
+- [ ] Eigen landschap dat in de doorlopende wereld (4.11) past
+- [ ] Elke klim met naam, categorie en profiel zoals de echte
+
+#### 4.18 Vrij rijden door het wegennet
+
+Epic: E4 · Fase: V3 · Prio: Could · Punten: 8
+
+Als rijder wil ik bij een kruising zelf kiezen waar ik heen rijd.
+
+- [ ] Bij een kruising links of rechts kiezen
+- [ ] De HUD toont de volgende kruising en waar de wegen heen gaan
+- [ ] Records, ghost en badges blijven per klim werken
+
 ### E5 Ritopname en export (MVP)
 
 #### 5.1 Rit opslaan als .fit
@@ -512,6 +649,44 @@ Als rijder wil ik pauzeren zonder dat de rit stopt met tellen.
 - [x] Pauzeknop
 - [x] Tijd en afstand blijven kloppen
 
+#### 6.5 W/kg en VAM in beeld
+
+Epic: E6 · Fase: V2 · Prio: Should · Punten: 2
+
+Als rijder wil ik W/kg en VAM zien, de getallen waarmee klimmers zich meten.
+
+- [ ] W/kg (3 s) en VAM in de HUD tijdens een klim
+- [ ] VAM en gemiddeld W/kg per klim in de ritsamenvatting (5.3)
+
+#### 6.6 Vooruitblik op de helling
+
+Epic: E6 · Fase: V2 · Prio: Should · Punten: 2
+
+Als rijder wil ik weten wat er aankomt, zodat ik mijn krachten kan verdelen.
+
+- [ ] Melding voor een steil stuk, zoals "over 300 m: 800 m aan 11%"
+- [ ] Het steilste stuk gemarkeerd in het hoogteprofiel
+- [ ] Drempel instelbaar
+
+#### 6.7 Bediening zonder toetsenbord
+
+Epic: E6 · Fase: V2 · Prio: Should · Punten: 3
+
+Als rijder wil ik de app bedienen zonder toetsenbord, want op de trainer kan ik er slecht bij.
+
+- [ ] Remmen, schakelen (2.7), pauze en menu met een gamepad (Input System)
+- [ ] Een Bluetooth-afstandsbediening werkt als die zich als toetsenbord of gamepad meldt
+- [ ] Knoppen zelf in te stellen
+
+#### 6.8 Engelse vertaling
+
+Epic: E6 · Fase: V3 · Prio: Could · Punten: 3
+
+Als Engelstalige rijder wil ik de app in het Engels.
+
+- [ ] Alle UI-teksten uit een vertaaltabel
+- [ ] Nederlands en Engels, te kiezen in het profiel
+
 ### E7 Accounts en profiel (V1)
 
 #### 7.1 Account met e-mail of Apple/Google-login
@@ -584,6 +759,47 @@ Als rijder wil ik vermogenszones tijdens het rijden.
 
 - [x] Zonekleuren in de HUD
 
+#### 8.6 Pacingplan per klim
+
+Epic: E8 · Fase: V2 · Prio: Should · Punten: 5
+
+Als rijder wil ik voor de start weten hoe lang ik over een klim doe en hoe ik hem indeel.
+
+- [ ] Voorspelde klimtijd uit FTP, gewicht en een gekozen vermogen
+- [ ] Doelvermogen per stuk: op steile stukken iets harder, binnen een grens
+- [ ] De HUD toont voor of achter op schema
+- [ ] Getest tegen los uitgerekende referentiewaarden
+
+#### 8.7 W′-balans in de HUD
+
+Epic: E8 · Fase: V2 · Prio: Could · Punten: 3
+
+Als rijder wil ik zien hoeveel anaerobe reserve ik nog heb.
+
+- [ ] W′ uit het profiel (standaard 20 kJ)
+- [ ] W′-balans (Skiba) live als balk
+- [ ] Laagste W′-balans in de ritsamenvatting
+
+#### 8.8 Workouts uit de Intervals.icu-agenda
+
+Epic: E8 · Fase: V2 · Prio: Could · Punten: 3
+
+Als rijder wil ik de workout die Intervals.icu voor vandaag plant meteen kunnen rijden.
+
+- [ ] Geplande workouts van vandaag ophalen via de Intervals.icu-API (sleutel alleen lokaal)
+- [ ] Te rijden als gewone workout (8.2)
+- [ ] Zelfde koppeling als 5.4
+
+#### 8.9 Adaptief trainingsplan naar een doelklim
+
+Epic: E8 · Fase: V3 · Prio: Could · Punten: 13
+
+Als rijder wil ik een plan dat zich aanpast, op weg naar een doelklim of event.
+
+- [ ] Doel kiezen: een klim of een event met datum
+- [ ] Weekplan met workouts, na elke rit bijgesteld op belasting (CTL, ATL, TSB)
+- [ ] Besluit "Training" bijgewerkt (adaptief plan was uitgesteld)
+
 ### E9 Voortgang en uitdagingen (V1)
 
 #### 9.1 Badges voor voltooide klimmen
@@ -621,6 +837,36 @@ Als rijder wil ik een ghost van mijn beste poging.
 
 - [x] Doorzichtige renner op het parcours
 
+#### 9.5 Vermogenscurve en eFTP
+
+Epic: E9 · Fase: V2 · Prio: Should · Punten: 5
+
+Als rijder wil ik mijn beste vermogens zien en een FTP-schatting zonder test.
+
+- [ ] Beste 5 s, 1 min, 5 min, 20 min en 60 min over alle ritten en de laatste 90 dagen
+- [ ] Vermogenscurve in het profiel
+- [ ] eFTP-schatting met een voorstel om de FTP bij te werken
+
+#### 9.6 Klimverzamelingen
+
+Epic: E9 · Fase: V2 · Prio: Should · Punten: 3
+
+Als rijder wil ik verzamelingen van klimmen afvinken, zoals alle HC's.
+
+- [ ] Verzamelingen als "Alle HC's", "De drie kanten van de Ventoux" en "Muren van Vlaanderen"
+- [ ] Voortgangsbalk en badge bij voltooien
+- [ ] Verzamelingen staan in data, niet in code, zodat er via 4.16 nieuwe bij kunnen
+
+#### 9.7 Ghost van een profrecord
+
+Epic: E9 · Fase: V2 · Prio: Could · Punten: 3
+
+Als rijder wil ik tegen de recordtijd van een prof op de klim rijden.
+
+- [ ] Per klim de bekende recordtijd, alleen de openbare eindtijd
+- [ ] Ghost op een tempo verdeeld naar de helling
+- [ ] Bron van elke tijd in `docs/bronnen.md`
+
 ### E10 Multiplayer (V2, uitgesteld: je rijdt voorlopig solo)
 
 #### 10.1 Andere rijders zien op dezelfde klim
@@ -648,6 +894,16 @@ Epic: E10 · Fase: V2 · Prio: Later · Punten: 3
 Als rijder wil ik chat en emotes.
 
 - [ ] Vooraf gedefinieerde berichten
+
+#### 10.4 Live samen rijden in een kleine groep
+
+Epic: E10 · Fase: V3 · Prio: Could · Punten: 13
+
+Als rijder wil ik live met een paar vrienden dezelfde klim rijden.
+
+- [ ] 2-8 rijders op dezelfde klim
+- [ ] Gratis en zonder eigen server (peer-to-peer of een gratis relay)
+- [ ] Uitnodigen via het GitHub-account (E7)
 
 ### E11 Racen en leaderboards (V2)
 
@@ -688,6 +944,16 @@ Als rijder wil ik een gratis ranglijst via GitHub.
 - [ ] GitHub Pages toont hem
 - [ ] Bekend en geaccepteerd: niet vals-spel-bestendig
 
+#### 11.5 Ghosts van vrienden via GitHub
+
+Epic: E11 · Fase: V2 · Prio: Could · Punten: 5
+
+Als rijder wil ik tegen de beste poging van een vriend rijden, zonder dat we tegelijk online zijn.
+
+- [ ] Beste poging per klim als bestand in de eigen profiel-Gist
+- [ ] Vriend toevoegen op GitHub-naam
+- [ ] Hun ghost rijdt mee op de klim
+
 ### E12 Content-tools (V2)
 
 #### 12.1 Eigen GPX importeren
@@ -707,6 +973,18 @@ Als gebruiker wil ik routes delen.
 
 - [ ] Link
 - [ ] Zoekbare bibliotheek
+
+#### 12.3 Mijn Strava-segmenten als klim
+
+Epic: E12 · Fase: V2 · Prio: Could · Punten: 8
+
+Als rijder wil ik mijn gesterde Strava-segmenten als klim rijden, met mijn eigen PR als doel.
+
+- [ ] Lijst met mijn gesterde segmenten (`GET /segments/starred`) met lengte, gemiddelde helling en categorie
+- [ ] Een segment wordt een klim: de weg uit de segment-streams (`latlng`, `distance`), hoogte en landschap via de klimpijplijn (4.1, 4.15)
+- [ ] Mijn PR op het segment als doeltijd of ghost (de API geeft inspanningen alleen met een Strava-abonnement)
+- [ ] De klim blijft lokaal bij de rijder: niet in de online catalogus (4.16), niet te delen (12.2) en niet in de ranglijst (11.4); bij ontkoppelen van Strava verdwijnt hij
+- [ ] De koppeling vraagt het recht `read` (of `read_all` voor privé-segmenten)
 
 ### E13 Ontwikkelomgeving (MVP)
 
@@ -762,6 +1040,15 @@ Als rijder wil ik de app voor Windows downloaden van GitHub en dat hij zichzelf 
 - [ ] Mislukt de update, dan blijft de oude versie werken
 - [ ] De app start de meegeleverde brug zelf
 
+#### 13.7 Streaming-overlay
+
+Epic: E13 · Fase: V3 · Prio: Could · Punten: 3
+
+Als rijder wil ik mijn rit kunnen streamen met de HUD erbij.
+
+- [ ] HUD en hoogteprofiel als lokale webpagina, bruikbaar als browserbron in OBS
+- [ ] Transparante achtergrond
+
 ### E14 Mobiele versie (V1)
 
 #### 14.1 App op de telefoon draaien
@@ -815,6 +1102,15 @@ Als rijder wil ik ANT+ op de telefoon.
 
 - [ ] Alleen Android met ANT+-hardware of dongle; iOS ondersteunt het niet
 
+#### 14.7 iOS
+
+Epic: E14 · Fase: V3 · Prio: Could · Punten: 8
+
+Als rijder met een iPhone of iPad wil ik de app daarop gebruiken.
+
+- [ ] Unity-build voor iOS, Bluetooth via CoreBluetooth
+- [ ] Uitgezocht of installeren kan zonder betaald Apple-ontwikkelaarsaccount (budget: nul)
+
 ## 5. Eisen, risico's en juridisch
 
 Het grootste risico is niet techniek maar content: zonder rechten op de routes en het merk bouw je op drijfzand.
@@ -826,7 +1122,7 @@ Het grootste risico is niet techniek maar content: zonder rechten op de routes e
 | Content maken kost te veel tijd | Hoog | Pijplijn voor automatische klim-generatie vóór handwerk |
 | Rechten op kaartdata en namen van klimmen | Midden | Open data (OpenStreetMap, open hoogtedata), eigen namen of vrije namen |
 | Handelsmerken (Zwift, MyWhoosh, merknamen klimmen) | Midden | Eigen naam en stijl; geen kopieën van hun werelden of logo's |
-| Strava-API-voorwaarden | Midden | App registreren, merkrichtlijnen volgen |
+| Strava-API-voorwaarden | Midden | App registreren, merkrichtlijnen volgen; Strava-data (ook segmenten) alleen tonen aan de rijder die hem koppelde, nooit delen of in de catalogus (12.3) |
 | Prestaties op laptops zonder zware GPU | Midden | Low-poly stijl, instelbare kwaliteit |
 | Solo-ontwikkelaar raakt gemotiveerd kwijt | Midden | Kleine mijlpalen, elke sprint iets rijdbaars |
 | Geen budget voor assets en kaartdata | Hoog | Alleen gratis of open bronnen (CC0, OpenStreetMap), zelf low-poly genereren met Claude en Unity-MCP |
@@ -849,7 +1145,8 @@ Eerste rijdbare versie na ongeveer vier tot vijf sprints van twee weken; elke sp
 - **Sprint 3, de eerste klim:** 4.1, 4.2, 3.1 (basis), 6.2. Doel: één echte klim uit GPX, met hoogteprofiel.
 - **Sprint 4-5, afronden MVP:** 4.3, 4.4, 4.11, 4.12, 5.1, 5.2, 6.3, 8.1, 8.2, 8.5. Doel: vier icoonklimmen in één wereld, ritopname, Strava-upload, FTP-test en workouts.
 - **Sprint 5-8, V1:** E14 (mobiele versie), E9 (badges, records, ghost), E7 (profiel, optioneel), meer klimmen (4.5, 4.7), grind en kasseien (4.13).
-- **Later, V2:** multiplayer, racen, content-tools, GitHub-ranglijst.
+- **Later, V2:** multiplayer, racen, content-tools, GitHub-ranglijst; verder (toegevoegd 2026-10-27) slimmer klimmen (6.5, 6.6, 8.6, 8.7), virtuele versnellingen (2.7), klimmen als vast pakket en zonder release toevoegen (4.15, 4.16), betere hoogtedata (4.14), geluid en sfeer (3.6-3.9), bediening zonder toetsenbord (6.7), vermogenscurve en verzamelingen (9.5-9.7), ghosts van vrienden (11.5), eigen Strava-segmenten (12.3), kalibratie (1.9) en Intervals.icu-workouts (8.8).
+- **Daarna, V3:** adaptief trainingsplan (8.9), fantasiegebergte (4.17), vrij rijden door het wegennet (4.18), live met een kleine groep (10.4), iOS (14.7), slimme ventilator (1.10), streaming-overlay (13.7), VR (3.10) en een Engelse vertaling (6.8).
 
 **Definitie van klaar:** de feature werkt op een echte trainer, is getest met minstens één .fit-rit, en staat in de changelog.
 
@@ -861,6 +1158,7 @@ Alle eerdere vragen zijn beantwoord (zie sectie 2). Nog open of te verifiëren:
 
 - [ ] Biedt de FitBike Smart Drive 50 Bluetooth FTMS aan, of alleen ANT+ FE-C en een eigen Bluetooth-protocol? (story 1.8)
 - [x] Is er een gratis Unity-pakket voor Bluetooth LE op Windows, of is een eigen .NET-brug nodig? (sectie 8, stap 4) **Besloten 2026-10-15:** eigen .NET-brug (`Bridge/`), zie `docs/decisions.md`.
+- [ ] Geldt sinds juni 2026 een Strava-abonnement voor ontwikkelaars met een Standard-app, zoals een derde partij meldt? Dat raakt 5.2 en 12.3; controleren in het API Settings Dashboard.
 - [ ] Staat Garmin Connect automatische upload toe voor een hobbyproject, of alleen handmatig via .fit? (story 5.4)
 - [ ] Zijn de Bluetooth-identificaties in sectie 8 (UUID's en opcodes) gecontroleerd tegen de officiële Bluetooth-specificatie? **Deels (2026-10-15):** alle service- en characteristic-UUID's kloppen met de Bluetooth SIG assigned numbers; de Control Point-opcodes (0x00, 0x07, 0x11, antwoord 0x80) zijn bij 1.2 gecontroleerd tegen GoldenCheetah en Auuki (de FTMS-specificatie zelf is niet vrij te downloaden); ANT+-pagina 51 nog controleren bij 1.7/1.8.
 
