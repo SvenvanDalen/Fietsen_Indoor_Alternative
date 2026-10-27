@@ -15,7 +15,7 @@ namespace FietsApp
     /// sluit het scherm. Zolang het open is staat de rit stil. Maakt zichzelf (met de Strava-koppeling) aan in elke scène
     /// met een <see cref="RideController"/>, zodat er niets in de scène hoeft te worden gezet.
     /// </summary>
-    public sealed class HomeScreen : MonoBehaviour
+    public sealed class HomeScreen : MonoBehaviour, IPanel
     {
         const int RecentRides = 7;
         static readonly CultureInfo Dutch = CultureInfo.GetCultureInfo("nl-NL");

@@ -10,7 +10,7 @@ namespace FietsApp
     /// hartslag en FTP instellen. Elke wijziging gaat via <see cref="ProfileStore.Save"/> en daarmee na een paar
     /// seconden naar de Gist. De rit staat stil zolang het paneel open is.
     /// </summary>
-    public sealed class AccountView : MonoBehaviour
+    public sealed class AccountView : MonoBehaviour, IPanel
     {
         [SerializeField] GitHubAccount account;
         [SerializeField] RideController ride;

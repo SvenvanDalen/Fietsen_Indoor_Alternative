@@ -9,7 +9,7 @@ namespace FietsApp
     /// Ritsamenvatting (story 5.3): op de top een melding met de klimtijd, en aan het eind van de route een paneel met
     /// tijd, afstand, gemiddeld vermogen, klimtijd en hoogtemeters. Enter, Esc of de knop sluit het paneel.
     /// </summary>
-    public sealed class RideSummaryView : MonoBehaviour
+    public sealed class RideSummaryView : MonoBehaviour, IPanel
     {
         [SerializeField] RideController ride;
         [SerializeField] RouteView routeView;

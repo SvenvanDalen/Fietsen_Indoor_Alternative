@@ -13,7 +13,7 @@ namespace FietsApp
     /// duur; pijltjes doen hetzelfde voor het gekozen blok. Opslaan maakt een .zwo in <see cref="WorkoutStore.Folder"/>,
     /// om te delen of in andere apps te gebruiken. De rit staat stil zolang de editor open is.
     /// </summary>
-    public sealed class WorkoutEditor : MonoBehaviour
+    public sealed class WorkoutEditor : MonoBehaviour, IPanel
     {
         [SerializeField] RideController ride;
         [SerializeField] WorkoutController workouts;

@@ -53,6 +53,7 @@ Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
 | `FietsApp.Training` | Rijdersprofiel, vermogenszones, FTP-test en workouts | `noEngineReferences` |
 | `FietsApp.Accounts` | GitHub-account (device flow) en profiel-Gist: berichten, JSON-lezer | `noEngineReferences` |
 | `FietsApp.Strava` | Strava-koppeling: OAuth-berichten, uploads, welke ritten nog moeten (`UploadQueue`) | `noEngineReferences` |
+| `FietsApp.Mobile` | Telefoon en tablet: hoe groot de interface wordt (`UiScale`) | `noEngineReferences` |
 | `FietsApp.Updates` | Updater: release-check, download, sha256, staging (`UpdateFlow`) | `noEngineReferences` |
 | `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer, brugclient (`Bluetooth/`) | Mag Unity gebruiken |
 | `FietsApp.Tests.EditMode` | NUnit-tests | |
@@ -72,6 +73,7 @@ Er is geen command-line testrunner; draai tests met `Unity_RunCommand` via `Test
 - Unity's AI Assistant-pakket wijzigt soms vanzelf `ProjectSettings/` (bijvoorbeeld `APP_UI_EDITOR_ONLY`, `SceneTemplateSettings.json`). Commit die niet mee met eigen werk.
 - Als de Unity-editor op de achtergrond draait, loopt de Play-modus niet door (ook niet met Run In Background). Zet de editor op pauze (`EditorApplication.isPaused = true`) en roep per `Unity_RunCommand` één keer `EditorApplication.Step()` aan: elke opdracht draait dan ongeveer één frame van 20 ms, inclusief async-voortzettingen en WebSocket-berichten. Herhaal de opdracht tot de toestand er is; een lus van `Step()` binnen één opdracht levert niet meer frames op.
 - Beeld controleren: render `Camera.main` naar een `RenderTexture`, sla die op als PNG in de scratchpad en bekijk hem met Read. Overlay-UI komt alleen in beeld als je de canvassen tijdelijk op `ScreenSpaceCamera` zet (en `Canvas.ForceUpdateCanvases()` aanroept). Met `RideController.StartAt(afstand)` spring je naar een plek op de route.
+- Telefoonbeeld in de editor: zet `ScreenFit.Preview = (1080, 400f)` (pixels hoog, dpi), voeg in Play een `TouchBar` toe (die start alleen vanzelf met een aanraakscherm) en render naar een `RenderTexture` van 2400×1080 met de canvassen op `ScreenSpaceCamera`. Zet `Preview` daarna terug op `null`.
 - UI in code: geef een eigen `Graphic`-subklasse expliciet een `CanvasRenderer` mee bij `new GameObject(...)`, anders tekent hij niets (bij `Image` gaat het vanzelf).
 - Compileer nooit terwijl de Play-modus loopt: Unity herlaadt dan de scripts tijdens het spelen, niet-geserialiseerde velden worden leeg en componenten werpen NullReferenceExceptions. Stop Play eerst; dat duurt een frame, dus controleer `EditorApplication.isPlaying` in een volgende opdracht.
 - `Unity_RunCommand` staat `System.Reflection` niet toe, weigert `AssetDatabase.DeleteAsset` (vraagt om bevestiging; verwijder via git) en ondersteunt geen opmaak zoals `{0:0.0}` in `result.Log` (gebruik `$"..."`). Druk knoppen in via `Button.onClick.Invoke()`.

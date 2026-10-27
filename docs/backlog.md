@@ -1066,8 +1066,10 @@ Epic: E14 · Fase: V1 · Prio: Should · Punten: 5
 
 Als rijder wil ik een touch-interface met een leesbare HUD.
 
-- [ ] Grote knoppen
-- [ ] HUD schaalt mee op kleine schermen
+- [x] Grote knoppen
+- [x] HUD schaalt mee op kleine schermen
+
+**Stand (2026-10-27):** gebouwd en bekeken in een telefoonvoorbeeld in de editor (2400×1080 bij 400 dpi); op een echte telefoon volgt bij 14.1. Elk paneel, de HUD-tegels, het hoogteprofiel en de pauzeknoppen groeien op een telefoon of tablet tot de interface oogt als op een scherm van 4,5 inch hoog (een telefoon: ×1,67), maar nooit buiten beeld (`UiScale`, `ScreenFit`). Met een aanraakscherm verschijnt links een knoppenbalk (`TouchBar`): Start, Terug (sluit wat open staat, zoals Escape), Rem (ingedrukt houden) en met de simulator ±25 W. Op een pc verandert er niets, behalve dat een te groot paneel krimpt tot het past.
 
 #### 14.3 Trainer en sensoren via Bluetooth koppelen op de telefoon
 
