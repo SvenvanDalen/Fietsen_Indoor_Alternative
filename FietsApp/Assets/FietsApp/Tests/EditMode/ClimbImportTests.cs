@@ -259,6 +259,35 @@ namespace FietsApp.Tests
         }
     }
 
+    public class HemelpoortTests
+    {
+        const string GpxPath = "Assets/FietsApp/Routes/Hemelpoort.gpx";
+
+        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+
+        [Test]
+        public void MatchesTheDesign()
+        {
+            var stats = ClimbStats.Of(Load());
+
+            // Ontwerp in tools/climbs.json: 9,94 km van 1250 naar 2105 m (8,6%), met een muur van 600 m aan 17%
+            // die na het gladstrijken (Gauss σ 150 m) nog ±16,6% per 100 m is.
+            Assert.That(stats.LengthMeters / 1000f, Is.EqualTo(9.94f).Within(0.05f));
+            Assert.That(stats.StartElevation, Is.EqualTo(1250f).Within(5f));
+            Assert.That(stats.EndElevation, Is.EqualTo(2105f).Within(5f));
+            Assert.That(stats.AverageGradePercent, Is.EqualTo(8.6f).Within(0.1f));
+            Assert.That(stats.MaxGradePercent, Is.InRange(15f, 17.5f));
+            Assert.That(stats.MinGradePercent, Is.GreaterThan(3f));
+            Assert.That(ClimbCategories.Of(stats), Is.EqualTo(ClimbCategory.HC));
+        }
+
+        [Test]
+        public void HasTheStairOfHairpins()
+        {
+            Assert.That(Hairpins.Count(Load()), Is.EqualTo(8));
+        }
+    }
+
     public class ClimbAssetTests
     {
         [Test]

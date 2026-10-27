@@ -140,7 +140,8 @@ def main():
                         help="waar de weg vandaan komt (auto: Overpass, bij falen OSRM)")
     args = parser.parse_args()
 
-    climbs = json.load(open(CATALOG, encoding="utf-8"))["climbs"]
+    # Fantasieklimmen (met "design") hebben geen echte weg; die bouwt tools/fantasy_climb.py.
+    climbs = [c for c in json.load(open(CATALOG, encoding="utf-8"))["climbs"] if "design" not in c]
     if args.only:
         wanted = set(args.only.split(","))
         climbs = [c for c in climbs if c["id"] in wanted]
