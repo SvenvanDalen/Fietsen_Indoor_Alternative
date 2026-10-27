@@ -746,8 +746,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02dfb96a3f2633242bde31c67c39dcdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.RideMenu
-  library: {fileID: 11400000, guid: 69d7db2d21a48034484e354262f60158, type: 2}
-  climbs: []
   routeView: {fileID: 1397060718}
   ride: {fileID: 1293722325}
   openAtStart: 1
@@ -1156,8 +1154,8 @@ MonoBehaviour:
   bareVergeMaterial: {fileID: 2100000, guid: d2713d57375d58549a8b79c61ec2d47a, type: 2}
   roadWidth: 6
   vergeWidth: 2.5
-  climb: {fileID: 11400000, guid: 983c6b2dde51fd343bef26a790dca975, type: 2}
-  library: {fileID: 11400000, guid: 69d7db2d21a48034484e354262f60158, type: 2}
+  climbId: MontVentoux_Bedoin
+  continuousWorld: 1
 --- !u!4 &1397060719
 Transform:
   m_ObjectHideFlags: 0

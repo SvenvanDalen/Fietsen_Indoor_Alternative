@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using FietsApp.Climbs;
 using FietsApp.World;
 using NUnit.Framework;
 
@@ -129,10 +128,10 @@ namespace FietsApp.Tests
 
     public class MontVentouxTests
     {
-        // Het GPX-bestand uit tools/route_from_osm.py; tests draaien met de projectmap als werkmap.
-        const string GpxPath = "Assets/FietsApp/Routes/MontVentoux_Bedoin.gpx";
+        // Het klimpakket uit tools/build_climbs.py.
+        const string Id = "MontVentoux_Bedoin";
 
-        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+        static Route Load() => TestPackages.Route(Id);
 
         [Test]
         public void MatchesTheKnownClimbFromBedoin()
@@ -165,9 +164,9 @@ namespace FietsApp.Tests
 
     public class AlpeDHuezTests
     {
-        const string GpxPath = "Assets/FietsApp/Routes/AlpeDHuez.gpx";
+        const string Id = "AlpeDHuez";
 
-        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+        static Route Load() => TestPackages.Route(Id);
 
         [Test]
         public void MatchesTheKnownClimb()
@@ -203,9 +202,9 @@ namespace FietsApp.Tests
 
     public class StelvioTests
     {
-        const string GpxPath = "Assets/FietsApp/Routes/Stelvio_Prato.gpx";
+        const string Id = "Stelvio_Prato";
 
-        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+        static Route Load() => TestPackages.Route(Id);
 
         [Test]
         public void MatchesTheKnownClimbFromPrato()
@@ -232,9 +231,9 @@ namespace FietsApp.Tests
 
     public class FinestreTests
     {
-        const string GpxPath = "Assets/FietsApp/Routes/Finestre_Susa.gpx";
+        const string Id = "Finestre_Susa";
 
-        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+        static Route Load() => TestPackages.Route(Id);
 
         [Test]
         public void MatchesTheKnownClimbFromSusa()
@@ -261,9 +260,9 @@ namespace FietsApp.Tests
 
     public class BananenbergTests
     {
-        const string GpxPath = "Assets/FietsApp/Routes/Bananenberg.gpx";
+        const string Id = "Bananenberg";
 
-        static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
+        static Route Load() => TestPackages.Route(Id);
 
         [Test]
         public void MatchesTheDesign()
@@ -288,28 +287,25 @@ namespace FietsApp.Tests
         }
     }
 
-    public class ClimbAssetTests
+    public class ClimbSurfaceTests
     {
         [Test]
         public void GravelSection()
         {
-            var climb = UnityEngine.ScriptableObject.CreateInstance<Climb>();
-            climb.surfaces = new[] { new SurfaceSection { from = 10480f, to = 100000f, surface = Surface.Gravel } };
+            var climb = new Climb { Surfaces = new[] { new SurfaceSection { from = 10480f, to = 100000f, surface = Surface.Gravel } } };
 
             Assert.That(climb.SurfaceAt(10000f), Is.EqualTo(Surface.Asphalt));
             Assert.That(climb.SurfaceAt(10480f), Is.EqualTo(Surface.Gravel));
             Assert.That(climb.SurfaceAt(17000f), Is.EqualTo(Surface.Gravel));
-            UnityEngine.Object.DestroyImmediate(climb);
         }
 
         [Test]
         public void Asphalt_ByDefault()
         {
-            var climb = UnityEngine.ScriptableObject.CreateInstance<Climb>();
+            var climb = new Climb();
 
             Assert.That(climb.SurfaceAt(0f), Is.EqualTo(Surface.Asphalt));
             Assert.That(climb.SurfaceAt(5000f), Is.EqualTo(Surface.Asphalt));
-            UnityEngine.Object.DestroyImmediate(climb);
         }
     }
 

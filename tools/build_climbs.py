@@ -1,13 +1,16 @@
-"""Bouwt alle klimmen uit tools/climbs.json (story 4.5): weg (route_from_osm), hoogte en landschap (terrain_from_tiles).
+"""Bouwt alle klimmen uit tools/climbs.json (story 4.5): weg (route_from_osm), hoogte en landschap (terrain_from_tiles),
+en pakt elke klim in als klimpakket met catalogusregel (story 4.15, tools/climb_package.py).
 
 Werkt in twee stappen, zodat de daglimiet van OpenTopoData (1000 verzoeken) niet opgaat aan verkeerde routes:
 
   python tools/build_climbs.py --check          # alleen de weg uit OSM; vergelijkt de lengte met de bekende lengte
-  python tools/build_climbs.py                  # daarna: hoogtes en landschap voor de klimmen die nog geen GPX hebben
+  python tools/build_climbs.py                  # daarna: hoogtes en landschap voor de klimmen die nog geen pakket hebben
+  python tools/build_climbs.py --packages       # alleen opnieuw inpakken, bijv. na een andere naam of begroeiing
 
-Opties: --only id1,id2 voor een deel, --force om een bestaande GPX opnieuw te maken. Bestaande bestanden worden
-overgeslagen. Hoogtes worden bewaard in tools/.cache/ (niet in git), zodat een nieuwe poging geen quotum kost.
-Na afloop: in Unity menu FietsApp > Klimmen bijwerken maakt de Climb-assets en de bibliotheek.
+Opties: --only id1,id2 voor een deel, --force om een bestaande klim opnieuw te maken. Klimmen met een pakket worden
+alleen opnieuw ingepakt. Hoogtes worden bewaard in tools/.cache/ (niet in git), zodat een nieuwe poging geen quotum
+kost. Een pakket dat inhoudelijk verandert krijgt een hogere versie; publiceren is de pakketten en catalogus.json
+naar main pushen (story 4.16).
 """
 import argparse
 import json
@@ -20,9 +23,9 @@ sys.path.insert(0, os.path.dirname(__file__))
 from route_from_osm import (OVERPASS, bridge_structures, distance_m, fetch_elevations, fetch_structures,  # noqa: E402
                             http_json, osrm_path, repair_bumps, resample, route_path, trim_to_climb, write_gpx)
 from terrain_from_tiles import build_terrain  # noqa: E402
+from climb_package import WORK, load_catalog, package, package_all, package_path, save_catalog, work_paths  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROUTES = os.path.join(ROOT, "FietsApp", "Assets", "FietsApp", "Routes")
 CATALOG = os.path.join(ROOT, "tools", "climbs.json")
 CACHE = os.path.join(ROOT, "tools", ".cache", "elevations.json")
 LENGTH_TOLERANCE = 0.15  # 15% verschil met de bekende lengte mag (andere start- of finishplek)
@@ -97,13 +100,15 @@ def find_route(climb, router):
 
 
 def build(climb, check_only, force, cache, router="auto"):
-    gpx = os.path.join(ROUTES, climb["id"] + ".gpx")
-    terrain = os.path.join(ROUTES, climb["id"] + ".terrain.bytes")
+    """Weg, hoogte en landschap van een klim in de werkmap; het inpakken doet main daarna."""
+    gpx, terrain = work_paths(climb["id"])
     known = climb["known"]
+    if os.path.exists(package_path(climb["id"])) and not force:
+        return "bestaat"
     if os.path.exists(gpx) and not force:
         if not check_only and not os.path.exists(terrain):
             build_terrain(gpx, terrain)
-        return "bestaat"
+        return "GPX bestaat"
 
     path, length, problems, source = find_route(climb, router)
     if check_only:
@@ -135,17 +140,25 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--check", action="store_true", help="alleen de weg controleren, geen hoogtes ophalen")
     parser.add_argument("--only", help="komma-gescheiden id's")
-    parser.add_argument("--force", action="store_true", help="bestaande GPX opnieuw maken")
+    parser.add_argument("--force", action="store_true", help="bestaande klim opnieuw maken")
+    parser.add_argument("--packages", action="store_true", help="alleen opnieuw inpakken, zonder netwerk")
     parser.add_argument("--router", choices=["auto", "overpass", "osrm"], default="auto",
                         help="waar de weg vandaan komt (auto: Overpass, bij falen OSRM)")
     args = parser.parse_args()
 
-    # Fantasieklimmen (met "design") hebben geen echte weg; die bouwt tools/fantasy_climb.py.
-    climbs = [c for c in json.load(open(CATALOG, encoding="utf-8"))["climbs"] if "design" not in c]
+    climbs = json.load(open(CATALOG, encoding="utf-8"))["climbs"]
     if args.only:
         wanted = set(args.only.split(","))
         climbs = [c for c in climbs if c["id"] in wanted]
+    if args.packages:
+        for cid, outcome in package_all(climbs):
+            print(f"  {cid:28} {outcome}")
+        return
+    # Fantasieklimmen (met "design") hebben geen echte weg; die bouwt tools/fantasy_climb.py.
+    climbs = [c for c in climbs if "design" not in c]
     os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    os.makedirs(WORK, exist_ok=True)
+    catalog = load_catalog()
     cache = json.load(open(CACHE, encoding="utf-8")) if os.path.exists(CACHE) else {}
 
     results = []
@@ -153,6 +166,9 @@ def main():
         print(f"== {climb['name']}")
         try:
             outcome = build(climb, args.check, args.force, cache, args.router)
+            if not args.check and not outcome.startswith("overgeslagen"):
+                outcome += "; " + package(climb, catalog)
+                save_catalog(catalog)
         except (SystemExit, Exception) as error:  # één klim mag de rest niet tegenhouden
             outcome = f"FOUT: {error}"
         finally:

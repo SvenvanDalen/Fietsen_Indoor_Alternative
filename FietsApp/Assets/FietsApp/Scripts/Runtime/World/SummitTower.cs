@@ -1,3 +1,4 @@
+using FietsApp.Climbs;
 using UnityEngine;
 
 namespace FietsApp
@@ -5,7 +6,7 @@ namespace FietsApp
     /// <summary>
     /// Herkenningspunt op een top, zoals de zendmast van de Mont Ventoux: een laag gebouw, een witte toren en
     /// een rood-witte antenne, low-poly uit eenvoudige vormen. Staat op echte coördinaten en op de hoogte
-    /// van het echte landschap. Alleen bij een klim met <see cref="Climb.summitTower"/> en een hoogtebestand.
+    /// van het echte landschap. Alleen bij een klim met <see cref="Climb.SummitTower"/> en een hoogtebestand.
     /// </summary>
     [ExecuteAlways]
     public sealed class SummitTower : MonoBehaviour
@@ -33,9 +34,9 @@ namespace FietsApp
         {
             var heights = routeView != null ? routeView.NaturalHeights : null;
             var climb = routeView != null ? routeView.Climb : null;
-            if (climb == null || !climb.summitTower || heights == null) return;
+            if (climb == null || !climb.SummitTower || heights == null) return;
             // Echte coördinaten naar de plek in de wereld (ook als de klim daar gedraaid en verschoven ligt).
-            var place = routeView.FromGeo(climb.summitLatitude, climb.summitLongitude);
+            var place = routeView.FromGeo(climb.SummitLatitude, climb.SummitLongitude);
             if (!place.HasValue) return;
             var (x, z) = place.Value;
             var root = _generated.NewObject("Zendmast", transform).transform;

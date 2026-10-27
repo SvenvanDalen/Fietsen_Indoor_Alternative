@@ -17,7 +17,7 @@ behandeling krijgt. Alleen standaardbibliotheek, dus zonder installatie te draai
 
   python tools/route_from_osm.py --ref "D 974" --bbox 44.10,5.15,44.20,5.32 \\
       --start 44.1245,5.1793 --end 44.1740,5.2788 \\
-      --name "Mont Ventoux (Bédoin)" --out FietsApp/Assets/FietsApp/Routes/MontVentoux_Bedoin.gpx
+      --name "Mont Ventoux (Bédoin)" --out tools/.cache/klimmen/MontVentoux_Bedoin.gpx
 
 Zie docs/bronnen.md voor de opdrachten per klim, ook met --highway en --via.
 

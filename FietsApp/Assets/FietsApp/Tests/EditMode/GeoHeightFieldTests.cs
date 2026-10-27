@@ -69,14 +69,13 @@ namespace FietsApp.Tests
 
     public class RealTerrainTests
     {
-        const string GpxPath = "Assets/FietsApp/Routes/MontVentoux_Bedoin.gpx";
-        const string TerrainPath = "Assets/FietsApp/Routes/MontVentoux_Bedoin.terrain.bytes";
 
         [Test]
         public void VentouxTerrain_FollowsTheRealMountain()
         {
-            var route = ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
-            var field = GeoHeightField.Parse(File.ReadAllBytes(TerrainPath));
+            var climb = TestPackages.Load("MontVentoux_Bedoin");
+            var route = ClimbImport.FromGpx(Gpx.Parse(climb.Gpx));
+            var field = GeoHeightField.Parse(climb.Terrain);
             var settings = new TerrainSettings { Margin = 300f };
             var grid = TerrainHeights.Generate(route, settings, new LocalHeights(field, route.Projection));
 

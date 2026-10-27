@@ -112,13 +112,13 @@ namespace FietsApp
             var climb = routeView.Climb;
             if (climb == null) return null; // oefenklim
             string today = System.DateTime.Now.ToString("yyyy-MM-dd");
-            var result = ProfileStore.Current.AddClimbTime(climb.displayName, seconds, today);
+            var result = ProfileStore.Current.AddClimbTime(climb.Name, seconds, today);
             ProfileStore.Save();
             // Eerste keer of nieuw record: dit wordt de ghost voor de volgende keer (9.4).
             if (result.IsFirst || result.IsRecord)
             {
-                var trace = GhostTrace.FromLog(recorder.Log, routeView.ClimbStart, routeView.ClimbEnd, climb.displayName, today);
-                if (trace != null) GhostStore.Save(climb.name, trace);
+                var trace = GhostTrace.FromLog(recorder.Log, routeView.ClimbStart, routeView.ClimbEnd, climb.Name, today);
+                if (trace != null) GhostStore.Save(climb.Id, trace);
             }
             return result.IsRecord ? $"<color=#ffd060>{result.Describe()}</color>" : result.Describe();
         }

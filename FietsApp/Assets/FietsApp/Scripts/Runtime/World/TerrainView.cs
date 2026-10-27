@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FietsApp.Climbs;
 using FietsApp.World;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -65,9 +66,14 @@ namespace FietsApp
             var climb = routeView.Climb;
             // In de doorlopende wereld ligt alles in hoogte verschoven; de boomgrens schuift mee (besluit "Doorlopende wereld").
             float offset = routeView.ElevationOffset;
-            _settings.TreeLine = climb != null ? climb.treeLine + offset : float.MaxValue;
-            _settings.ForestFrom = climb != null ? climb.forestFrom + offset : float.MaxValue;
-            _aboveTreeLine = climb != null && climb.aboveTreeLine != null ? climb.aboveTreeLine : bareMaterial;
+            _settings.TreeLine = climb != null ? climb.TreeLine + offset : float.MaxValue;
+            _settings.ForestFrom = climb != null ? climb.ForestFrom + offset : float.MaxValue;
+            _aboveTreeLine = (climb != null ? climb.AboveTreeLine : Ground.Bare) switch
+            {
+                Ground.Grass => grassMaterial,
+                Ground.DarkGrass => darkGrassMaterial,
+                _ => bareMaterial,
+            };
             _biome = new Biome(_settings);
 
             float t0 = Time.realtimeSinceStartup;

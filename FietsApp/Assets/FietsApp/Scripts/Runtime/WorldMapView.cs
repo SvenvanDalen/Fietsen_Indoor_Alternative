@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using FietsApp.Climbs;
 using FietsApp.Training;
 using FietsApp.World;
 using UnityEngine;
@@ -62,9 +63,9 @@ namespace FietsApp
         {
             _world = routeView.World;
             if (_world == null) return; // geen bibliotheek: geen wereld
-            _assets = rideMenu.Climbs.ToDictionary(c => c.name);
+            _assets = rideMenu.Climbs.ToDictionary(c => c.Id);
             if (_regionButtons.Count == 0) BuildRegions();
-            var current = routeView.Climb != null ? _world.Find(routeView.Climb.name) : null;
+            var current = routeView.Climb != null ? _world.Find(routeView.Climb.Id) : null;
             Select(current != null ? _world.RegionOf(current) : _world.Regions[0]);
             _panel.SetActive(true);
             ride.Hold(this);
@@ -166,7 +167,7 @@ namespace FietsApp
                 Vector2 foot = dir * approach, top = dir * (approach + climb.Route.Length * scale);
                 Line(_detail, Vector2.zero, foot, 2f, new Color(0.6f, 0.6f, 0.6f));
                 var stats = ClimbStats.Of(climb.Route);
-                bool current = routeView.Climb != null && routeView.Climb.name == climb.Id;
+                bool current = routeView.Climb != null && routeView.Climb.Id == climb.Id;
                 Line(_detail, foot, top, current ? 7f : 5f, CategoryColor(ClimbCategories.Of(stats)));
                 if (ProfileStore.Current.HasBadge(climb.Name)) Badge(_detail, top, 16f);
             }
@@ -202,7 +203,7 @@ namespace FietsApp
                 label.fontSize = rowHeight < 30f ? 14 : 17;
                 label.rectTransform.offsetMin = new Vector2(10f, 0f);
                 string color = ColorUtility.ToHtmlStringRGB(CategoryColor(category));
-                bool current = routeView.Climb != null && routeView.Climb.name == climb.Id;
+                bool current = routeView.Climb != null && routeView.Climb.Id == climb.Id;
                 label.text = $"<b>{climb.Name}</b>{(current ? "  <color=#9fd>(nu)</color>" : "")}   " +
                              $"<color=#ddd>{(stats.LengthMeters / 1000f).ToString("0.0", Dutch)} km · " +
                              $"{stats.AverageGradePercent.ToString("0.0", Dutch)}%</color>  " +
