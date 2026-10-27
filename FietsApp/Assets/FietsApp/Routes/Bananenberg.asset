@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4b32d3c1fa44bd43a11f078199919ad, type: 3}
+  m_Name: Bananenberg
+  m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.Climb
+  displayName: Bananenberg
+  gpx: {fileID: 6176564803743436627, guid: a5ad6f7f432778a4a9e05e44751aeb6d, type: 3}
+  terrain: {fileID: 0}
+  region: Fantasie
+  country: Fantasie
+  lengthMeters: 9944.676
+  averageGradePercent: 8.594117
+  elevationGain: 854.6571
+  treeLine: 2100
+  forestFrom: 800
+  aboveTreeLine: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
+  gravelVergeAboveTreeLine: 1
+  surfaces: []
+  summitTower: 0
+  summitLatitude: 0
+  summitLongitude: 0

@@ -323,8 +323,8 @@ Epic: E4 · Fase: MVP · Prio: Must · Punten: 8
 
 Als rijder wil ik 5 startklimmen, waaronder vier echte iconen.
 
-- [ ] Stelvio, Alpe d'Huez, Mont Ventoux en Colle delle Finestre
-- [ ] Plus één fantasieklim
+- [x] Stelvio, Alpe d'Huez, Mont Ventoux en Colle delle Finestre
+- [x] Plus één fantasieklim
 
 **Stand (2026-10-15):** Mont Ventoux vanaf Bédoin is nagemaakt (21,4 km, 313 → 1887 m, gemiddeld 7,4%, max 12,5% per 100 m) met echte weg, echt landschap, boomgrens en zendmast. Bronnen in `docs/bronnen.md`. De pijplijn voor 4.1 en 4.2 is daarmee ook gebouwd.
 
@@ -333,6 +333,8 @@ Als rijder wil ik 5 startklimmen, waaronder vier echte iconen.
 **Stand (2026-10-16, later):** Passo dello Stelvio vanaf Prato erbij (SS38, 24,6 km, 911 → 2759 m, gemiddeld 7,5%, steilste km 9,6%, HC, 45 van de 48 haarspelden herkend). Nog te doen: Colle delle Finestre, een fantasieklim.
 
 **Stand (2026-10-16, Finestre):** Colle delle Finestre vanaf Susa erbij (17,9 km, 485 → 2158 m, gemiddeld 9,3%, HC), met de laatste 7,4 km als grindweg in beeld (extra rolweerstand volgt bij 4.13). De vier iconen staan er daarmee; nog te doen: een fantasieklim.
+
+**Stand (2026-10-27):** fantasieklim Bananenberg erbij (gebied Fantasie, 9,9 km, 1250 → 2105 m, gemiddeld 8,6%, HC): aanloop, een trap van acht haarspelden aan 9%, de muur "De Poort" van 600 m aan 17% (na gladstrijken ±16,6%), een adempauze en een finale aan 12% boven de boomgrens. Ontworpen in `tools/climbs.json` (veld `design`: weg en hellingsprofiel) en gebouwd met `tools/fantasy_climb.py`; de GPX ligt in de Noordzee, zodat de rit op Strava niet over een echte weg lijkt te gaan. Geen echt landschap: Unity verzint de bergen. Daarmee staan de vijf startklimmen er.
 
 #### 4.5 Bibliotheek met 50+ klimmen
 

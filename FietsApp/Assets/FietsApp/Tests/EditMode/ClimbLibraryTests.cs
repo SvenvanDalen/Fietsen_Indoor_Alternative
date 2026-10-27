@@ -31,7 +31,8 @@ namespace FietsApp.Tests
         public void ClimbIsRideable(Climb climb)
         {
             Assert.That(climb.gpx, Is.Not.Null, "GPX ontbreekt");
-            Assert.That(climb.terrain, Is.Not.Null, "landschap ontbreekt");
+            // Een fantasieklim heeft geen echt landschap; Unity verzint er bergen omheen.
+            if (climb.region != "Fantasie") Assert.That(climb.terrain, Is.Not.Null, "landschap ontbreekt");
             Assert.That(climb.region, Is.Not.Empty, "gebied ontbreekt");
 
             var route = ClimbImport.FromGpx(Gpx.Parse(climb.gpx.text));
