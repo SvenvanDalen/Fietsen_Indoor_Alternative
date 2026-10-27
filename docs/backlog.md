@@ -755,7 +755,7 @@ Epic: E13 · Fase: MVP · Prio: Should · Punten: 5
 
 Als rijder wil ik de app voor Windows downloaden van GitHub en dat hij zichzelf daarna bijwerkt.
 
-- [ ] Elke push naar `main` maakt een GitHub Release met de app en de brug
+- [ ] Elke push naar `production` maakt een GitHub Release met de app en de brug (vanaf 2026-10-27; daarvoor `main`)
 - [ ] De app zet een nieuwere release op de achtergrond klaar en installeert hem bij afsluiten of via "Nu herstarten"
 - [ ] Mislukt de update, dan blijft de oude versie werken
 - [ ] De app start de meegeleverde brug zelf

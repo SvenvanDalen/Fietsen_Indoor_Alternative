@@ -1,10 +1,10 @@
-# Windows-release bij elke push naar main (story 13.6): tests, Unity-build, brug, zip en GitHub Release.
+# Windows-release bij elke push naar production (story 13.6); production krijgt af en toe een PR vanaf main: tests, Unity-build, brug, zip en GitHub Release.
 # De app haalt de nieuwste release op en werkt zichzelf bij; zie docs/releases.md.
 name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [production]
     paths:
       - 'FietsApp/**'
       - 'Bridge/**'
@@ -84,8 +84,8 @@ jobs:
 
   release:
     name: Brug, zip en release
-    # Alleen vanaf main: een handmatige run op een andere branch mag nooit een release worden waar alle installaties naar bijwerken.
-    if: github.ref == 'refs/heads/main'
+    # Alleen vanaf production: een handmatige run op een andere branch mag nooit een release worden waar alle installaties naar bijwerken.
+    if: github.ref == 'refs/heads/production'
     needs: build
     runs-on: windows-latest
     defaults:
