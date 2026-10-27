@@ -31,7 +31,7 @@ Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, 
 
 ## Releases en updates
 
-Elke push naar `main` maakt via `.github/workflows/release.yml` een Windows-release; de app werkt zichzelf daarmee bij (`docs/releases.md`).
+Elke push naar `production` maakt via `.github/workflows/release.yml` een Windows-release; de app werkt zichzelf daarmee bij (`docs/releases.md`). De pipeline duurt lang, dus werk gaat gewoon naar `main` en de eigenaar zet af en toe een release klaar met een PR van `main` naar `production`. Open die PR alleen als de eigenaar erom vraagt.
 
 - Logica in `FietsApp.Updates` (engine-vrij, getest), lijm in `Runtime/Updates/` en `Runtime/Bluetooth/BridgeLauncher.cs`; ze draaien alleen in de Windows-speler, niet in de Editor.
 - `tools/installer/FietsApp.iss` maakt `FietsApp-Setup.exe` (Inno Setup); het updatescript neemt het verwijderprogramma (`unins*`) over uit de oude map, want dat zit niet in de zip.

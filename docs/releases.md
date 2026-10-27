@@ -1,6 +1,6 @@
 # Releases en updates (story 13.6)
 
-Elke push naar `main` die iets in `FietsApp/`, `Bridge/`, `tools/updater/` of `tools/installer/` verandert, maakt via `.github/workflows/release.yml` een nieuwe Windows-versie: release `v0.1.<runnummer>` met
+Elke push naar `production` die iets in `FietsApp/`, `Bridge/`, `tools/updater/` of `tools/installer/` verandert, maakt via `.github/workflows/release.yml` een nieuwe Windows-versie: release `v0.1.<runnummer>` met
 
 - `FietsApp-Setup.exe`: de installer voor nieuwe gebruikers (Inno Setup, `tools/installer/FietsApp.iss`);
 - `FietsApp-Windows.zip` en `FietsApp-Windows.zip.sha256`: wat de app zelf gebruikt om bij te werken. De zip bevat de app, de Bluetooth-brug (`Bridge/FietsBridge.exe`) en het updatescript.
@@ -39,4 +39,4 @@ De workflow bouwt met [GameCI](https://game.ci) en heeft een Unity-licentie nodi
 
 Zie <https://game.ci/docs/github/activation> voor een Personal-licentie. Controle: `gh secret list` toont alle drie. Verloopt de licentie, vervang dan `UNITY_LICENSE`.
 
-Handmatig een release maken kan met `gh workflow run release.yml` (of *Run workflow* op GitHub), alleen vanaf `main`. Op een andere branch draaien alleen de tests en de build.
+Handmatig een release maken kan met `gh workflow run release.yml` (of *Run workflow* op GitHub), alleen vanaf `production`. Op een andere branch draaien alleen de tests en de build.
