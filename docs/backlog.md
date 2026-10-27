@@ -240,8 +240,8 @@ Epic: E3 · Fase: MVP · Prio: Must · Punten: 13 (eerst splitsen)
 
 Als rijder wil ik een 3D-weg langs een route zien.
 
-- [ ] Weg gegenereerd uit GPX
-- [ ] 60 fps op een gemiddelde laptop
+- [x] Weg gegenereerd uit GPX
+- [x] 60 fps op een gemiddelde laptop
 
 **Gesplitst (2026-10-15):**
 
@@ -250,6 +250,8 @@ Als rijder wil ik een 3D-weg langs een route zien.
 - 3.1c Rijder en camera volgen de route; de helling van de route gaat naar de rit (2 pt)
 - 3.1d Weg uit GPX, samen met 4.1 (3 pt)
 - 3.1e Prestaties: weg in stukken opdelen en alleen het zichtbare deel tekenen, 60 fps (3 pt)
+
+**Stand 3.1e (2026-10-27):** gemeten met de nieuwe prestatietest (`FietsApp.exe -benchmark [-benchmark-climb AlpeDHuez]`: rijdt vijf stukken van een klim, meet zonder vsync en schrijft `[Benchmark]` in het log). Op de geïntegreerde Intel Arc 140T (1920×1200, kwaliteit PC): Alpe d'Huez gemiddeld 173 fps (1% traagste beeldjes 94 fps), Stelvio vanaf Prato 139 fps (98 fps). Het terrein was al in stukken met grovere driehoeken op afstand; de weg zelf is één kleine mesh (2 hoekpunten per 10 m) en hoeft niet opgedeeld. Eén haper van 140 ms bij het begin van de eerste meting op Alpe d'Huez; verder nergens boven 40 ms.
 
 #### 3.2 Terrein dat past bij de klim
 

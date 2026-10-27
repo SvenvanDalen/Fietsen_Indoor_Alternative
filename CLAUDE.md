@@ -39,6 +39,7 @@ Elke push naar `production` maakt via `.github/workflows/release.yml` een Window
 - Assetnamen (`FietsApp-Windows.zip`, `.sha256`) en de tag `v0.1.<run>` staan in de workflow én in `UpdateDecision`; wijzig ze samen.
 - Netwerk in de speler via `UnityWebRequest`, niet `HttpClient`: Mono's eigen TLS faalt daar op GitHub ("TrustFailure: Chain instance is empty"), terwijl het in de Editor wel werkt.
 - Lokaal proberen: bouw met `Unity.exe -batchmode -quit -projectPath FietsApp -buildTarget Win64 -buildWindows64Player <map>\FietsApp.exe` en start de speler met `-batchmode -nographics -logFile <log>`; zoek naar `[Update]`.
+- Prestaties meten: start de speler met `-benchmark` (en `-benchmark-climb <assetnaam>`, standaard `AlpeDHuez`) en `--no-update`; hij rijdt vijf stukken, schrijft `[Benchmark]` met fps in het log en sluit af. Voor de geïntegreerde GPU: zet in `HKCU\Software\Microsoft\DirectX\UserGpuPreferences` de waarde `GpuPreference=1;` op het pad van de exe en haal hem daarna weer weg.
 
 ## Unity-project (`FietsApp/`)
 
