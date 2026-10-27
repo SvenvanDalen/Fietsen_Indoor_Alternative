@@ -78,7 +78,7 @@ namespace FietsApp
             var geo = routeView.ToGeo(here.X, here.Z);
             if (geo.HasValue) (lat, lon) = geo.Value;
             var t = ride.Trainer;
-            if (_log.Count == 0) _climbName = routeView.Climb != null ? routeView.Climb.displayName : "Oefenklim";
+            if (_log.Count == 0) _climbName = routeView.Climb != null ? routeView.Climb.Name : "Oefenklim";
             // Echte hoogte en echte ligging, ook als de klim in de doorlopende wereld verschoven ligt.
             _log.Add(new RideSample(DateTime.UtcNow, t.PowerWatts, t.CadenceRpm, t.HeartRateBpm, ride.SpeedMs,
                 distance, routeView.RealElevation(here.Elevation), lat, lon));

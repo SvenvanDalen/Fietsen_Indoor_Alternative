@@ -2,22 +2,23 @@
 
 Een ontwerp bestaat uit een weg (stukken rechtdoor, bochten en een trap van haarspelden) en een hellingsprofiel
 (helling per stuk, in meter vanaf de voet). Het script legt de weg op een vast punt op de kaart (in zee, zodat de
-rit op Strava niet over een echte weg lijkt te gaan) en schrijft een GPX naar FietsApp/Assets/FietsApp/Routes/.
+rit op Strava niet over een echte weg lijkt te gaan) en maakt er een klimpakket van (story 4.15, tools/climb_package.py).
 Er is geen hoogtebestand van het landschap; Unity maakt er verzonnen bergen omheen.
 
   python tools/fantasy_climb.py                 # alle fantasieklimmen
   python tools/fantasy_climb.py --only Bananenberg
-
-Na afloop: in Unity menu FietsApp > Klimmen bijwerken.
 """
 import argparse
 import json
 import math
 import os
+import sys
 from xml.sax.saxutils import escape
 
+sys.path.insert(0, os.path.dirname(__file__))
+from climb_package import WORK, load_catalog, package, save_catalog, work_paths  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROUTES = os.path.join(ROOT, "FietsApp", "Assets", "FietsApp", "Routes")
 CATALOG = os.path.join(ROOT, "tools", "climbs.json")
 EARTH_RADIUS = 6371000.0
 STEP = 5.0  # m tussen de punten van de GPX
@@ -113,7 +114,8 @@ def build(climb):
     design = climb["design"]
     points = trace(design["path"])
     heights, length = elevations(points, design["start_elevation"], design["grades"])
-    write_gpx(os.path.join(ROUTES, climb["id"] + ".gpx"), climb["name"], to_geo(points, design["origin"]), heights)
+    os.makedirs(WORK, exist_ok=True)
+    write_gpx(work_paths(climb["id"])[0], climb["name"], to_geo(points, design["origin"]), heights)
     gain = heights[-1] - heights[0]
     return f"{length / 1000:.1f} km, {heights[0]:.0f} -> {heights[-1]:.0f} m, gemiddeld {100 * gain / length:.1f}%"
 
@@ -127,8 +129,10 @@ def main():
     if args.only:
         wanted = set(args.only.split(","))
         climbs = [c for c in climbs if c["id"] in wanted]
+    catalog = load_catalog()
     for climb in climbs:
-        print(f"{climb['name']}: {build(climb)}")
+        print(f"{climb['name']}: {build(climb)}; {package(climb, catalog)}")
+    save_catalog(catalog)
 
 
 if __name__ == "__main__":

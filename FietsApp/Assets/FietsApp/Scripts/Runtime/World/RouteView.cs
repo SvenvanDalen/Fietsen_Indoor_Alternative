@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using FietsApp.Climbs;
 using FietsApp.World;
 using UnityEngine;
 
@@ -26,10 +27,10 @@ namespace FietsApp
         [SerializeField, Min(2f)] float roadWidth = 6f;
         [SerializeField, Min(0f)] float vergeWidth = 2.5f;
 
-        [Tooltip("De klim (Assets/FietsApp/Routes). Leeg = de oefenklim.")]
-        [SerializeField] Climb climb;
-        [Tooltip("Alle klimmen; samen vormen ze de doorlopende wereld (story 4.11). Leeg = alleen de klim zelf.")]
-        [SerializeField] ClimbLibrary library;
+        [Tooltip("Id van de klim (het klimpakket in Resources/Klimmen, story 4.15). Leeg = de oefenklim.")]
+        [SerializeField] string climbId = "MontVentoux_Bedoin";
+        [Tooltip("Alle klimmen vormen samen de doorlopende wereld (story 4.11). Uit = alleen de klim zelf.")]
+        [SerializeField] bool continuousWorld = true;
 
         readonly GeneratedContent _generated = new GeneratedContent();
         Route _route, _climbRoute, _ownRoute;
@@ -37,23 +38,20 @@ namespace FietsApp
         bool _journeyResolved;
         IHeightSource _naturalHeights;
         CornerSpeeds _corners;
+        Climb _climb;
 
-        static ClimbLibrary _worldFor;
         static WorldMap _world;
+
+        Climb climb => _climb ?? (_climb = string.IsNullOrEmpty(climbId) ? null : ClimbLibrary.Find(climbId));
 
         /// <summary>De doorlopende wereld van alle klimmen in de bibliotheek, eenmalig opgebouwd.</summary>
         public WorldMap World
         {
             get
             {
-                if (library == null || library.climbs == null || library.climbs.Length == 0) return null;
-                if (_worldFor != library || _world == null)
-                {
-                    _world = WorldMap.Build(library.climbs.Where(c => c != null && c.gpx != null)
-                        .Select(c => new WorldClimb(c.name, c.displayName, c.region, ClimbImport.FromGpx(Gpx.Parse(c.gpx.text)))));
-                    _worldFor = library;
-                }
-                return _world;
+                if (!continuousWorld || ClimbLibrary.All.Count == 0) return null;
+                return _world ?? (_world = WorldMap.Build(ClimbLibrary.All
+                    .Select(c => new WorldClimb(c.Id, c.Name, c.Region, ClimbImport.FromGpx(Gpx.Parse(c.Gpx))))));
             }
         }
 
@@ -64,15 +62,15 @@ namespace FietsApp
             {
                 if (_journeyResolved) return _journey;
                 _journeyResolved = true;
-                var placed = climb != null ? World?.Find(climb.name) : null;
+                var placed = climb != null ? World?.Find(climb.Id) : null;
                 _journey = placed != null ? World.Journey(placed) : null;
                 return _journey;
             }
         }
 
         /// <summary>De klim zelf in eigen meters en echte hoogte (voor geografie en statistiek).</summary>
-        public Route OwnRoute => _ownRoute ?? (_ownRoute = climb != null && climb.gpx != null
-            ? ClimbImport.FromGpx(Gpx.Parse(climb.gpx.text))
+        public Route OwnRoute => _ownRoute ?? (_ownRoute = climb != null
+            ? ClimbImport.FromGpx(Gpx.Parse(climb.Gpx))
             : TestRoutes.Testklim());
 
         // Lui aangemaakt, zodat andere componenten de route kunnen opvragen ongeacht in welke volgorde OnEnable draait.
@@ -140,7 +138,8 @@ namespace FietsApp
         /// <summary>Kies een andere klim tijdens het spelen (ritmenu, story 6.3).</summary>
         public void SetClimb(Climb value)
         {
-            climb = value;
+            _climb = value;
+            climbId = value?.Id;
             _generated.DestroyAll();
             OnEnable();
             ClimbChanged?.Invoke();
@@ -148,14 +147,15 @@ namespace FietsApp
 
         /// <summary>Echt landschap in de lokale meters van de route, of null als er geen is.</summary>
         public IHeightSource NaturalHeights =>
-            _naturalHeights ?? (_naturalHeights = climb == null || climb.terrain == null || OwnRoute.Projection == null ? null
+            _naturalHeights ?? (_naturalHeights = climb == null || climb.Terrain == null || OwnRoute.Projection == null ? null
                 : Journey != null
-                    ? new WorldHeights(GeoHeightField.Parse(climb.terrain.bytes), OwnRoute.Projection, Journey.Climb.Placement)
-                    : (IHeightSource)new LocalHeights(GeoHeightField.Parse(climb.terrain.bytes), OwnRoute.Projection));
+                    ? new WorldHeights(GeoHeightField.Parse(climb.Terrain), OwnRoute.Projection, Journey.Climb.Placement)
+                    : (IHeightSource)new LocalHeights(GeoHeightField.Parse(climb.Terrain), OwnRoute.Projection));
 
         void OnEnable()
         {
-            // Opnieuw inlezen, voor als de GPX of het landschap in de inspector is gewisseld.
+            // Opnieuw inlezen, voor als de klim in de inspector is gewisseld.
+            if (_climb != null && _climb.Id != climbId) _climb = null;
             _route = _climbRoute = _ownRoute = null;
             _journey = null;
             _journeyResolved = false;
@@ -185,7 +185,7 @@ namespace FietsApp
                     roadMaterial, unpavedRoadMaterial ?? roadMaterial, cobblesRoadMaterial ?? roadMaterial, snowRoadMaterial ?? roadMaterial,
                 }, pts,
                 i => (int)SurfaceAt(pts[i].Distance));
-            float gravelFrom = climb != null && climb.gravelVergeAboveTreeLine ? climb.treeLine : float.MaxValue;
+            float gravelFrom = climb != null && climb.GravelVergeAboveTreeLine ? climb.TreeLine : float.MaxValue;
             AddStrip("Berm", verges, new[] { vergeMaterial, bareVergeMaterial ?? vergeMaterial }, pts,
                 i => RealElevation(pts[i].Elevation) > gravelFrom ? 1 : 0);
         }

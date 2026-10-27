@@ -51,7 +51,7 @@ namespace FietsApp
         public void Reload()
         {
             _footTime = null;
-            _trace = routeView.Climb != null ? GhostStore.Load(routeView.Climb.name) : null;
+            _trace = routeView.Climb != null ? GhostStore.Load(routeView.Climb.Id) : null;
             if (_trace != null && _ghost == null) _ghost = MakeGhost();
             if (_ghost != null) _ghost.gameObject.SetActive(false);
             _lastGhostDistance = -1f;

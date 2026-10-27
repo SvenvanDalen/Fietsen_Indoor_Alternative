@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FietsApp.Climbs;
 using UnityEngine;
 
 namespace FietsApp
@@ -46,7 +47,7 @@ namespace FietsApp
             var route = FindAnyObjectByType<RouteView>();
             var menu = FindAnyObjectByType<RideMenu>();
             string id = Argument("-benchmark-climb", "AlpeDHuez");
-            var climb = menu != null ? menu.Climbs.FirstOrDefault(c => c.name == id) : null;
+            var climb = menu != null ? menu.Climbs.FirstOrDefault(c => c.Id == id) : null;
             if (climb == null)
             {
                 Debug.LogError($"[Benchmark] klim {id} niet gevonden");
@@ -75,7 +76,7 @@ namespace FietsApp
                 all.AddRange(frames);
             }
 
-            Debug.Log($"[Benchmark] {climb.displayName}, {SystemInfo.graphicsDeviceName}, {Screen.width}x{Screen.height}, " +
+            Debug.Log($"[Benchmark] {climb.Name}, {SystemInfo.graphicsDeviceName}, {Screen.width}x{Screen.height}, " +
                       $"kwaliteit {QualitySettings.names[QualitySettings.GetQualityLevel()]}: {Report(all)}");
             Application.Quit();
         }

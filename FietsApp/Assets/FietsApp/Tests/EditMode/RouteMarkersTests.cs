@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FietsApp.World;
 using NUnit.Framework;
-using UnityEditor;
 using UnityEngine;
 
 namespace FietsApp.Tests
@@ -81,8 +80,7 @@ namespace FietsApp.Tests
         public void AlpeDHuezHasItsTwentyOneBends()
         {
             // Werkelijkheid: 21 genummerde bochten (bord 21 onderaan, 1 bij de finish).
-            var gpx = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/FietsApp/Routes/AlpeDHuez.gpx");
-            var pins = RouteMarkers.Hairpins(ClimbImport.FromGpx(Gpx.Parse(gpx.text)));
+            var pins = RouteMarkers.Hairpins(TestPackages.Route("AlpeDHuez"));
             Assert.That(pins, Has.Count.EqualTo(21));
             Assert.That(pins[0].Number, Is.EqualTo(21));
         }
@@ -91,8 +89,7 @@ namespace FietsApp.Tests
         public void StelvioFromPratoHasAboutFortyEightTornanti()
         {
             // Werkelijkheid: 48 tornanti; de bovenste liggen soms zo dicht op elkaar dat er een paar samenvallen.
-            var gpx = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/FietsApp/Routes/Stelvio_Prato.gpx");
-            var pins = RouteMarkers.Hairpins(ClimbImport.FromGpx(Gpx.Parse(gpx.text)));
+            var pins = RouteMarkers.Hairpins(TestPackages.Route("Stelvio_Prato"));
             Assert.That(pins.Count, Is.InRange(44, 50));
         }
     }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using FietsApp.Climbs;
 using FietsApp.Training;
 using FietsApp.World;
 using UnityEngine;
@@ -17,9 +18,6 @@ namespace FietsApp
     /// </summary>
     public sealed class RideMenu : MonoBehaviour, IPanel
     {
-        [Tooltip("Alle klimmen (Routes/Bibliotheek.asset). Leeg = de lijst hieronder.")]
-        [SerializeField] ClimbLibrary library;
-        [SerializeField] Climb[] climbs;
         [SerializeField] RouteView routeView;
         [SerializeField] RideController ride;
         [SerializeField] bool openAtStart = true;
@@ -31,6 +29,7 @@ namespace FietsApp
         readonly ClimbFilter _filter = new ClimbFilter();
         ClimbSummary[] _summaries;
         GameObject _panel;
+        Climb[] climbs;
         RectTransform _panelRect, _footer;
         Text _lengthLabel, _gradeLabel, _categoryLabel, _regionLabel, _countryLabel, _empty, _pageLabel, _scaleLabel, _everestingLabel, _stageLabel, _title;
         EverestingView _everesting;
@@ -53,8 +52,7 @@ namespace FietsApp
             if (ride == null) ride = FindAnyObjectByType<RideController>();
             _everesting = FindAnyObjectByType<EverestingView>();
             _stageController = FindAnyObjectByType<StageController>();
-            var source = library != null && library.climbs.Length > 0 ? library.climbs : climbs ?? new Climb[0];
-            climbs = source.Where(c => c != null && c.gpx != null).ToArray();
+            climbs = ClimbLibrary.All.ToArray();
             UiFactory.EnsureEventSystem();
             Build();
             _panel.SetActive(false);
@@ -66,17 +64,17 @@ namespace FietsApp
             _filter.SetRegions(_summaries.Select(s => s.Region));
             _filter.SetCountries(_summaries.Select(s => s.Country));
             if (routeView.Climb != null)
-                ride.GradeScale = ProfileStore.Current.GradeScale(routeView.Climb.displayName) / 100f;
+                ride.GradeScale = ProfileStore.Current.GradeScale(routeView.Climb.Name) / 100f;
             if (openAtStart && FindAnyObjectByType<HomeScreen>() == null) Open(); // anders opent het startscherm
         }
 
-        /// <summary>Opgeslagen kerncijfers als die er zijn; anders de GPX inlezen.</summary>
+        /// <summary>Kerncijfers uit het pakket als die er zijn; anders de GPX inlezen.</summary>
         ClimbSummary Summarize(Climb c)
         {
-            if (c.lengthMeters > 0f)
-                return ClimbSummary.Of(c.displayName, c.lengthMeters, c.averageGradePercent, c.elevationGain, c.region, c.country);
-            var route = c == routeView.Climb ? routeView.OwnRoute : ClimbImport.FromGpx(Gpx.Parse(c.gpx.text));
-            return ClimbSummary.Of(c.displayName, ClimbStats.Of(route), c.region, c.country);
+            if (c.LengthMeters > 0f)
+                return ClimbSummary.Of(c.Name, c.LengthMeters, c.AverageGradePercent, c.ElevationGain, c.Region, c.Country);
+            var route = c == routeView.Climb ? routeView.OwnRoute : ClimbImport.FromGpx(Gpx.Parse(c.Gpx));
+            return ClimbSummary.Of(c.Name, ClimbStats.Of(route), c.Region, c.Country);
         }
 
         void Update()
@@ -99,7 +97,7 @@ namespace FietsApp
             _panel.SetActive(true);
             ride.Hold(this); // rit staat stil zolang je kiest
             _gradeScale = routeView.Climb != null
-                ? ProfileStore.Current.GradeScale(routeView.Climb.displayName)
+                ? ProfileStore.Current.GradeScale(routeView.Climb.Name)
                 : RiderProfile.DefaultGradeScale;
             Refresh();
         }
@@ -122,9 +120,9 @@ namespace FietsApp
                 return;
             }
             if (climbs[index] != routeView.Climb) routeView.SetClimb(climbs[index]);
-            if (ProfileStore.Current.GradeScale(climbs[index].displayName) != _gradeScale)
+            if (ProfileStore.Current.GradeScale(climbs[index].Name) != _gradeScale)
             {
-                ProfileStore.Current.SetGradeScale(climbs[index].displayName, _gradeScale);
+                ProfileStore.Current.SetGradeScale(climbs[index].Name, _gradeScale);
                 ProfileStore.Save();
             }
             ride.GradeScale = _gradeScale / 100f;
@@ -139,7 +137,7 @@ namespace FietsApp
         public void Ride(Climb climb)
         {
             if (climb != routeView.Climb) routeView.SetClimb(climb);
-            ride.GradeScale = ProfileStore.Current.GradeScale(climb.displayName) / 100f;
+            ride.GradeScale = ProfileStore.Current.GradeScale(climb.Name) / 100f;
             ride.StartAt(0f);
             if (IsOpen) Close();
         }
@@ -150,7 +148,7 @@ namespace FietsApp
             if (!_composing) _composing = true;
             else if (_stage.CanStart)
             {
-                var chosen = _stage.Climbs.Select(id => climbs.First(c => c.name == id)).ToList();
+                var chosen = _stage.Climbs.Select(id => climbs.First(c => c.Id == id)).ToList();
                 StopComposing();
                 _stageController.Begin(chosen);
                 return;
@@ -161,7 +159,7 @@ namespace FietsApp
 
         void ChooseForStage(Climb climb)
         {
-            _stageNote = _stage.Toggle(climb.name, climb.region) switch
+            _stageNote = _stage.Toggle(climb.Id, climb.Region) switch
             {
                 StageChoice.OtherRegion => $"alleen klimmen uit {_stage.Region}",
                 StageChoice.Full => $"hooguit {Stage.MaxClimbs} klimmen",
@@ -242,13 +240,13 @@ namespace FietsApp
                 int index = _shown[first + i];
                 var climb = _summaries[index];
                 bool current = climbs[index] == routeView.Climb;
-                int inStage = IndexOf(_stage.Climbs, climbs[index].name);
+                int inStage = IndexOf(_stage.Climbs, climbs[index].Id);
                 label.text = (inStage >= 0 ? $"<color=#ffd060>[{inStage + 1}]</color> " : "") +
                              $"{i + 1}.  <b>{climb.Name}</b>{(current ? "  <color=#9fd>(nu)</color>" : "")}" +
                              $"   <color=#ddd>{climb.Details(Dutch)}</color>" +
                              Place(climb) +
-                             ScaleNote(climbs[index].displayName) +
-                             RecordNote(climbs[index].displayName);
+                             ScaleNote(climbs[index].Name) +
+                             RecordNote(climbs[index].Name);
             }
             _empty.gameObject.SetActive(_shown.Count == 0);
             _pageLabel.text = $"{_shown.Count} klimmen · {_page + 1}/{pages}";

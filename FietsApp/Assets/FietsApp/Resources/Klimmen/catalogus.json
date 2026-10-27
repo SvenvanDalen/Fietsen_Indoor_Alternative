@@ -1,0 +1,453 @@
+{
+  "format": 1,
+  "climbs": [
+    {
+      "id": "Agnello",
+      "version": 1,
+      "format": 1,
+      "sha256": "6087dd47bfd8f7c8624af35ed32580d8acdd94dfe9eb60979e225ea1bf1c1da1",
+      "file": "Agnello.klim.bytes",
+      "size": 245883
+    },
+    {
+      "id": "Allos_Barcelonnette",
+      "version": 1,
+      "format": 1,
+      "sha256": "84327fabd0059af82d2b7c33d8684dc3b1b48755cde1673998fa36556b7753e0",
+      "file": "Allos_Barcelonnette.klim.bytes",
+      "size": 144682
+    },
+    {
+      "id": "AlpeDHuez",
+      "version": 1,
+      "format": 1,
+      "sha256": "8266f5666dc85ef32b26a1e27604e393c32fda31eef9f271363cf3b42a953f36",
+      "file": "AlpeDHuez.klim.bytes",
+      "size": 48371
+    },
+    {
+      "id": "Angliru",
+      "version": 1,
+      "format": 1,
+      "sha256": "4361c232da607e6b9865fabdcc33c59d44b5403fa40ce64b7920fbc87c5cd45a",
+      "file": "Angliru.klim.bytes",
+      "size": 60404
+    },
+    {
+      "id": "Aspin_Arreau",
+      "version": 1,
+      "format": 1,
+      "sha256": "ce44d3c93c0e01181a20a409403627fe9ff4ef6672df51a1cc2f15bc97d50caa",
+      "file": "Aspin_Arreau.klim.bytes",
+      "size": 59585
+    },
+    {
+      "id": "Aubisque_Laruns",
+      "version": 1,
+      "format": 1,
+      "sha256": "d1f6939c2c6e1c5bfa76dd7d5baaa93cad4e620c6f55ab40d37ef213f73d2006",
+      "file": "Aubisque_Laruns.klim.bytes",
+      "size": 92854
+    },
+    {
+      "id": "Bananenberg",
+      "version": 1,
+      "format": 1,
+      "sha256": "1df407cde8aade9ecfb56124ea333dcaffb4a4146cb351df5662da98e1ef8db2",
+      "file": "Bananenberg.klim.bytes",
+      "size": 18562
+    },
+    {
+      "id": "Bonette",
+      "version": 1,
+      "format": 1,
+      "sha256": "df63b132a9fdb75b387c7b73c643863fda2be9be7786698d9fa2d1a6aa363c90",
+      "file": "Bonette.klim.bytes",
+      "size": 204718
+    },
+    {
+      "id": "Cauberg",
+      "version": 1,
+      "format": 1,
+      "sha256": "511d04b3f152e85bfea5353e5d5093578a0ab2fe45f8ca5b6068b8d4a4a77ba7",
+      "file": "Cauberg.klim.bytes",
+      "size": 6659
+    },
+    {
+      "id": "Colombiere",
+      "version": 1,
+      "format": 1,
+      "sha256": "1bcbd9c42927e0f7c26b4fa933927d46bb99d329c65a5e3f257d0bcd10d03a34",
+      "file": "Colombiere.klim.bytes",
+      "size": 143426
+    },
+    {
+      "id": "CroixDeFer",
+      "version": 1,
+      "format": 1,
+      "sha256": "c82e67be59bc17445e78738382be88159c26b9eb731a3a01df4df2e2223eed0a",
+      "file": "CroixDeFer.klim.bytes",
+      "size": 301990
+    },
+    {
+      "id": "Falzarego_Cortina",
+      "version": 1,
+      "format": 1,
+      "sha256": "0f990e6a3f99b0e9f98c25753e1a32916498465dab59d0bad93d47d5f5dfdc2d",
+      "file": "Falzarego_Cortina.klim.bytes",
+      "size": 112560
+    },
+    {
+      "id": "Fedaia",
+      "version": 1,
+      "format": 1,
+      "sha256": "3daceef47c7fd211fe159c8a102eef8bc2d7570cd1ab1acd39a9a56f0db36ebb",
+      "file": "Fedaia.klim.bytes",
+      "size": 123674
+    },
+    {
+      "id": "Finestre_Susa",
+      "version": 1,
+      "format": 1,
+      "sha256": "7ff6994536351da384b374aacc792ca8ab3f6d28ca2de856d55c91cd56acd448",
+      "file": "Finestre_Susa.klim.bytes",
+      "size": 68123
+    },
+    {
+      "id": "Furka_Realp",
+      "version": 1,
+      "format": 1,
+      "sha256": "0f025f4524d95416a5950f959bbd5bad7003f4f31efaa0d17eb6f563029a3baa",
+      "file": "Furka_Realp.klim.bytes",
+      "size": 86825
+    },
+    {
+      "id": "Galibier_Valloire",
+      "version": 1,
+      "format": 1,
+      "sha256": "2b16e509ad8b3463dfbaceef37d1b0b067ac051fa1346cc15dce678e20d200f9",
+      "file": "Galibier_Valloire.klim.bytes",
+      "size": 114221
+    },
+    {
+      "id": "Gardena_Corvara",
+      "version": 1,
+      "format": 1,
+      "sha256": "3a60cbd731b42a3b460a7b87456632befea0ea860706d09ee0478c60d1bb864f",
+      "file": "Gardena_Corvara.klim.bytes",
+      "size": 36998
+    },
+    {
+      "id": "Gavia",
+      "version": 1,
+      "format": 1,
+      "sha256": "7957c337ce7195e54671e477d489e6f1e3b1cb4abb181f75a53329e8a4a3f962",
+      "file": "Gavia.klim.bytes",
+      "size": 115465
+    },
+    {
+      "id": "Giau",
+      "version": 1,
+      "format": 1,
+      "sha256": "a8eeebf0645b5ae960d3688a13726eae155ce1e433f7f8047755b3d5491af695",
+      "file": "Giau.klim.bytes",
+      "size": 45562
+    },
+    {
+      "id": "Glandon",
+      "version": 1,
+      "format": 1,
+      "sha256": "f6b017c97430c2ffa48512a3a2ae705608b9141d2eba8ef3bfd8ac4ac50957c3",
+      "file": "Glandon.klim.bytes",
+      "size": 371735
+    },
+    {
+      "id": "GrandBallon",
+      "version": 1,
+      "format": 1,
+      "sha256": "d2769ef0f33fc1246feb3153f56e6a0ee2d28bc631b438c2b0cfbb8700c352bd",
+      "file": "GrandBallon.klim.bytes",
+      "size": 100281
+    },
+    {
+      "id": "GrandColombier_Culoz",
+      "version": 1,
+      "format": 1,
+      "sha256": "d0d491d002a7f187a0fef6642372d63b253563cf104875a193af64b274cedb9c",
+      "file": "GrandColombier_Culoz.klim.bytes",
+      "size": 66572
+    },
+    {
+      "id": "Granon",
+      "version": 1,
+      "format": 1,
+      "sha256": "e8b32ea4b9f038416af05c72d6cd7c7d2f25ecb271bba663ed097d2bc65b9367",
+      "file": "Granon.klim.bytes",
+      "size": 47303
+    },
+    {
+      "id": "Grimsel_Innertkirchen",
+      "version": 1,
+      "format": 1,
+      "sha256": "e06320e39598ed73db64eb21f7b49b5ec1685a0d702682a4be3f7f533e453289",
+      "file": "Grimsel_Innertkirchen.klim.bytes",
+      "size": 402750
+    },
+    {
+      "id": "Grossglockner_Heiligenblut",
+      "version": 1,
+      "format": 1,
+      "sha256": "535d58e285708eb55f84c2d3e08333821e525e7b39d03fff7734740f19e68afa",
+      "file": "Grossglockner_Heiligenblut.klim.bytes",
+      "size": 90985
+    },
+    {
+      "id": "Hautacam",
+      "version": 1,
+      "format": 1,
+      "sha256": "25120150c27882619b57a750b4653f82bc6cf7269e14407ddbf763a5d7980877",
+      "file": "Hautacam.klim.bytes",
+      "size": 64641
+    },
+    {
+      "id": "Izoard_Briancon",
+      "version": 1,
+      "format": 1,
+      "sha256": "b191e552ee5e8abd672864c5b07fab944204825323c7a823d21d55fe1922bf37",
+      "file": "Izoard_Briancon.klim.bytes",
+      "size": 198758
+    },
+    {
+      "id": "JouxPlane",
+      "version": 1,
+      "format": 1,
+      "sha256": "c0d1a960b9260dab8f2bea3a7bc2dded1618487fcef5f0acb23759bc7110166f",
+      "file": "JouxPlane.klim.bytes",
+      "size": 47919
+    },
+    {
+      "id": "Kapelmuur",
+      "version": 1,
+      "format": 1,
+      "sha256": "0416026cbd4f056a7b8514f2847ac3015b9c9a9c906848e0a437da1f04371566",
+      "file": "Kapelmuur.klim.bytes",
+      "size": 5594
+    },
+    {
+      "id": "Keutenberg",
+      "version": 1,
+      "format": 1,
+      "sha256": "ece5121d7731a5fd3c38162a16b8383a90af9131df04a283068654c6703e7a31",
+      "file": "Keutenberg.klim.bytes",
+      "size": 5758
+    },
+    {
+      "id": "Koppenberg",
+      "version": 1,
+      "format": 1,
+      "sha256": "617512fae1d43da0ec8f8d34b61849e245b24ae49acf7e1eefee4d0dc7fdfe4d",
+      "file": "Koppenberg.klim.bytes",
+      "size": 4342
+    },
+    {
+      "id": "LaRedoute",
+      "version": 1,
+      "format": 1,
+      "sha256": "7185a46fea6e3c9f6414228f6155ca7f6fca66bbc76b1123c864deb288b97326",
+      "file": "LaRedoute.klim.bytes",
+      "size": 9765
+    },
+    {
+      "id": "LagosDeCovadonga",
+      "version": 1,
+      "format": 1,
+      "sha256": "be3a9fbf57e3985bed5e33f3644c58b37dfa36f3da6d035b5122f0da49e00e4f",
+      "file": "LagosDeCovadonga.klim.bytes",
+      "size": 67456
+    },
+    {
+      "id": "LuzArdiden",
+      "version": 1,
+      "format": 1,
+      "sha256": "820525d4051b53bd0b11779cb862ce388cfb6f6df2081284f972e0b139f85a97",
+      "file": "LuzArdiden.klim.bytes",
+      "size": 73703
+    },
+    {
+      "id": "Madeleine_LaChambre",
+      "version": 1,
+      "format": 1,
+      "sha256": "66f3b836173e5fd5420ddee8050679fd804b9801b98747e39adfb173529bc111",
+      "file": "Madeleine_LaChambre.klim.bytes",
+      "size": 167225
+    },
+    {
+      "id": "Mantet_Sahorre",
+      "version": 1,
+      "format": 1,
+      "sha256": "932f3b2242ed809905615fe91a4cd67144e516ddfb347ea5a58efa7e462bdbc5",
+      "file": "Mantet_Sahorre.klim.bytes",
+      "size": 92687
+    },
+    {
+      "id": "MontVentoux_Bedoin",
+      "version": 1,
+      "format": 1,
+      "sha256": "35ef82cce30265d0f9822162f5a58e84536ae152f9c7a698661cb646355a45ed",
+      "file": "MontVentoux_Bedoin.klim.bytes",
+      "size": 182148
+    },
+    {
+      "id": "MontVentoux_Malaucene",
+      "version": 1,
+      "format": 1,
+      "sha256": "aa29df0a394ae0f8b4034926ac698799d772d9a78b322335ca644a2d04679339",
+      "file": "MontVentoux_Malaucene.klim.bytes",
+      "size": 119812
+    },
+    {
+      "id": "MontVentoux_Sault",
+      "version": 1,
+      "format": 1,
+      "sha256": "ba182ed5d362b13db1dad5481498e27d21932bcd1445d2ab8e3a4ce4a61e83a6",
+      "file": "MontVentoux_Sault.klim.bytes",
+      "size": 197329
+    },
+    {
+      "id": "Mortirolo",
+      "version": 1,
+      "format": 1,
+      "sha256": "c62d3842239043ab0db3440019349954664ffd5ae97374d9e69ad9d29ba6acaa",
+      "file": "Mortirolo.klim.bytes",
+      "size": 43356
+    },
+    {
+      "id": "MurDeHuy",
+      "version": 1,
+      "format": 1,
+      "sha256": "efd235430d06fa0b1dd885b55797c0a956e8a63a31c9cf5707894b064836bda9",
+      "file": "MurDeHuy.klim.bytes",
+      "size": 7947
+    },
+    {
+      "id": "Paterberg",
+      "version": 1,
+      "format": 1,
+      "sha256": "4a7415e9f16e8ac3255a108da8daed84264720a7537ddf2f626d4658752a8306",
+      "file": "Paterberg.klim.bytes",
+      "size": 4425
+    },
+    {
+      "id": "Peyresourde_Luchon",
+      "version": 1,
+      "format": 1,
+      "sha256": "6c2d13b0388b69bc03a257d03bc769c6e99582726c8db35e9d3dd42507e83cd6",
+      "file": "Peyresourde_Luchon.klim.bytes",
+      "size": 78352
+    },
+    {
+      "id": "PlancheDesBellesFilles",
+      "version": 1,
+      "format": 1,
+      "sha256": "1ce51504be4ad65a8fd31a13c3a7e288d2e8a21962dc37c73cebb5f2c255756f",
+      "file": "PlancheDesBellesFilles.klim.bytes",
+      "size": 25025
+    },
+    {
+      "id": "PlateauDeBeille",
+      "version": 1,
+      "format": 1,
+      "sha256": "e5c28cf091486a9abc67a2150b3980cc77c3baa0f6536236f31e9a95238ecb42",
+      "file": "PlateauDeBeille.klim.bytes",
+      "size": 52595
+    },
+    {
+      "id": "Pordoi_Arabba",
+      "version": 1,
+      "format": 1,
+      "sha256": "0ec6bbc2443f623b393eeff66d81073fdab031da3ec18490958df5124eeedfc5",
+      "file": "Pordoi_Arabba.klim.bytes",
+      "size": 49370
+    },
+    {
+      "id": "Pordoi_Canazei",
+      "version": 1,
+      "format": 1,
+      "sha256": "3f24575bd3dbc25203978d8e5308cf0989f5d69020f1ade04bfd964ef5ae5ae7",
+      "file": "Pordoi_Canazei.klim.bytes",
+      "size": 48625
+    },
+    {
+      "id": "PortDeBales",
+      "version": 1,
+      "format": 1,
+      "sha256": "bec991af65a7c721c021d98ab738ff37d3254122ed478a67b7a2a62992198504",
+      "file": "PortDeBales.klim.bytes",
+      "size": 178506
+    },
+    {
+      "id": "Stelvio_Bormio",
+      "version": 1,
+      "format": 1,
+      "sha256": "488d7b40073aaf408aaeb20c2bef6d5ae4dee64fee45680a9ce1253d442a6656",
+      "file": "Stelvio_Bormio.klim.bytes",
+      "size": 194305
+    },
+    {
+      "id": "Stelvio_Prato",
+      "version": 1,
+      "format": 1,
+      "sha256": "113efe56541fa4f9821635d58b8c17a0432b79206ff0b8196b664179316b72ca",
+      "file": "Stelvio_Prato.klim.bytes",
+      "size": 321375
+    },
+    {
+      "id": "Susten_Innertkirchen",
+      "version": 1,
+      "format": 1,
+      "sha256": "259a3530d7a0c20864ae96a628abaed40ff445d057d5db4468f4b0355f56d3c5",
+      "file": "Susten_Innertkirchen.klim.bytes",
+      "size": 249169
+    },
+    {
+      "id": "Telegraphe",
+      "version": 1,
+      "format": 1,
+      "sha256": "a311e775c4f5f2a08c1df5a920334e847608a7b2c34875fecf83933d7a4d853c",
+      "file": "Telegraphe.klim.bytes",
+      "size": 46081
+    },
+    {
+      "id": "Tourmalet_Luz",
+      "version": 1,
+      "format": 1,
+      "sha256": "f3661063dfe5cc9ed2fa0cd91eaa4e6c2023c108e4bf0c3dc5cac379a606472c",
+      "file": "Tourmalet_Luz.klim.bytes",
+      "size": 189242
+    },
+    {
+      "id": "Tourmalet_SainteMarie",
+      "version": 1,
+      "format": 1,
+      "sha256": "d4726009a628a7942a0d54dfb18d94e40b4a605aa7eb2e5b769a580b00652d1b",
+      "file": "Tourmalet_SainteMarie.klim.bytes",
+      "size": 196924
+    },
+    {
+      "id": "TreCime",
+      "version": 1,
+      "format": 1,
+      "sha256": "f7499de7bf0bc7c3aa57deb0e4c1d6c13d68e4ec433127175abc7542736ef83e",
+      "file": "TreCime.klim.bytes",
+      "size": 58852
+    },
+    {
+      "id": "Zoncolan_Ovaro",
+      "version": 1,
+      "format": 1,
+      "sha256": "2a94e8695953bacef94e3e4a00572fb1754284063acd3596954a385c4527ca91",
+      "file": "Zoncolan_Ovaro.klim.bytes",
+      "size": 55224
+    }
+  ]
+}

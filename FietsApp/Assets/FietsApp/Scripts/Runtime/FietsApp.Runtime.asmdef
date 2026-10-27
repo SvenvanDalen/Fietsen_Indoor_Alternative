@@ -5,6 +5,7 @@
         "FietsApp.Physics",
         "FietsApp.Trainers",
         "FietsApp.World",
+        "FietsApp.Climbs",
         "FietsApp.Recording",
         "FietsApp.Training",
         "FietsApp.Accounts",

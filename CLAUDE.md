@@ -27,7 +27,7 @@ Unity heeft op Windows geen Bluetooth LE; `Bridge/FietsBridge` (.NET 10, Windows
 
 ## Klimmen namaken (`tools/`)
 
-Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, hoogte uit SRTM) en een hoogtebestand van het landschap (`tools/terrain_from_tiles.py`), beide in `FietsApp/Assets/FietsApp/Routes/`. Maak daar een `Climb`-asset (menu *FietsApp/Klim*) met de bestanden, de boom- en bosgrens en de grond boven de boomgrens, en koppel die aan `RouteView`. Leg bij elke klim de bron vast in `docs/bronnen.md`, en controleer het profiel tegen de bekende cijfers van de klim met een test (zie `MontVentouxTests`). Alleen open data; Strava-segmenten alleen als eigen klim van de rijder (12.3), nooit in de catalogus of in de repo.
+Een klim is één klimpakket (zip) in `FietsApp/Assets/FietsApp/Resources/Klimmen/<id>.klim.bytes`: `klim.json` (naam, gebied, kerncijfers, begroeiing, ondergrond, herkenningspunt, bron en licentie), de GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, hoogte uit SRTM) en het landschap (`tools/terrain_from_tiles.py`). Zet de klim in `tools/climbs.json` en draai `python tools/build_climbs.py` (fantasieklimmen: `tools/fantasy_climb.py`); alleen opnieuw inpakken na een wijziging in `climbs.json` gaat met `--packages`. Het script hoogt de versie op en werkt `catalogus.json` bij; de app leest de pakketten tijdens het draaien (`FietsApp.Climbs`, `ClimbLibrary`), er zijn geen `Climb`-assets meer. Pakketten en catalogus op `main` pushen publiceert de klim voor alle geïnstalleerde apps, zonder release (story 4.16). Verander je wat de app uit een pakket leest, verhoog dan `FORMAT` in `tools/climb_package.py` én `ClimbPackage.Format`. Leg bij elke klim de bron vast in `docs/bronnen.md`, en controleer het profiel tegen de bekende cijfers van de klim met een test (zie `MontVentouxTests`). Alleen open data; Strava-segmenten alleen als eigen klim van de rijder (12.3), nooit in de catalogus of in de repo.
 
 ## Releases en updates
 
@@ -55,6 +55,7 @@ Code staat in `FietsApp/Assets/FietsApp/`, verdeeld over assembly definitions:
 | `FietsApp.Strava` | Strava-koppeling: OAuth-berichten, uploads, welke ritten nog moeten (`UploadQueue`) | `noEngineReferences` |
 | `FietsApp.Mobile` | Telefoon en tablet: hoe groot de interface wordt (`UiScale`) | `noEngineReferences` |
 | `FietsApp.Updates` | Updater: release-check, download, sha256, staging (`UpdateFlow`) | `noEngineReferences` |
+| `FietsApp.Climbs` | Klimpakketten lezen (`ClimbPackage`), meegeleverd + gedownload samenvoegen (`ClimbShelf`), online catalogus (`ClimbSync`) | `noEngineReferences` |
 | `FietsApp.Runtime` | MonoBehaviours: `RideController`, `Hud`, invoer, brugclient (`Bluetooth/`) | Mag Unity gebruiken |
 | `FietsApp.Tests.EditMode` | NUnit-tests | |
 

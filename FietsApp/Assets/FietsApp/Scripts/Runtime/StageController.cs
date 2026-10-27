@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FietsApp.Climbs;
 using FietsApp.Recording;
 using UnityEngine;
 using UnityEngine.UI;
@@ -71,8 +72,8 @@ namespace FietsApp
             _switching = false;
             ShowStatus();
             _toastText.text = _index == 0
-                ? $"<b>Etappe</b>: {_climbs.Count} klimmen, eerst {_climbs[0].displayName}"
-                : $"<b>Klim {_index + 1}/{_climbs.Count}</b>: op naar {_climbs[_index].displayName}";
+                ? $"<b>Etappe</b>: {_climbs.Count} klimmen, eerst {_climbs[0].Name}"
+                : $"<b>Klim {_index + 1}/{_climbs.Count}</b>: op naar {_climbs[_index].Name}";
             _toast.SetActive(true);
             _toastUntil = Time.unscaledTime + nextSeconds;
         }
@@ -86,7 +87,7 @@ namespace FietsApp
         void OnLegFinished(RideLog log)
         {
             if (!IsRunning) return;
-            _legs.Add(new StageLeg(_climbs[_index].displayName, log, log.SecondsBetween(routeView.ClimbStart, routeView.ClimbEnd)));
+            _legs.Add(new StageLeg(_climbs[_index].Name, log, log.SecondsBetween(routeView.ClimbStart, routeView.ClimbEnd)));
             _legDone = true; // pas in Update verder, zodat iedereen die op Finished wacht deze klim nog afhandelt
         }
 
@@ -116,8 +117,8 @@ namespace FietsApp
 
         void ShowStatus()
         {
-            _statusText.text = $"Etappe {_index + 1}/{_climbs.Count}: <b>{_climbs[_index].displayName}</b>" +
-                               (_index + 1 < _climbs.Count ? $"\n<size=16><color=#bbb>daarna {_climbs[_index + 1].displayName}</color></size>" : "");
+            _statusText.text = $"Etappe {_index + 1}/{_climbs.Count}: <b>{_climbs[_index].Name}</b>" +
+                               (_index + 1 < _climbs.Count ? $"\n<size=16><color=#bbb>daarna {_climbs[_index + 1].Name}</color></size>" : "");
             _status.SetActive(true);
         }
 

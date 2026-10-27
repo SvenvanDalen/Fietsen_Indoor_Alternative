@@ -4,8 +4,8 @@ Haalt open "terrain tiles" (Terrarium-PNG, AWS Open Data, o.a. uit SRTM) op voor
 leest de hoogtes uit en schrijft een regelmatig rooster in breedte- en lengtegraden naar een .bytes-bestand
 dat Unity direct kan inlezen. Alleen standaardbibliotheek:
 
-  python tools/terrain_from_tiles.py --gpx FietsApp/Assets/FietsApp/Routes/MontVentoux_Bedoin.gpx \\
-      --out FietsApp/Assets/FietsApp/Routes/MontVentoux_Bedoin.terrain.bytes
+  python tools/terrain_from_tiles.py --gpx tools/.cache/klimmen/MontVentoux_Bedoin.gpx \\
+      --out tools/.cache/klimmen/MontVentoux_Bedoin.terrain.bytes
 
 Bestandsformaat (little-endian), gelezen door FietsApp.World.GeoHeightField:
   "FDEM", int32 versie (1), double zuid, double west, double dlat, double dlon, int32 rijen, int32 kolommen,
