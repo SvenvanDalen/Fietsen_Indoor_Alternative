@@ -31,7 +31,7 @@ Een klim bestaat uit een GPX (`tools/route_from_osm.py`: weg uit OpenStreetMap, 
 
 ## Releases en updates
 
-Elke push naar `main` maakt via `.github/workflows/release.yml` een Windows-release; de app werkt zichzelf daarmee bij (`docs/releases.md`).
+Elke push naar `production` maakt via `.github/workflows/release.yml` een Windows-release; de app werkt zichzelf daarmee bij (`docs/releases.md`). De pipeline duurt lang, dus werk gaat gewoon naar `main` en de eigenaar zet af en toe een release klaar met een PR van `main` naar `production`. Open die PR alleen als de eigenaar erom vraagt.
 
 - Logica in `FietsApp.Updates` (engine-vrij, getest), lijm in `Runtime/Updates/` en `Runtime/Bluetooth/BridgeLauncher.cs`; ze draaien alleen in de Windows-speler, niet in de Editor.
 - `tools/installer/FietsApp.iss` maakt `FietsApp-Setup.exe` (Inno Setup); het updatescript neemt het verwijderprogramma (`unins*`) over uit de oude map, want dat zit niet in de zip.
@@ -39,6 +39,7 @@ Elke push naar `main` maakt via `.github/workflows/release.yml` een Windows-rele
 - Assetnamen (`FietsApp-Windows.zip`, `.sha256`) en de tag `v0.1.<run>` staan in de workflow én in `UpdateDecision`; wijzig ze samen.
 - Netwerk in de speler via `UnityWebRequest`, niet `HttpClient`: Mono's eigen TLS faalt daar op GitHub ("TrustFailure: Chain instance is empty"), terwijl het in de Editor wel werkt.
 - Lokaal proberen: bouw met `Unity.exe -batchmode -quit -projectPath FietsApp -buildTarget Win64 -buildWindows64Player <map>\FietsApp.exe` en start de speler met `-batchmode -nographics -logFile <log>`; zoek naar `[Update]`.
+- Prestaties meten: start de speler met `-benchmark` (en `-benchmark-climb <assetnaam>`, standaard `AlpeDHuez`) en `--no-update`; hij rijdt vijf stukken, schrijft `[Benchmark]` met fps in het log en sluit af. Voor de geïntegreerde GPU: zet in `HKCU\Software\Microsoft\DirectX\UserGpuPreferences` de waarde `GpuPreference=1;` op het pad van de exe en haal hem daarna weer weg.
 
 ## Unity-project (`FietsApp/`)
 

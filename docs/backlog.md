@@ -272,8 +272,8 @@ Epic: E3 · Fase: MVP · Prio: Must · Punten: 13 (eerst splitsen)
 
 Als rijder wil ik een 3D-weg langs een route zien.
 
-- [ ] Weg gegenereerd uit GPX
-- [ ] 60 fps op een gemiddelde laptop
+- [x] Weg gegenereerd uit GPX
+- [x] 60 fps op een gemiddelde laptop
 
 **Gesplitst (2026-10-15):**
 
@@ -282,6 +282,8 @@ Als rijder wil ik een 3D-weg langs een route zien.
 - 3.1c Rijder en camera volgen de route; de helling van de route gaat naar de rit (2 pt)
 - 3.1d Weg uit GPX, samen met 4.1 (3 pt)
 - 3.1e Prestaties: weg in stukken opdelen en alleen het zichtbare deel tekenen, 60 fps (3 pt)
+
+**Stand 3.1e (2026-10-27):** gemeten met de nieuwe prestatietest (`FietsApp.exe -benchmark [-benchmark-climb AlpeDHuez]`: rijdt vijf stukken van een klim, meet zonder vsync en schrijft `[Benchmark]` in het log). Op de geïntegreerde Intel Arc 140T (1920×1200, kwaliteit PC): Alpe d'Huez gemiddeld 173 fps (1% traagste beeldjes 94 fps), Stelvio vanaf Prato 139 fps (98 fps). Het terrein was al in stukken met grovere driehoeken op afstand; de weg zelf is één kleine mesh (2 hoekpunten per 10 m) en hoeft niet opgedeeld. Eén haper van 140 ms bij het begin van de eerste meting op Alpe d'Huez; verder nergens boven 40 ms.
 
 #### 3.2 Terrein dat past bij de klim
 
@@ -406,8 +408,8 @@ Epic: E4 · Fase: MVP · Prio: Must · Punten: 8
 
 Als rijder wil ik 5 startklimmen, waaronder vier echte iconen.
 
-- [ ] Stelvio, Alpe d'Huez, Mont Ventoux en Colle delle Finestre
-- [ ] Plus één fantasieklim
+- [x] Stelvio, Alpe d'Huez, Mont Ventoux en Colle delle Finestre
+- [x] Plus één fantasieklim
 
 **Stand (2026-10-15):** Mont Ventoux vanaf Bédoin is nagemaakt (21,4 km, 313 → 1887 m, gemiddeld 7,4%, max 12,5% per 100 m) met echte weg, echt landschap, boomgrens en zendmast. Bronnen in `docs/bronnen.md`. De pijplijn voor 4.1 en 4.2 is daarmee ook gebouwd.
 
@@ -416,6 +418,8 @@ Als rijder wil ik 5 startklimmen, waaronder vier echte iconen.
 **Stand (2026-10-16, later):** Passo dello Stelvio vanaf Prato erbij (SS38, 24,6 km, 911 → 2759 m, gemiddeld 7,5%, steilste km 9,6%, HC, 45 van de 48 haarspelden herkend). Nog te doen: Colle delle Finestre, een fantasieklim.
 
 **Stand (2026-10-16, Finestre):** Colle delle Finestre vanaf Susa erbij (17,9 km, 485 → 2158 m, gemiddeld 9,3%, HC), met de laatste 7,4 km als grindweg in beeld (extra rolweerstand volgt bij 4.13). De vier iconen staan er daarmee; nog te doen: een fantasieklim.
+
+**Stand (2026-10-27):** fantasieklim Bananenberg erbij (gebied Fantasie, 9,9 km, 1250 → 2105 m, gemiddeld 8,6%, HC): aanloop, een trap van acht haarspelden aan 9%, de muur "De Poort" van 600 m aan 17% (na gladstrijken ±16,6%), een adempauze en een finale aan 12% boven de boomgrens. Ontworpen in `tools/climbs.json` (veld `design`: weg en hellingsprofiel) en gebouwd met `tools/fantasy_climb.py`; de GPX ligt in de Noordzee, zodat de rit op Strava niet over een echte weg lijkt te gaan. Geen echt landschap: Unity verzint de bergen. Daarmee staan de vijf startklimmen er.
 
 #### 4.5 Bibliotheek met 50+ klimmen
 
@@ -1031,7 +1035,7 @@ Epic: E13 · Fase: MVP · Prio: Should · Punten: 5
 
 Als rijder wil ik de app voor Windows downloaden van GitHub en dat hij zichzelf daarna bijwerkt.
 
-- [ ] Elke push naar `main` maakt een GitHub Release met de app en de brug
+- [ ] Elke push naar `production` maakt een GitHub Release met de app en de brug (vanaf 2026-10-27; daarvoor `main`)
 - [ ] De app zet een nieuwere release op de achtergrond klaar en installeert hem bij afsluiten of via "Nu herstarten"
 - [ ] Mislukt de update, dan blijft de oude versie werken
 - [ ] De app start de meegeleverde brug zelf
