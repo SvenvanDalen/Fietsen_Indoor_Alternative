@@ -16,7 +16,7 @@ namespace FietsApp
     /// Een klim kiezen zet je aan de voet. Cijfertoetsen 1-9 kiezen, pijl links/rechts bladert. De knop Weerstand
     /// (of G) stelt in hoeveel van de helling de trainer laat voelen (story 2.3); dat wordt per klim onthouden.
     /// </summary>
-    public sealed class RideMenu : MonoBehaviour
+    public sealed class RideMenu : MonoBehaviour, IPanel
     {
         [SerializeField] RouteView routeView;
         [SerializeField] RideController ride;
@@ -266,6 +266,7 @@ namespace FietsApp
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0.5f, 1f);
             panel.anchoredPosition = new Vector2(0f, -190f); // onder de HUD-tegels en de statusregel
             panel.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.8f);
+            panel.gameObject.AddComponent<ScreenFit>(); // groter op een telefoon (story 14.2)
             _panel = panel.gameObject;
             _panelRect = panel;
 

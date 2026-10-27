@@ -84,6 +84,7 @@ namespace FietsApp
             corner.anchorMin = corner.anchorMax = corner.pivot = new Vector2(1f, 1f);
             corner.anchoredPosition = new Vector2(-24f, -24f);
             corner.sizeDelta = new Vector2(150f, 100f);
+            corner.gameObject.AddComponent<ScreenFit>(); // groter op een telefoon (story 14.2)
             (_, _buttonLabel) = UiFactory.Button(corner, "Pauzeknop", Vector2.zero, 150f, 44f, Toggle);
             UiFactory.Button(corner, "Opslaanknop", new Vector2(0f, -54f), 150f, 44f, SaveRide).label.text = "Opslaan (O)";
 

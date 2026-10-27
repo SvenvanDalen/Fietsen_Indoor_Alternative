@@ -9,7 +9,7 @@ namespace FietsApp
     /// Strava-paneel (story 5.2): S opent het. Client ID en Client Secret van je eigen Strava-API-app invullen, koppelen
     /// via de browser, en zien wat er naar Strava gaat. De rit staat stil zolang het paneel open is.
     /// </summary>
-    public sealed class StravaView : MonoBehaviour
+    public sealed class StravaView : MonoBehaviour, IPanel
     {
         [SerializeField] StravaAccount strava;
         [SerializeField] RideController ride;

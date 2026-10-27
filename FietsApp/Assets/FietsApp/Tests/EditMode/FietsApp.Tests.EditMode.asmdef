@@ -13,7 +13,8 @@
         "FietsApp.Training",
         "FietsApp.Accounts",
         "FietsApp.Updates",
-        "FietsApp.Strava"
+        "FietsApp.Strava",
+        "FietsApp.Mobile"
     ],
     "includePlatforms": [
         "Editor"

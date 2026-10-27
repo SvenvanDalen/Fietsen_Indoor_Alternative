@@ -11,6 +11,7 @@
         "FietsApp.Accounts",
         "FietsApp.Updates",
         "FietsApp.Strava",
+        "FietsApp.Mobile",
         "Unity.InputSystem",
         "UnityEngine.UI",
         "Unity.Burst",

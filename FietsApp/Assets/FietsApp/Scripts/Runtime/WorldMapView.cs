@@ -19,7 +19,7 @@ namespace FietsApp
     /// Het is ook het overzicht van je badges (story 9.1): uitgereden klimmen krijgen een gouden ruit, per gebied en
     /// in de titel staat hoeveel je er hebt.
     /// </summary>
-    public sealed class WorldMapView : MonoBehaviour
+    public sealed class WorldMapView : MonoBehaviour, IPanel
     {
         [SerializeField] RouteView routeView;
         [SerializeField] RideMenu rideMenu;

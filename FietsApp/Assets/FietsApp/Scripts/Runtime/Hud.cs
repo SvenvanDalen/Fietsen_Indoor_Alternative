@@ -84,7 +84,7 @@ namespace FietsApp
 
         void ApplyScale()
         {
-            if (_root != null) _root.localScale = Vector3.one * scale;
+            if (_root != null) _root.GetComponent<ScreenFit>().BaseScale = scale;
         }
 
         void BuildCanvas()
@@ -102,6 +102,8 @@ namespace FietsApp
             _root.SetParent(canvasGo.transform, false);
             _root.anchorMin = _root.anchorMax = _root.pivot = new Vector2(0.5f, 1f);
             _root.anchoredPosition = new Vector2(0f, -24f);
+            _root.sizeDelta = new Vector2(4 * TileWidth + 60f, TileHeight + 48f); // tegels plus statusregel
+            _root.gameObject.AddComponent<ScreenFit>(); // groter op een telefoon (story 14.2)
             ApplyScale();
 
             _power = AddTile("VERMOGEN", "W", 0);
