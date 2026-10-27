@@ -6,7 +6,7 @@ rit op Strava niet over een echte weg lijkt te gaan) en schrijft een GPX naar Fi
 Er is geen hoogtebestand van het landschap; Unity maakt er verzonnen bergen omheen.
 
   python tools/fantasy_climb.py                 # alle fantasieklimmen
-  python tools/fantasy_climb.py --only Hemelpoort
+  python tools/fantasy_climb.py --only Bananenberg
 
 Na afloop: in Unity menu FietsApp > Klimmen bijwerken.
 """

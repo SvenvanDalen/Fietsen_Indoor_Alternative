@@ -334,7 +334,7 @@ Als rijder wil ik 5 startklimmen, waaronder vier echte iconen.
 
 **Stand (2026-10-16, Finestre):** Colle delle Finestre vanaf Susa erbij (17,9 km, 485 → 2158 m, gemiddeld 9,3%, HC), met de laatste 7,4 km als grindweg in beeld (extra rolweerstand volgt bij 4.13). De vier iconen staan er daarmee; nog te doen: een fantasieklim.
 
-**Stand (2026-10-27):** fantasieklim Hemelpoort erbij (gebied Fantasie, 9,9 km, 1250 → 2105 m, gemiddeld 8,6%, HC): aanloop, een trap van acht haarspelden aan 9%, de muur "De Poort" van 600 m aan 17% (na gladstrijken ±16,6%), een adempauze en een finale aan 12% boven de boomgrens. Ontworpen in `tools/climbs.json` (veld `design`: weg en hellingsprofiel) en gebouwd met `tools/fantasy_climb.py`; de GPX ligt in de Noordzee, zodat de rit op Strava niet over een echte weg lijkt te gaan. Geen echt landschap: Unity verzint de bergen. Daarmee staan de vijf startklimmen er.
+**Stand (2026-10-27):** fantasieklim Bananenberg erbij (gebied Fantasie, 9,9 km, 1250 → 2105 m, gemiddeld 8,6%, HC): aanloop, een trap van acht haarspelden aan 9%, de muur "De Poort" van 600 m aan 17% (na gladstrijken ±16,6%), een adempauze en een finale aan 12% boven de boomgrens. Ontworpen in `tools/climbs.json` (veld `design`: weg en hellingsprofiel) en gebouwd met `tools/fantasy_climb.py`; de GPX ligt in de Noordzee, zodat de rit op Strava niet over een echte weg lijkt te gaan. Geen echt landschap: Unity verzint de bergen. Daarmee staan de vijf startklimmen er.
 
 #### 4.5 Bibliotheek met 50+ klimmen
 

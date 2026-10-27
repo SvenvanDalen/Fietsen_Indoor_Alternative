@@ -259,9 +259,9 @@ namespace FietsApp.Tests
         }
     }
 
-    public class HemelpoortTests
+    public class BananenbergTests
     {
-        const string GpxPath = "Assets/FietsApp/Routes/Hemelpoort.gpx";
+        const string GpxPath = "Assets/FietsApp/Routes/Bananenberg.gpx";
 
         static Route Load() => ClimbImport.FromGpx(Gpx.Parse(File.ReadAllText(GpxPath, Encoding.UTF8)));
 

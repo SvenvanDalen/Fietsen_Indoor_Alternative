@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="FietsApp tools/fantasy_climb.py" xmlns="http://www.topografix.com/GPX/1/1">
   <metadata>
-    <name>Hemelpoort</name>
+    <name>Bananenberg</name>
     <desc>Fantasieklim: verzonnen weg en hoogte, geen echte plek.</desc>
   </metadata>
   <trk>
-    <name>Hemelpoort</name>
+    <name>Bananenberg</name>
     <trkseg>
       <trkpt lat="53.300000" lon="3.600000"><ele>1250.0</ele></trkpt>
       <trkpt lat="53.300045" lon="3.600000"><ele>1250.2</ele></trkpt>
