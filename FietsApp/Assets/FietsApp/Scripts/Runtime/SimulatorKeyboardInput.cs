@@ -20,7 +20,9 @@ namespace FietsApp
         {
             var kb = UiFactory.IsTyping ? null : Keyboard.current; // niet tijdens typen in een tekstveld
             if (kb == null) return;
-            _ride.Brake = kb.spaceKey.isPressed ? 1f : 0f;
+            // Alleen bij indrukken en loslaten, zodat de remknop van de TouchBar (story 14.2) ook werkt.
+            if (kb.spaceKey.wasPressedThisFrame) _ride.Brake = 1f;
+            if (kb.spaceKey.wasReleasedThisFrame) _ride.Brake = 0f;
             if (_ride.Trainer != _ride.Simulator) return;
 
             float step = kb.shiftKey.isPressed ? 50f : 10f;

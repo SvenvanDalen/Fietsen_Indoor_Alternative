@@ -103,6 +103,7 @@ namespace FietsApp
             panel.anchoredPosition = new Vector2(-24f, 24f);
             panel.sizeDelta = new Vector2(Width, Height);
             panel.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.55f);
+            panel.gameObject.AddComponent<ScreenFit>(); // groter op een telefoon (story 14.2)
             panel.GetComponent<Image>().raycastTarget = false;
             _panel = panel.gameObject;
 

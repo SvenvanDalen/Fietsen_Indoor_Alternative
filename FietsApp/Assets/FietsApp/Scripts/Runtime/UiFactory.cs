@@ -60,6 +60,7 @@ namespace FietsApp
             rt.anchoredPosition = position;
             rt.sizeDelta = size;
             rt.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);
+            rt.gameObject.AddComponent<ScreenFit>(); // groter op een telefoon (story 14.2)
             return rt;
         }
 

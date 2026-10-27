@@ -11,7 +11,7 @@ namespace FietsApp.Bluetooth
     /// trainers en sensoren en hun signaalsterkte; klik op een apparaat om te verbinden of te
     /// ontkoppelen. Toets B toont of verbergt het paneel.
     /// </summary>
-    public sealed class DeviceScanPanel : MonoBehaviour
+    public sealed class DeviceScanPanel : MonoBehaviour, IPanel
     {
         [SerializeField] BridgeClient bridge;
         [SerializeField] BridgeTrainerLink link;
@@ -70,6 +70,10 @@ namespace FietsApp.Bluetooth
 
         /// <summary>Toont het paneel (vanaf het startscherm).</summary>
         public void Show() => _panel.SetActive(true);
+
+        public bool IsOpen => _panel != null && _panel.activeSelf;
+
+        public void Close() => _panel.SetActive(false);
 
         void OnConnectionChanged(bool connected)
         {
@@ -179,6 +183,7 @@ namespace FietsApp.Bluetooth
             panel.anchoredPosition = new Vector2(24f, 24f);
             panel.sizeDelta = new Vector2(Width, height);
             panel.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);
+            panel.gameObject.AddComponent<ScreenFit>(); // groter op een telefoon (story 14.2)
             _panel = panel.gameObject;
 
             float y = -12f;

@@ -11,7 +11,7 @@ namespace FietsApp
     /// (en dus ook naar de Gist); de fiets telt met zijn gewicht en luchtweerstand mee in de fysica.
     /// De rit staat stil zolang het paneel open is.
     /// </summary>
-    public sealed class AvatarView : MonoBehaviour
+    public sealed class AvatarView : MonoBehaviour, IPanel
     {
         [SerializeField] RideController ride;
         [SerializeField] RiderView riderView;
