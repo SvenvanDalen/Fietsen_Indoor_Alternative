@@ -532,11 +532,13 @@ Epic: E4 · Fase: V2 · Prio: Should · Punten: 5
 
 Als ontwikkelaar wil ik dat elke klim één vast pakket is dat de app tijdens het draaien inleest, zodat een klim data is en geen Unity-asset.
 
-- [ ] Pakket met `klim.json` (naam, gebied, land, kerncijfers, begroeiing, ondergrond, herkenningspunt, bron en licentie), de GPX en het landschap
-- [ ] Versienummer van het formaat in het pakket
-- [ ] `tools/build_climbs.py` maakt de pakketten
-- [ ] De app laadt klimmen uit pakketten in plaats van uit `Climb`-assets
-- [ ] De bestaande klimmen omgezet; `ClimbLibraryTests` draait op de pakketten
+- [x] Pakket met `klim.json` (naam, gebied, land, kerncijfers, begroeiing, ondergrond, herkenningspunt, bron en licentie), de GPX en het landschap
+- [x] Versienummer van het formaat in het pakket
+- [x] `tools/build_climbs.py` maakt de pakketten
+- [x] De app laadt klimmen uit pakketten in plaats van uit `Climb`-assets
+- [x] De bestaande klimmen omgezet; `ClimbLibraryTests` draait op de pakketten
+
+**Stand (2026-10-27):** gebouwd (PR #180). 56 klimmen omgezet naar pakketten in `Resources/Klimmen/`; zie de besluiten Klimpakket en Klimmen zonder release.
 
 #### 4.16 Klimmen toevoegen zonder nieuwe release
 
@@ -544,11 +546,13 @@ Epic: E4 · Fase: V2 · Prio: Should · Punten: 8
 
 Als rijder wil ik nieuwe klimmen krijgen zonder dat de app een nieuwe versie nodig heeft.
 
-- [ ] Online catalogus (per klim versie en sha256 van het pakket uit 4.15), gratis op GitHub
-- [ ] De app haalt bij het opstarten de catalogus op (`UnityWebRequest`), downloadt nieuwe of gewijzigde pakketten op de achtergrond en controleert de sha256
-- [ ] Zonder internet werken de meegeleverde en al gedownloade klimmen
-- [ ] Een klim publiceren is een push naar de catalogus, zonder app-release
-- [ ] Een pakket met een nieuwer formaat dan de app kent wordt overgeslagen met een melding
+- [x] Online catalogus (per klim versie en sha256 van het pakket uit 4.15), gratis op GitHub
+- [x] De app haalt bij het opstarten de catalogus op (`UnityWebRequest`), downloadt nieuwe of gewijzigde pakketten op de achtergrond en controleert de sha256
+- [x] Zonder internet werken de meegeleverde en al gedownloade klimmen
+- [x] Een klim publiceren is een push naar de catalogus, zonder app-release
+- [x] Een pakket met een nieuwer formaat dan de app kent wordt overgeslagen met een melding
+
+**Stand (2026-10-27):** gebouwd (PR #180). Catalogus live op `main`; nog niet geprobeerd in een gebouwde speler (volgt bij de volgende release).
 
 #### 4.17 Fantasiegebergte
 
