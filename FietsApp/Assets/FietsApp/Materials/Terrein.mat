@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Terrein
+  m_Shader: {fileID: 4800000, guid: 06fdd4d1e7c0d934eb1dc5f65885c468, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BareMap:
+        m_Texture: {fileID: 2800000, guid: 89683aa3e2eebe24aaa0cfaa930fe008, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BareNormal:
+        m_Texture: {fileID: 2800000, guid: 51bb8d4502833a347977e295fe9e9089, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ForestMap:
+        m_Texture: {fileID: 2800000, guid: 4998bd33be8ff2946b86d23f6ba284a8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ForestNormal:
+        m_Texture: {fileID: 2800000, guid: 87d65c2ba38ea9847a65c710b149bf55, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GrassMap:
+        m_Texture: {fileID: 2800000, guid: a349cb9a836e32b4fb777baa4debcf69, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GrassNormal:
+        m_Texture: {fileID: 2800000, guid: 7f7b6d7c7874aad4a94c73c224d6ca57, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RockMap:
+        m_Texture: {fileID: 2800000, guid: c5a6dd2955bc1e641906568eaf2ee87b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RockNormal:
+        m_Texture: {fileID: 2800000, guid: 15ee2b94a622d8d47923dbed1c7f0391, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _FarDistance: 120
+    - _FarScale: 7
+    - _MacroStrength: 0.3
+    - _NormalDistance: 80
+    - _NormalStrength: 1
+    - _Smoothness: 0.08
+    m_Colors:
+    - _DryGrass: {r: 0.86, g: 0.8, b: 0.52, a: 1}
+    - _TileSize: {r: 4, g: 10, b: 3, a: 4}
+    - _Tint0: {r: 0.8, g: 0.95, b: 0.7, a: 1}
+    - _Tint1: {r: 0.95, g: 0.93, b: 0.9, a: 1}
+    - _Tint2: {r: 0.8, g: 0.82, b: 0.84, a: 1}
+    - _Tint3: {r: 0.5, g: 0.58, b: 0.4, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

@@ -18,11 +18,14 @@ namespace FietsApp.World
         public float TreeLineAt(float x, float z) =>
             _settings.TreeLine + _noise.Fbm(x / 400f, z / 400f, octaves: 3) * _settings.TreeLineVariation;
 
+        /// <summary>Waar het bos begint, met dezelfde golving als de boomgrens.</summary>
+        public float ForestFromAt(float x, float z) =>
+            _settings.ForestFrom + _noise.Fbm(x / 400f + 50f, z / 400f, octaves: 3) * _settings.TreeLineVariation;
+
         public bool IsAboveTreeLine(float x, float z, float elevation) => elevation > TreeLineAt(x, z);
 
         /// <summary>In de boszone: boven de bosgrens (met dezelfde golving) en onder de boomgrens.</summary>
         public bool IsForest(float x, float z, float elevation) =>
-            elevation > _settings.ForestFrom + _noise.Fbm(x / 400f + 50f, z / 400f, octaves: 3) * _settings.TreeLineVariation
-            && !IsAboveTreeLine(x, z, elevation);
+            elevation > ForestFromAt(x, z) && !IsAboveTreeLine(x, z, elevation);
     }
 }
