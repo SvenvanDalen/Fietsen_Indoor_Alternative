@@ -90,6 +90,7 @@ De Colle delle Finestre heeft geen doorlopend wegnummer in OSM (alleen het stuk 
 - **OpenStreetMap**: © OpenStreetMap-bijdragers, Open Database License (ODbL). De GPX-bestanden zijn afgeleid van OSM-data en vallen daarom ook onder de ODbL. In de app vermelden: "Wegen © OpenStreetMap-bijdragers".
 - **SRTM** (NASA/USGS): publiek domein. Opgehaald via de gratis OpenTopoData-API (max. 100 punten per verzoek, 1 per seconde, 1000 per dag).
 - **Terrain Tiles** (AWS Open Data, oorspronkelijk Mapzen/Tilezen): samengesteld uit o.a. SRTM, GMTED en EU-DEM. Naamsvermelding volgens de Tilezen-richtlijnen; voor Europa onder meer "Produced using Copernicus data and information funded by the European Union – EU-DEM layers".
+- **ambientCG** (ambientcg.com): CC0, geen naamsvermelding nodig. Texturen (1K, kleur en OpenGL-normal map) in `Assets/FietsApp/Textures/`: Grass004 (gras), Rock030 (rots), Gravel023 (kalksteen boven de boomgrens, ook berm en grindweg), Ground037 (bosbodem), Asphalt033 (asfalt).
 
 ## Bewust niet gebruikt
 

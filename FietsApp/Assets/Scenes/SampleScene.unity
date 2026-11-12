@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_FogMode: 3
-  m_FogDensity: 0.01
+  m_Fog: 1
+  m_FogColor: {r: 0.72, g: 0.79, b: 0.87, a: 1}
+  m_FogMode: 2
+  m_FogDensity: 0.00028
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: b8734ddf08e36c046894b70ecae30b41, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -283,7 +283,7 @@ MonoBehaviour:
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 1
-  m_Antialiasing: 0
+  m_Antialiasing: 2
   m_AntialiasingQuality: 2
   m_StopNaN: 0
   m_Dithering: 0
@@ -1184,14 +1184,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.TerrainView
   routeView: {fileID: 1397060718}
-  grassMaterial: {fileID: 2100000, guid: caaaffd3d68fab74f867d126b2363295, type: 2}
-  darkGrassMaterial: {fileID: 2100000, guid: 32a1bd9156cbeb0488e6b4ecb4404640, type: 2}
-  rockMaterial: {fileID: 2100000, guid: fb0a0a11cc33e034c9fbd66d4fceb414, type: 2}
+  terrainMaterial: {fileID: 2100000, guid: 8882b3e20fb280141bd52239cad68ac9, type: 2}
   trunkMaterial: {fileID: 2100000, guid: 9a6c0a435b374504a91bd8cf5e68f78a, type: 2}
   leavesMaterial: {fileID: 2100000, guid: 3b901b215139b24498d587b1f3df0f80, type: 2}
   stoneMaterial: {fileID: 2100000, guid: aff483c4dd7c9184dbd1ede8ea43187a, type: 2}
-  bareMaterial: {fileID: 2100000, guid: d5f0476f4e0300247a1f3ef7fb49174c, type: 2}
-  forestMaterial: {fileID: 2100000, guid: 9d1137bb88e179448a96a351d4dc0636, type: 2}
   seed: 42
 --- !u!114 &1397060721
 MonoBehaviour:
@@ -1239,6 +1235,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FietsApp.Runtime::FietsApp.PauseController
   ride: {fileID: 1293722325}
   rideMenu: {fileID: 884605691}
+  recorder: {fileID: 0}
 --- !u!4 &1513543191
 Transform:
   m_ObjectHideFlags: 0
