@@ -67,5 +67,20 @@ namespace FietsApp.Tests
 
             StringAssert.Contains("top niet gehaald", RideSummaryText.Of(log, null, 0f));
         }
+
+        [Test]
+        public void AscentBetweenCountsOnlyTheClimb()
+        {
+            var log = Log(50); // elke seconde 1 m erbij, 10 m verder: voet op 100 m, top op 300 m
+            Assert.That(log.AscentBetween(100f, 300f), Is.EqualTo(20f).Within(1e-3));
+        }
+
+        [Test]
+        public void SummaryShowsClimbNumbersWhenGiven()
+        {
+            var log = Log(50);
+            StringAssert.Contains("Klimcijfers:</color>  <b>4.17 W/kg", RideSummaryText.Of(log, 21, 300f, "4.17 W/kg"));
+            StringAssert.DoesNotContain("Klimcijfers", RideSummaryText.Of(log, 21, 300f));
+        }
     }
 }

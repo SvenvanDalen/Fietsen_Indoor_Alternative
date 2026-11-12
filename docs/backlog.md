@@ -659,8 +659,8 @@ Epic: E6 · Fase: V2 · Prio: Should · Punten: 2
 
 Als rijder wil ik W/kg en VAM zien, de getallen waarmee klimmers zich meten.
 
-- [ ] W/kg (3 s) en VAM in de HUD tijdens een klim
-- [ ] VAM en gemiddeld W/kg per klim in de ritsamenvatting (5.3)
+- [x] W/kg (3 s) en VAM in de HUD tijdens een klim
+- [x] VAM en gemiddeld W/kg per klim in de ritsamenvatting (5.3)
 
 #### 6.6 Vooruitblik op de helling
 

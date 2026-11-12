@@ -15,7 +15,8 @@ namespace FietsApp.Recording
 
         /// <param name="climbSeconds">Klimtijd van voet tot top, of null als de top niet gehaald is.</param>
         /// <param name="climbWatts">Gemiddeld vermogen op de klim.</param>
-        public static string Of(RideLog log, double? climbSeconds, float climbWatts)
+        /// <param name="climbNumbers">W/kg en VAM op de klim (story 6.5), kant-en-klaar; leeg laat de regel weg.</param>
+        public static string Of(RideLog log, double? climbSeconds, float climbWatts, string climbNumbers = "")
         {
             var sb = new StringBuilder();
             Line(sb, "Tijd", Clock(log.TimerSeconds));
@@ -24,6 +25,7 @@ namespace FietsApp.Recording
             Line(sb, "Klimtijd", climbSeconds.HasValue
                 ? $"{Clock(climbSeconds.Value)}  <color=#bbb>(gemiddeld {climbWatts:0} W)</color>"
                 : "<color=#bbb>top niet gehaald</color>");
+            if (!string.IsNullOrEmpty(climbNumbers)) Line(sb, "Klimcijfers", climbNumbers);
             Line(sb, "Hoogtemeters", $"{log.Ascent:0} m");
             if (log.AverageHeartRate > 0f) Line(sb, "Hartslag", $"{log.AverageHeartRate:0} bpm  <color=#bbb>(max {log.MaxHeartRate:0})</color>");
             return sb.ToString().TrimEnd('\n');

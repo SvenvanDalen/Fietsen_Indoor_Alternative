@@ -1,3 +1,4 @@
+using FietsApp.Training;
 using FietsApp.Recording;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -86,7 +87,11 @@ namespace FietsApp
             string name = recorder.ClimbName ?? "Rit";
             var climb = log.SecondsBetween(routeView.ClimbStart, routeView.ClimbEnd);
             _title.text = $"<b>{name}</b>  <color=#bbb>ritsamenvatting</color>";
-            _body.text = RideSummaryText.Of(log, climb, log.AveragePowerBetween(routeView.ClimbStart, routeView.ClimbEnd)) +
+            float climbWatts = log.AveragePowerBetween(routeView.ClimbStart, routeView.ClimbEnd);
+            string numbers = climb is double seconds
+                ? $"{RiderNumbers.WattsPerKg(climbWatts, ProfileStore.Current.weightKg):0.00} W/kg  <color=#bbb>(VAM {RiderNumbers.Vam(log.AscentBetween(routeView.ClimbStart, routeView.ClimbEnd), seconds):0} m/u)</color>"
+                : "";
+            _body.text = RideSummaryText.Of(log, climb, climbWatts, numbers) +
                          (_recordLine != null ? $"\n<color=#bbb>Record:</color>  <b>{_recordLine}</b>" : "");
             _panel.SetActive(true);
         }
