@@ -66,6 +66,16 @@ namespace FietsApp.Recording
             }
         }
 
+        /// <summary>Opgetelde stijging in meters tussen twee afstanden op de route (bijv. voet en top van de klim).</summary>
+        public float AscentBetween(float start, float end)
+        {
+            float total = 0f;
+            for (int i = 1; i < _samples.Count; i++)
+                if (_samples[i - 1].DistanceM >= start && _samples[i].DistanceM <= end)
+                    total += Math.Max(0f, _samples[i].Elevation - _samples[i - 1].Elevation);
+            return total;
+        }
+
         /// <summary>
         /// Gereden tijd (s, zonder pauzes) waarop de rit afstand <paramref name="distance"/> passeerde, tussen twee metingen
         /// in geïnterpoleerd; 0 als de rit daar al voorbij begon, null als hij er (nog) niet kwam.

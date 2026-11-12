@@ -18,12 +18,14 @@ namespace FietsApp
         const float TileWidth = 220f;
         const float TileHeight = 120f;
         const float ZoneSeconds = 3f;
+        const float VamSeconds = 60f;
         static readonly Color TileColor = new Color(0f, 0f, 0f, 0.55f);
 
         RectTransform _root;
         Text _power, _cadence, _speed, _heartRate, _status, _powerCaption;
         Image _powerTile, _zoneBar;
         readonly RollingAverage _zonePower = new RollingAverage(ZoneSeconds);
+        readonly RollingAverage _climbRate = new RollingAverage(VamSeconds); // stijgsnelheid in m/s, voor VAM (story 6.5)
 
         void Awake()
         {
@@ -45,12 +47,17 @@ namespace FietsApp
             _speed.text = $"{ride.SpeedMs * 3.6f:0.0}";
             _heartRate.text = t.HeartRateBpm > 0f ? $"{t.HeartRateBpm:0}" : "--";
 
+            _climbRate.Add(ride.SpeedMs * ride.GradePercent / 100f, Time.deltaTime);
             int seconds = (int)ride.ElapsedSeconds;
             _status.text =
                 $"{t.Name}{(t.IsConnected ? "" : " (niet verbonden)")}   " +
                 (t.ErgWatts > 0f
                     ? $"helling {ride.GradePercent:0.0}%   <color=#ffd060>ERG {t.ErgWatts:0} W</color>   "
                     : $"helling {ride.GradePercent:0.0}% (trainer {t.GradePercent:0.0}%)   ") +
+                (_zonePower.Value >= 1.0
+                    ? $"{RiderNumbers.WattsPerKg(_zonePower.Value, ProfileStore.Current.weightKg):0.0} W/kg" : "") +
+                (ride.GradePercent > 1f && _climbRate.Duration >= 10.0
+                    ? $"   VAM {RiderNumbers.Vam(_climbRate.Value, 1.0):0}   " : "   ") +
                 $"{ride.DistanceM / 1000f:0.00} km   {seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}" +
                 (ride.Surface != FietsApp.World.Surface.Asphalt
                     ? $"   <color=#e0c890>{FietsApp.World.Surfaces.Label(ride.Surface)}</color>" : "") +
